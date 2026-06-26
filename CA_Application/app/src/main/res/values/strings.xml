@@ -1,0 +1,38 @@
+<resources>
+    <string name="app_name">Wellness AI</string>
+
+    <!-- Auth -->
+    <string name="login">Login</string>
+    <string name="logout">Logout</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="register">Register</string>
+
+    <!-- Wellness -->
+    <string name="sleep_hours">Sleep Hours</string>
+    <string name="exercise_activity">Exercise Activity</string>
+    <string name="exercise_duration">Duration (mins)</string>
+    <string name="record_date">Date</string>
+    <string name="save_record">Save Record</string>
+    <string name="delete_record">Delete Record</string>
+    <string name="edit_record">Edit Record</string>
+
+    <!-- Chat -->
+    <string name="chat_title">AI Wellness Assistant</string>
+    <string name="send">Send</string>
+    <string name="type_message">Type a message…</string>
+
+    <!-- Agentic AI -->
+    <string name="recommendations">AI Recommendations</string>
+    <string name="get_recommendations">Get Recommendations</string>
+
+    <!-- Navigation -->
+    <string name="dashboard">Dashboard</string>
+    <string name="view_records">View Records</string>
+    <string name="add_record">Add Record</string>
+    <string name="chat">Chat</string>
+
+    <!-- Network -->
+    <string name="network_error">Network error. Please try again.</string>
+    <string name="session_expired">Session expired. Please login again.</string>
+</resources>
