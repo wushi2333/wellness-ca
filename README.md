@@ -55,8 +55,3 @@ Android App ──HTTP──→ FastAPI (:8000) ──→ DeepSeek API
 - **Aiven MySQL** accessed only through FastAPI — never directly from mobile
 - **JWT** authentication on all protected endpoints
 - **X-API-Token** gateway guard on all endpoints
-
-## Authors
-
-- Backend: Xia Zihang
-- Android: Team members
