@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+        Predefined typography scales for team members.
+        Reference in layouts via:
+          android:textAppearance="@style/Heading1"
+          android:textAppearance="@style/Body"
+          android:textAppearance="@style/Caption"
+    -->
+
+    <!-- Headings -->
+    <style name="Heading1" parent="TextAppearance.Material3.HeadlineLarge">
+        <item name="fontFamily">@font/segoe_ui</item>
+        <item name="android:textSize">28sp</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:fontWeight">700</item>
+    </style>
+
+    <style name="Heading2" parent="TextAppearance.Material3.HeadlineMedium">
+        <item name="fontFamily">@font/segoe_ui</item>
+        <item name="android:textSize">22sp</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:fontWeight">700</item>
+    </style>
+
+    <style name="Heading3" parent="TextAppearance.Material3.HeadlineSmall">
+        <item name="fontFamily">@font/segoe_ui</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:fontWeight">600</item>
+    </style>
+
+    <!-- Body text -->
+    <style name="BodyLarge" parent="TextAppearance.Material3.BodyLarge">
+        <item name="fontFamily">@font/segoe_ui</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:fontWeight">400</item>
+    </style>
+
+    <style name="Body" parent="TextAppearance.Material3.BodyMedium">
+        <item name="fontFamily">@font/segoe_ui</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:fontWeight">400</item>
+    </style>
+
+    <!-- Captions / labels -->
+    <style name="Caption" parent="TextAppearance.Material3.BodySmall">
+        <item name="fontFamily">@font/segoe_ui</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:fontWeight">400</item>
+    </style>
+
+    <style name="Label" parent="TextAppearance.Material3.LabelMedium">
+        <item name="fontFamily">@font/segoe_ui</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:textColor">@color/text_hint</item>
+        <item name="android:fontWeight">500</item>
+        <item name="android:letterSpacing">0.05</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+
+    <!-- Buttons -->
+    <style name="ButtonText" parent="TextAppearance.Material3.LabelLarge">
+        <item name="fontFamily">@font/segoe_ui</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/on_primary</item>
+        <item name="android:fontWeight">600</item>
+    </style>
+
+    <!-- Chat message text -->
+    <style name="ChatMessage" parent="TextAppearance.Material3.BodyMedium">
+        <item name="fontFamily">@font/segoe_ui</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontWeight">400</item>
+        <item name="android:lineSpacingExtra">4sp</item>
+    </style>
+
+</resources>

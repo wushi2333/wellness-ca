@@ -1,9 +1,18 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.CA_Application" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
-    </style>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base Material 3 theme with Segoe UI font -->
+    <style name="Theme.CA_Application" parent="Theme.Material3.Light.NoActionBar">
+        <!-- Colors -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/secondary</item>
+        <item name="colorOnPrimary">@color/on_primary</item>
+        <item name="android:colorBackground">@color/background</item>
+        <item name="colorSurface">@color/surface</item>
+        <item name="colorError">@color/error</item>
 
-    <style name="Theme.CA_Application" parent="Base.Theme.CA_Application" />
+        <!-- Font — applies to all Material components -->
+        <item name="fontFamily">@font/segoe_ui</item>
+        <item name="android:fontFamily">@font/segoe_ui</item>
+    </style>
 </resources>
