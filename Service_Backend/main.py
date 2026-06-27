@@ -9,6 +9,7 @@ from sqlalchemy.sql import func
 from openai import OpenAI
 import database
 import security
+from agent import models as agent_models  # registers AgentRecommendation with Base.metadata
 
 app = FastAPI(title="Wellness CA Backend", version="1.0")
 
@@ -244,3 +245,8 @@ def get_recommendations(_=Depends(verify_gateway),
         db.add(Recommendation(user_id=user_id, content=tip))
     db.commit()
     return {"recommendations": tips}
+
+from agent.router import router as agent_router
+
+app.include_router(agent_router)
+
