@@ -1,14 +1,20 @@
-# Author Xia Zihang
+# Author: Xia Zihang, Huang Qianer
 import json
 import os
+from dotenv import load_dotenv
 from fastapi import FastAPI, Depends, HTTPException, Header, status
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from sqlalchemy import Column, Integer, String, Float, Date, Text, DateTime, ForeignKey
 from sqlalchemy.sql import func
 from openai import OpenAI
+from chatbot import chat_router
+from chatbot.mysql_to_chroma import textualize_record
+from chatbot.chroma_store import collection
 import database
 import security
+
+load_dotenv()
 
 app = FastAPI(title="Wellness CA Backend", version="1.0")
 
@@ -151,8 +157,27 @@ def create_record(entry: WellnessEntry, _=Depends(verify_gateway),
     db.add(rec)
     db.commit()
     db.refresh(rec)
-    return {"message": "Created", "id": rec.id}
+    # RAG 实时自动注入逻辑
+    try:
+        # 将新插入的记录转化为语义文本
+        chunk_text = textualize_record(rec)
 
+        # 实时写入 ChromaDB，并附带 user_id 元数据用于后续的隔离检索
+        collection.upsert(
+            ids=[f"record_{rec.id}"],
+            documents=[chunk_text],
+            metadatas=[{
+                "source": "mysql_realtime",
+                "user_id": user_id,
+                "record_date": str(rec.record_date),
+                "record_id": rec.id
+            }]
+        )
+        print(f"User {user_id}'s new health data has been synchronized in real-time to the ChromaDB vector database.")
+    except Exception as e:
+        print(f"ChromaDB real-time synchronization failed: {e}")
+
+    return {"message": "Created", "id": rec.id}
 
 @app.put("/records/{record_id}")
 def update_record(record_id: int, entry: WellnessEntry,
@@ -166,6 +191,28 @@ def update_record(record_id: int, entry: WellnessEntry,
     for k, v in entry.model_dump().items():
         setattr(rec, k, v)
     db.commit()
+
+    # 2. ================= RAG 实时自动更新逻辑 =================
+    try:
+
+        # 重新将更新后的数据库记录转化为具有语义的自然语言文本块
+        chunk_text = textualize_record(rec)
+
+        # 使用 upsert 方法：如果 ID 存在则覆盖，从而实现更新，确保向量数据库与 MySQL 同步
+        collection.upsert(
+            ids=[f"record_{rec.id}"],
+            documents=[chunk_text],
+            metadatas=[{
+                "source": "mysql_realtime_update",
+                "user_id": user_id,
+                "record_date": str(rec.record_date),
+                "record_id": rec.id
+            }]
+        )
+        print(f"User {user_id}'s health data has been updated in real-time in ChromaDB")
+    except Exception as e:
+        print(f"ChromaDB real-time synchronization failed: {e}")
+
     return {"message": "Updated"}
 
 
@@ -179,31 +226,23 @@ def delete_record(record_id: int, _=Depends(verify_gateway),
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Record not found")
     db.delete(rec)
     db.commit()
+
+    try:
+        # 直接通过对应的 record_id 将其从向量数据库的集合中彻底移除
+        collection.delete(
+            ids=[f"record_{record_id}"]
+        )
+        print(f"User {user_id}'s record record_{record_id} has been completely deleted from ChromaDB.")
+    except Exception as e:
+        # ChromaDB 的 delete 方法如果找不到对应的 id，某些版本可能会抛错，我们同样捕获它
+            print(f"ChromaDB real-time deletion failed (possibly the file itself no longer exists): {e}")
+    # =======================================================
+
     return {"message": "Deleted"}
 
 
 # ===========================  CHATBOT  ======================================
-SYSTEM_PROMPT = (
-    "You are a friendly wellness assistant. "
-    "Give concise, practical health advice. "
-    "Ask clarifying questions when needed."
-)
-
-@app.post("/chat")
-def chat(req: ChatRequest, _=Depends(verify_gateway),
-         user_id: int = Depends(current_user_id),
-         db: Session = Depends(database.get_db)):
-    resp = _deepseek.chat.completions.create(
-        model="deepseek-chat",
-        messages=[{"role": "system", "content": SYSTEM_PROMPT},
-                  {"role": "user", "content": req.message}],
-        temperature=0.7, max_tokens=512,
-    )
-    reply = resp.choices[0].message.content
-    db.add(ChatHistory(user_id=user_id, question=req.message, answer=reply))
-    db.commit()
-    return {"reply": reply}
-
+app.include_router(chat_router.router)
 
 # ========================  AGENTIC AI  ======================================
 AGENTIC_PROMPT = (
