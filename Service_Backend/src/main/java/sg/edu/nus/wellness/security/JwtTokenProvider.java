@@ -1,3 +1,4 @@
+// Author: Xia Zihang
 package sg.edu.nus.wellness.security;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;

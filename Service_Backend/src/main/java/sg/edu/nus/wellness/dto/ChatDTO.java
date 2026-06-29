@@ -1,3 +1,4 @@
+// Author: Xia Zihang
 package sg.edu.nus.wellness.dto;
 public class ChatDTO {
     public static class Req { public String message; }

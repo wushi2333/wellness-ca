@@ -1,3 +1,4 @@
+// Author: Xia Zihang
 package sg.edu.nus.wellness.dto;
 public class WellnessRequest {
     public Double sleepHours; public String exerciseActivity="";

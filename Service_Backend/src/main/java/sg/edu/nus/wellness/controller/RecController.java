@@ -1,3 +1,4 @@
+// Author: Xia Zihang
 package sg.edu.nus.wellness.controller;
 import sg.edu.nus.wellness.service.RecService;
 import jakarta.servlet.http.HttpServletRequest;

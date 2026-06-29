@@ -1,3 +1,4 @@
+// Author: Xia Zihang
 package sg.edu.nus.wellness.service;
 import sg.edu.nus.wellness.dto.WellnessRequest;
 import sg.edu.nus.wellness.model.WellnessRecord;

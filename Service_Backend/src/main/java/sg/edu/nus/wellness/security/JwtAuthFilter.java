@@ -1,3 +1,4 @@
+// Author: Xia Zihang
 package sg.edu.nus.wellness.security;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
