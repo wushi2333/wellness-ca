@@ -3,19 +3,18 @@ package iss.nus.edu.sg.ca_application.model
 /**
  * Author: Wang Songyu
  *
- * Represents a wellness record returned by the backend REST API.
+ * Represents the request body used for creating or updating
+ * a wellness record through the backend REST API.
  *
  * Used by:
- * - GET /records
+ * - POST /records
+ * - PUT /records/{id}
  *
- * This model represents a complete wellness record stored in the
- * database. Unlike WellnessEntry, it includes the unique record ID
- * assigned by the backend.
+ * This model matches the FastAPI WellnessEntry schema.
+ * Unlike WellnessRecord, it does not contain an ID because
+ * the record ID is generated and managed by the server.
  */
-data class WellnessRecord(
-
-    // Unique record identifier
-    val id: Int = 0,
+data class WellnessEntry(
 
     // Hours of sleep
     val sleepHours: Double,
@@ -31,4 +30,5 @@ data class WellnessRecord(
 
     // Additional notes
     val notes: String
+
 )
