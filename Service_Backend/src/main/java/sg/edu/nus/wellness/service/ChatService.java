@@ -1,4 +1,4 @@
-// Author: Xia Zihang
+// Author: Huang Qianer
 package sg.edu.nus.wellness.service;
 import sg.edu.nus.wellness.model.ChatHistory;
 import sg.edu.nus.wellness.repository.ChatHistoryRepo;
