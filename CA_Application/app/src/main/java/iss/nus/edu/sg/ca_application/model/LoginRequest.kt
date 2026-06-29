@@ -11,8 +11,8 @@ package iss.nus.edu.sg.ca_application.model
  *
  * Response body (JSON, 200 OK):
  * {
- *   "access_token": "eyJhbGciOi...",
- *   "token_type": "bearer"
+ *   "accessToken": "eyJhbGciOi...",
+ *   "tokenType": "bearer"
  * }
  *
  * Error response (JSON, 400):
@@ -27,6 +27,6 @@ package iss.nus.edu.sg.ca_application.model
  * }
  *
  * All subsequent authenticated requests MUST include headers:
- *   Authorization: Bearer <access_token>
+ *   Authorization: Bearer <accessToken>
  *   X-API-Token:   team-wellness-2025
  */

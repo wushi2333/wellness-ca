@@ -6,52 +6,67 @@ NUS-ISS SA62 Continuous Assessment Project.
 
 ```
 wellness-ca/
-├── CA_Application/          ← Android Studio project (Kotlin)
-│   ├── app/src/main/java/.../auth/        Login / JWT auth
-│   ├── app/src/main/java/.../wellness/    Wellness records CRUD
-│   ├── app/src/main/java/.../chat/        AI chatbot UI
-│   ├── app/src/main/java/.../agentic/     AI recommendations
-│   ├── app/src/main/java/.../network/     HTTP client (ApiClient)
-│   └── app/src/main/java/.../model/       Data classes (JSON contracts)
-│
-├── Service_Backend/          ← FastAPI backend (Python)
-│   ├── main.py               API endpoints (8 total)
-│   ├── database.py           Aiven MySQL via SQLAlchemy (SSL)
-│   ├── security.py           JWT create/verify + bcrypt
-│   ├── ca.pem                Aiven public CA certificate
-│   ├── .env.example          Environment variable template
-│   └── requirements.txt      Python dependencies
-│
+├── CA_Application/               ← Android Studio project (Kotlin)
+│   └── app/src/main/java/.../
+│       ├── auth/                 Login / JWT auth
+│       ├── wellness/             Wellness records CRUD
+│       ├── chat/                 AI chatbot UI
+│       ├── agentic/              AI recommendations
+│       ├── network/              HTTP client (ApiClient)
+│       └── model/                Data classes (JSON contracts)
+
+├── Service_Backend/               ← Spring Boot + Python sidecars
+│   ├── pom.xml                    Maven project (Java 17, Spring Boot 3.4)
+│   ├── src/main/java/.../         Controllers, services, security, models
+│   ├── src/main/resources/        application.properties (env-var placeholders)
+│   └── sidecar/
+│       ├── rag/                   RAG chatbot (Huang Qianer, FastAPI :8001)
+│       └── agent/                 Agentic AI (Cai Peilin, FastAPI :8002)
+
 └── docs/
-    └── api-reference.pdf     FastAPI endpoint documentation
+    └── agentic-api.md             Agentic AI API specification
 ```
 
 ## Quick Start
 
-### Android (Team Members)
+### Android
 
-1. Clone this repo
-2. Open `CA_Application/` in Android Studio
-3. Run on emulator — connects to `http://152.42.181.66:8000`
+```bash
+git clone https://github.com/wushi2333/wellness-ca.git
+# Open CA_Application/ in Android Studio → Run
+```
 
-### Backend (Server)
+### Backend
 
 ```bash
 cd Service_Backend
-pip install -r requirements.txt
-cp .env.example .env   # edit with real values
-uvicorn main:app --host 0.0.0.0 --port 8000
+mvn package -DskipTests
+java -jar target/wellness-backend-1.0.jar
 ```
+
+Requires: `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `JWT_SECRET_KEY`, `DEEPSEEK_API_KEY`, `API_GATEWAY_TOKEN`.
 
 ## Architecture
 
 ```
-Android App ──HTTP──→ FastAPI (:8000) ──→ DeepSeek API
-                              │
-                              └──→ Aiven MySQL (cloud)
+Android App ──HTTP──→ Spring Boot :8000 ──→ Aiven MySQL (cloud)
+                         │
+            ┌────────────┼────────────┐
+            ▼            ▼            ▼
+       DeepSeek API   RAG :8001   Agent :8002
+                      (ChromaDB)  (function-calling)
 ```
 
-- **DeepSeek API Key** stored only on server — never in Android code
-- **Aiven MySQL** accessed only through FastAPI — never directly from mobile
-- **JWT** authentication on all protected endpoints
-- **X-API-Token** gateway guard on all endpoints
+- **DeepSeek API Key** stored only on server
+- **Aiven MySQL** accessed only through backend — never from mobile
+- **JWT** on all protected endpoints; **X-API-Token** gateway guard on all
+- JSON uses **camelCase** (Spring Boot default)
+
+## Authors
+
+| Module | Author |
+|--------|:--:|
+| Spring Boot backend (base) | Xia Zihang |
+| RAG chatbot + ChromaDB | Huang Qianer |
+| Agentic AI recommendation | Cai Peilin |
+| Android app | Team members |

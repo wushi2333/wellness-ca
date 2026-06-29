@@ -6,7 +6,11 @@ import android.content.SharedPreferences
 /**
  * Author: Wang Songyu
  *
- * Manages JWT access token persistence using SharedPreferences.
+ * Token lifecycle:
+ *   1. LoginActivity calls POST /login → receives { "accessToken": "...", "tokenType": "bearer" }
+ *   2. saveToken(...) stores the token in SharedPreferences
+ *   3. getToken() retrieves it for every authenticated API call
+ *   4. clearToken() is called on logout or when a 401 is received
  *
  * Token lifecycle:
  * 1. LoginActivity calls POST /login and receives:
@@ -29,6 +33,8 @@ import android.content.SharedPreferences
  * - The JWT secret key is stored ONLY on the backend server.
  * - Android stores only the access token.
  * - SharedPreferences is used for local persistence.
+ * Storage: SharedPreferences (private to the app)
+ * Key names: "jwtAccessToken", "jwtTokenType"
  */
 object TokenManager {
 
