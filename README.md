@@ -14,16 +14,13 @@ wellness-ca/
 │   ├── app/src/main/java/.../network/     HTTP client (ApiClient)
 │   └── app/src/main/java/.../model/       Data classes (JSON contracts)
 │
-├── Service_Backend/          ← FastAPI backend (Python)
-│   ├── main.py               API endpoints (8 total)
-│   ├── database.py           Aiven MySQL via SQLAlchemy (SSL)
-│   ├── security.py           JWT create/verify + bcrypt
-│   ├── ca.pem                Aiven public CA certificate
-│   ├── .env.example          Environment variable template
-│   └── requirements.txt      Python dependencies
+├── Service_Backend/          ← Spring Boot backend (Java)
+│   ├── pom.xml               Maven project descriptor
+│   ├── src/main/java/.../    22 source files (controllers, services, security, models)
+│   └── src/main/resources/   application.properties (env-var placeholders)
 │
 └── docs/
-    └── api-reference.pdf     FastAPI endpoint documentation
+    └── api-reference.pdf     API endpoint documentation (8 endpoints)
 ```
 
 ## Quick Start
@@ -38,20 +35,27 @@ wellness-ca/
 
 ```bash
 cd Service_Backend
-pip install -r requirements.txt
-cp .env.example .env   # edit with real values
-uvicorn main:app --host 0.0.0.0 --port 8000
+mvn package -DskipTests
+java -jar target/wellness-backend-1.0.jar
 ```
+
+Requires environment variables: `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `JWT_SECRET_KEY`, `ACCESS_TOKEN_EXPIRE_MINUTES`, `DEEPSEEK_API_KEY`, `API_GATEWAY_TOKEN`.
 
 ## Architecture
 
 ```
-Android App ──HTTP──→ FastAPI (:8000) ──→ DeepSeek API
+Android App ──HTTP──→ Spring Boot (:8000) ──→ DeepSeek API
                               │
                               └──→ Aiven MySQL (cloud)
 ```
 
 - **DeepSeek API Key** stored only on server — never in Android code
-- **Aiven MySQL** accessed only through FastAPI — never directly from mobile
+- **Aiven MySQL** accessed only through Spring Boot — never directly from mobile
 - **JWT** authentication on all protected endpoints
 - **X-API-Token** gateway guard on all endpoints
+- JSON responses use **camelCase** field names (Spring Boot default)
+
+## Authors
+
+- Backend: Xia Zihang
+- Android: Team members
