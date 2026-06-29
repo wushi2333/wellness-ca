@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Author: Wang Songyu
+    Network Security Configuration
+
+    Allows cleartext HTTP traffic only for the backend server used by
+    the Wellness application during development.
+
+    Backend Server:
+    http://152.42.181.66:8000
+-->
+
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">152.42.181.66</domain>
+    </domain-config>
+</network-security-config>
