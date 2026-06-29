@@ -4,7 +4,7 @@ plugins {
 
 android {
     namespace = "iss.nus.edu.sg.ca_application"
-    compileSdk = 37
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "iss.nus.edu.sg.ca_application"
@@ -21,9 +21,7 @@ android {
     }
     buildTypes {
         release {
-            optimization {
-                enable = false
-            }
+            isMinifyEnabled = false
         }
     }
     compileOptions {
