@@ -14,6 +14,6 @@ package iss.nus.edu.sg.ca_application.model
  * }
  *
  * Required headers:
- *   Authorization: Bearer <access_token>
+ *   Authorization: Bearer <accessToken>
  *   X-API-Token:   team-wellness-2025
  */

@@ -4,7 +4,7 @@ package iss.nus.edu.sg.ca_application.auth
  * Manages JWT access token persistence and retrieval.
  *
  * Token lifecycle:
- *   1. LoginActivity calls POST /login → receives { "access_token": "...", "token_type": "bearer" }
+ *   1. LoginActivity calls POST /login → receives { "accessToken": "...", "tokenType": "bearer" }
  *   2. saveToken(...) stores the token in SharedPreferences
  *   3. getToken() retrieves it for every authenticated API call
  *   4. clearToken() is called on logout or when a 401 is received
@@ -19,5 +19,5 @@ package iss.nus.edu.sg.ca_application.auth
  * It never appears in the Android codebase.
  *
  * Storage: SharedPreferences (private to the app)
- * Key names: "jwt_access_token", "jwt_token_type"
+ * Key names: "jwtAccessToken", "jwtTokenType"
  */

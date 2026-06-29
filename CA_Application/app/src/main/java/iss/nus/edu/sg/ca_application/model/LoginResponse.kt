@@ -7,7 +7,7 @@ package iss.nus.edu.sg.ca_application.model
  *
  * This class models the JSON response:
  * {
- *   "access_token": "...",
- *   "token_type": "bearer"
+ *   "accessToken": "...",
+ *   "tokenType": "bearer"
  * }
  */

@@ -1,9 +1,0 @@
-fastapi
-uvicorn[standard]
-openai
-pymysql
-sqlalchemy
-cryptography
-python-dotenv
-python-jose[cryptography]
-bcrypt

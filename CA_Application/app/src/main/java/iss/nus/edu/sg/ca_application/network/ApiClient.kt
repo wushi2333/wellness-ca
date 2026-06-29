@@ -4,10 +4,10 @@ package iss.nus.edu.sg.ca_application.network
  * Centralized HTTP client for all backend API calls.
  *
  * Server:
- *   Ubuntu 24.04 running FastAPI on port 8000
+ *   Ubuntu 24.04 running Spring Boot on port 8000
  *
  * Required headers on EVERY authenticated request:
- *   Authorization: Bearer <jwt_access_token>
+ *   Authorization: Bearer <jwtAccessToken>
  *   X-API-Token:   team-wellness-2025
  *   Content-Type:  application/json
  *
