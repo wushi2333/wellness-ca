@@ -1,3 +1,4 @@
+// Author: Xia Zihang
 package sg.edu.nus.wellness.config;
 import sg.edu.nus.wellness.security.*;
 import org.springframework.context.annotation.*;

@@ -1,3 +1,4 @@
+// Author: Xia Zihang
 package sg.edu.nus.wellness.model;
 import jakarta.persistence.*;
 @Entity @Table(name="recommendations")

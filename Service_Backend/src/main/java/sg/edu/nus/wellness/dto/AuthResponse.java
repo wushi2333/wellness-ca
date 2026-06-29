@@ -1,3 +1,4 @@
+// Author: Xia Zihang
 package sg.edu.nus.wellness.dto;
 public class AuthResponse {
     public String accessToken; public String tokenType="bearer";
