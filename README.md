@@ -6,32 +6,55 @@ NUS-ISS SA62 Continuous Assessment Project.
 
 ```
 wellness-ca/
-├── CA_Application/          ← Android Studio project (Kotlin)
-│   ├── app/src/main/java/.../auth/        Login / JWT auth
-│   ├── app/src/main/java/.../wellness/    Wellness records CRUD
-│   ├── app/src/main/java/.../chat/        AI chatbot UI
-│   ├── app/src/main/java/.../agentic/     AI recommendations
-│   ├── app/src/main/java/.../network/     HTTP client (ApiClient)
-│   └── app/src/main/java/.../model/       Data classes (JSON contracts)
-│
-├── Service_Backend/          ← Spring Boot backend (Java)
-│   ├── pom.xml               Maven project descriptor
-│   ├── src/main/java/.../    22 source files (controllers, services, security, models)
-│   └── src/main/resources/   application.properties (env-var placeholders)
-│
+├── CA_Application/               ← Android Studio project (Kotlin)
+│   └── app/src/main/java/.../
+│       ├── auth/                 Login / JWT auth
+│       ├── wellness/             Wellness records CRUD
+│       ├── chat/                 AI chatbot UI
+│       ├── agentic/              AI recommendations
+│       ├── network/              HTTP client (ApiClient)
+│       └── model/                Data classes (JSON contracts)
+
+├── Service_Backend/               ← Spring Boot + Python sidecars
+│   ├── pom.xml                    Maven project (Java 17, Spring Boot 3.4)
+│   ├── src/main/java/.../         Controllers, services, security, models
+│   ├── src/main/resources/        application.properties (env-var placeholders)
+│   └── sidecar/
+│       ├── rag/                   RAG chatbot (Huang Qianer, FastAPI :8001)
+│       └── agent/                 Agentic AI (Cai Peilin, FastAPI :8002)
+
 └── docs/
-    └── api-reference.pdf     API endpoint documentation (8 endpoints)
+    └── agentic-api.md             Agentic AI API specification
 ```
+
+## API Endpoints
+
+All endpoints at `http://152.42.181.66:8000`. JSON uses **camelCase** field names.
+Auth: `X-API-Token` header (gateway) + `Authorization: Bearer <JWT>` (user).
+
+| Method | Path | Description | Author |
+|:--:|------|------|:--:|
+| POST | `/register` | Create account | Xia Zihang |
+| POST | `/login` | Login → JWT | Xia Zihang |
+| GET | `/records` | List wellness records | Xia Zihang |
+| POST | `/records` | Create record | Xia Zihang |
+| PUT | `/records/{id}` | Update record | Xia Zihang |
+| DELETE | `/records/{id}` | Delete record | Xia Zihang |
+| POST | `/chat` | AI chat (RAG-enhanced) | Huang Qianer |
+| GET | `/recommendations` | Simple AI tips | Xia Zihang |
+| POST | `/agent/recommend` | Agentic AI recommendation | Cai Peilin |
+| GET | `/agent/recommend/history` | Past agent recommendations | Cai Peilin |
 
 ## Quick Start
 
-### Android (Team Members)
+### Android
 
-1. Clone this repo
-2. Open `CA_Application/` in Android Studio
-3. Run on emulator — connects to `http://152.42.181.66:8000`
+```bash
+git clone https://github.com/wushi2333/wellness-ca.git
+# Open CA_Application/ in Android Studio → Run
+```
 
-### Backend (Server)
+### Backend
 
 ```bash
 cd Service_Backend
@@ -39,23 +62,29 @@ mvn package -DskipTests
 java -jar target/wellness-backend-1.0.jar
 ```
 
-Requires environment variables: `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `JWT_SECRET_KEY`, `ACCESS_TOKEN_EXPIRE_MINUTES`, `DEEPSEEK_API_KEY`, `API_GATEWAY_TOKEN`.
+Requires: `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `JWT_SECRET_KEY`, `DEEPSEEK_API_KEY`, `API_GATEWAY_TOKEN`.
 
 ## Architecture
 
 ```
-Android App ──HTTP──→ Spring Boot (:8000) ──→ DeepSeek API
-                              │
-                              └──→ Aiven MySQL (cloud)
+Android App ──HTTP──→ Spring Boot :8000 ──→ Aiven MySQL (cloud)
+                         │
+            ┌────────────┼────────────┐
+            ▼            ▼            ▼
+       DeepSeek API   RAG :8001   Agent :8002
+                      (ChromaDB)  (function-calling)
 ```
 
-- **DeepSeek API Key** stored only on server — never in Android code
-- **Aiven MySQL** accessed only through Spring Boot — never directly from mobile
-- **JWT** authentication on all protected endpoints
-- **X-API-Token** gateway guard on all endpoints
-- JSON responses use **camelCase** field names (Spring Boot default)
+- **DeepSeek API Key** stored only on server
+- **Aiven MySQL** accessed only through backend — never from mobile
+- **JWT** on all protected endpoints; **X-API-Token** gateway guard on all
+- JSON uses **camelCase** (Spring Boot default)
 
 ## Authors
 
-- Backend: Xia Zihang
-- Android: Team members
+| Module | Author |
+|--------|:--:|
+| Spring Boot backend (base) | Xia Zihang |
+| RAG chatbot + ChromaDB | Huang Qianer |
+| Agentic AI recommendation | Cai Peilin |
+| Android app | Team members |
