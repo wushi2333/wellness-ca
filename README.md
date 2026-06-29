@@ -27,24 +27,6 @@ wellness-ca/
     └── agentic-api.md             Agentic AI API specification
 ```
 
-## API Endpoints
-
-All endpoints at `http://152.42.181.66:8000`. JSON uses **camelCase** field names.
-Auth: `X-API-Token` header (gateway) + `Authorization: Bearer <JWT>` (user).
-
-| Method | Path | Description | Author |
-|:--:|------|------|:--:|
-| POST | `/register` | Create account | Xia Zihang |
-| POST | `/login` | Login → JWT | Xia Zihang |
-| GET | `/records` | List wellness records | Xia Zihang |
-| POST | `/records` | Create record | Xia Zihang |
-| PUT | `/records/{id}` | Update record | Xia Zihang |
-| DELETE | `/records/{id}` | Delete record | Xia Zihang |
-| POST | `/chat` | AI chat (RAG-enhanced) | Huang Qianer |
-| GET | `/recommendations` | Simple AI tips | Xia Zihang |
-| POST | `/agent/recommend` | Agentic AI recommendation | Cai Peilin |
-| GET | `/agent/recommend/history` | Past agent recommendations | Cai Peilin |
-
 ## Quick Start
 
 ### Android
