@@ -15,11 +15,7 @@ import iss.nus.edu.sg.ca_application.network.ApiClient
 import iss.nus.edu.sg.ca_application.network.ApiException
 import java.util.Calendar
 
-/**
- * Author: Wang Songyu
- *
- * Screen for creating or updating a wellness record.
- */
+/** Form for creating or editing a wellness record. */
 class WellnessEntryActivity : AppCompatActivity() {
 
     private lateinit var etSleepHours: EditText
@@ -67,9 +63,6 @@ class WellnessEntryActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * Displays a date picker for selecting the record date.
-     */
     private fun showDatePicker() {
 
         val calendar = Calendar.getInstance()
@@ -109,9 +102,6 @@ class WellnessEntryActivity : AppCompatActivity() {
         ).show()
     }
 
-    /**
-     * Validates user input and submits the record to the backend.
-     */
     private fun saveRecord() {
 
         val sleepHoursText = etSleepHours.text.toString().trim()
@@ -256,9 +246,6 @@ class WellnessEntryActivity : AppCompatActivity() {
         }.start()
     }
 
-    /**
-     * Shows or hides the loading indicator.
-     */
     private fun showLoading(loading: Boolean) {
         progressBar.visibility =
             if (loading) View.VISIBLE else View.GONE
