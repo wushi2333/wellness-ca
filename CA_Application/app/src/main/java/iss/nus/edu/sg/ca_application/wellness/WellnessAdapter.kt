@@ -8,20 +8,13 @@ import androidx.recyclerview.widget.RecyclerView
 import iss.nus.edu.sg.ca_application.R
 import iss.nus.edu.sg.ca_application.model.WellnessRecord
 
-/**
- * Author: Wang Songyu
- *
- * RecyclerView adapter for displaying wellness records.
- */
+/** RecyclerView adapter for wellness record items. */
 class WellnessAdapter(
     private var records: List<WellnessRecord>,
     private val onItemClick: (WellnessRecord) -> Unit,
     private val onItemLongClick: (WellnessRecord) -> Unit
 ) : RecyclerView.Adapter<WellnessAdapter.WellnessViewHolder>() {
 
-    /**
-     * Holds references to the views of a single wellness record item.
-     */
     class WellnessViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val tvDate: TextView = itemView.findViewById(R.id.tvRecordDate)
         val tvSleep: TextView = itemView.findViewById(R.id.tvSleepHours)
@@ -55,9 +48,6 @@ class WellnessAdapter(
 
     override fun getItemCount(): Int = records.size
 
-    /**
-     * Updates the adapter data and refreshes the RecyclerView.
-     */
     fun updateData(newRecords: List<WellnessRecord>) {
         records = newRecords
         notifyDataSetChanged()

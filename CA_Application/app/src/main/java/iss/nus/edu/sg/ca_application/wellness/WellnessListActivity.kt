@@ -18,19 +18,7 @@ import iss.nus.edu.sg.ca_application.auth.TokenManager
 import iss.nus.edu.sg.ca_application.network.ApiClient
 import iss.nus.edu.sg.ca_application.network.ApiException
 
-/**
- * Author: Wang Songyu
- * Displays the user's wellness records and provides CRUD operations.
- *
- * Features:
- * - Load wellness records from the backend
- * - Open record details
- * - Create a new record
- * - Delete an existing record
- * - Refresh the list after changes
- *
- * All network requests are executed on background threads.
- */
+/** Lists wellness records with swipe-to-delete and FAB to add new. */
 class WellnessListActivity : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
