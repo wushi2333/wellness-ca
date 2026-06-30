@@ -17,6 +17,7 @@ local.properties
 
 # Backend — secrets
 Service_Backend/.env
+Service_Backend/target/
 
 # Python
 __pycache__/

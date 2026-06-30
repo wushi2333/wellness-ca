@@ -1,10 +1,13 @@
-// Author: Xia Zihang
+// Author: Xia Zihang, Yutong Luo
 package sg.edu.nus.wellness.security;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
+import java.util.List;
 
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
@@ -14,12 +17,34 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
             throws ServletException, IOException {
-        String header = req.getHeader("Authorization");
-        if (header != null && header.startsWith("Bearer ")) {
-            try {
-                req.setAttribute("userId", Long.parseLong(jwt.validateAndGetUserId(header.substring(7))));
-            } catch (Exception e) { res.sendError(401, "Invalid token"); return; }
+        if (isPublicRequest(req)) {
+            chain.doFilter(req, res);
+            return;
         }
-        chain.doFilter(req, res);
+
+        String header = req.getHeader("Authorization");
+        if (header == null || !header.startsWith("Bearer ")) {
+            res.sendError(401, "Missing token");
+            return;
+        }
+
+        try {
+            Long userId = Long.parseLong(jwt.validateAndGetUserId(header.substring(7)));
+            req.setAttribute("userId", userId);
+            SecurityContextHolder.getContext().setAuthentication(
+                    new UsernamePasswordAuthenticationToken(userId, null, List.of()));
+            chain.doFilter(req, res);
+        } catch (Exception e) {
+            SecurityContextHolder.clearContext();
+            res.sendError(401, "Invalid token");
+        }
+    }
+
+    private boolean isPublicRequest(HttpServletRequest req) {
+        String path = req.getServletPath();
+        return "OPTIONS".equalsIgnoreCase(req.getMethod())
+                || "/error".equals(path)
+                || ("/register".equals(path) && "POST".equalsIgnoreCase(req.getMethod()))
+                || ("/login".equals(path) && "POST".equalsIgnoreCase(req.getMethod()));
     }
 }
