@@ -1,1 +1,164 @@
 package iss.nus.edu.sg.ca_application.wellness
+
+import android.app.Activity
+import android.app.AlertDialog
+import android.content.Intent
+import android.os.Bundle
+import android.view.View
+import android.widget.Button
+import android.widget.ProgressBar
+import android.widget.TextView
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import iss.nus.edu.sg.ca_application.R
+import iss.nus.edu.sg.ca_application.auth.TokenManager
+import iss.nus.edu.sg.ca_application.network.ApiClient
+import iss.nus.edu.sg.ca_application.network.ApiException
+
+/**
+ * Author: Wang Songyu
+ * Displays the user's wellness records and provides CRUD operations.
+ *
+ * Features:
+ * - Load wellness records from the backend
+ * - Open record details
+ * - Create a new record
+ * - Delete an existing record
+ * - Refresh the list after changes
+ *
+ * All network requests are executed on background threads.
+ */
+class WellnessListActivity : AppCompatActivity() {
+
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter: WellnessAdapter
+    private lateinit var btnAddRecord: Button
+    private lateinit var tvEmptyState: TextView
+    private lateinit var progressBar: ProgressBar
+
+    private val currentToken: String
+        get() = TokenManager.getToken(this)
+
+    private val entryActivityLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            loadRecords()
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_wellness_list)
+
+        recyclerView = findViewById(R.id.recyclerViewWellness)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        tvEmptyState = findViewById(R.id.tvEmptyState)
+        progressBar = findViewById(R.id.progressBar)
+
+        adapter = WellnessAdapter(
+            records = emptyList(),
+            onItemClick = { record ->
+                val intent = Intent(this, WellnessDetailActivity::class.java).apply {
+                    putExtra("record_id", record.id)
+                    putExtra("sleep_hours", record.sleepHours)
+                    putExtra("exercise_activity", record.exerciseActivity)
+                    putExtra("exercise_duration", record.exerciseDuration)
+                    putExtra("record_date", record.recordDate)
+                    putExtra("notes", record.notes)
+                }
+                entryActivityLauncher.launch(intent)
+            },
+            onItemLongClick = { record ->
+                confirmDelete(record.id)
+            }
+        )
+        recyclerView.adapter = adapter
+
+        btnAddRecord = findViewById(R.id.btnAddRecord)
+        btnAddRecord.setOnClickListener {
+            val intent = Intent(this, WellnessEntryActivity::class.java)
+            entryActivityLauncher.launch(intent)
+        }
+
+        loadRecords()
+    }
+
+    private fun confirmDelete(recordId: Int) {
+        AlertDialog.Builder(this)
+            .setTitle("Delete Record")
+            .setMessage("Are you sure you want to delete this wellness record?")
+            .setPositiveButton("Delete") { _, _ -> deleteRecord(recordId) }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun deleteRecord(recordId: Int) {
+        showLoading(true)
+        Thread {
+            try {
+                ApiClient.deleteRecord(currentToken, recordId)
+                runOnUiThread {
+                    Toast.makeText(this, "Record deleted successfully.", Toast.LENGTH_SHORT).show()
+                    loadRecords()
+                }
+            } catch (e: ApiException) {
+                runOnUiThread {
+                    showLoading(false)
+                    when (e.code) {
+                        401 -> Toast.makeText(this, "Session expired. Please log in again.", Toast.LENGTH_SHORT).show()
+                        403 -> Toast.makeText(this, "API gateway authentication failed.", Toast.LENGTH_SHORT).show()
+                        404 -> Toast.makeText(this, "Record not found or has already been deleted.", Toast.LENGTH_SHORT).show()
+                        else -> Toast.makeText(this, "Failed to delete record: ${e.code}", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } catch (e: Exception) {
+                runOnUiThread {
+                    showLoading(false)
+                    Toast.makeText(this, "Network error: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }.start()
+    }
+
+    private fun loadRecords() {
+        showLoading(true)
+        Thread {
+            try {
+                val records = ApiClient.getRecords(currentToken)
+                runOnUiThread {
+                    showLoading(false)
+                    adapter.updateData(records)
+                    tvEmptyState.visibility = if (records.isEmpty()) View.VISIBLE else View.GONE
+                }
+            } catch (e: ApiException) {
+                runOnUiThread {
+                    showLoading(false)
+                    when (e.code) {
+                        401 -> Toast.makeText(this, "Session expired. Please log in again.", Toast.LENGTH_SHORT).show()
+                        403 -> Toast.makeText(this, "API gateway authentication failed.", Toast.LENGTH_SHORT).show()
+                        else -> Toast.makeText(this, "Request failed: ${e.code}", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } catch (e: Exception) {
+                runOnUiThread {
+                    showLoading(false)
+                    Toast.makeText(this, "Network error: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }.start()
+    }
+
+    private fun showLoading(loading: Boolean) {
+        progressBar.visibility = if (loading) View.VISIBLE else View.GONE
+        if (loading) {
+            recyclerView.visibility = View.GONE
+            tvEmptyState.visibility = View.GONE
+        } else {
+            recyclerView.visibility = View.VISIBLE
+        }
+    }
+}

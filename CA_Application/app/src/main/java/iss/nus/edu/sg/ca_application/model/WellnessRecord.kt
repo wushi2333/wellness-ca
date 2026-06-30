@@ -1,8 +1,16 @@
 package iss.nus.edu.sg.ca_application.model
 
 /**
- * API Contract: GET /records  (response item)
+ * Author: Wang Songyu
  *
+ * Represents a wellness record returned by the backend REST API.
+ *
+ * Used by:
+ * - GET /records
+ *
+ * This model represents a complete wellness record stored in the
+ * database. Unlike WellnessEntry, it includes the unique record ID
+ * assigned by the backend.
  * Each wellness record returned by the backend:
  * {
  *   "id": 1,
@@ -32,3 +40,23 @@ package iss.nus.edu.sg.ca_application.model
  *   Authorization: Bearer <accessToken>
  *   X-API-Token:   team-wellness-2025
  */
+data class WellnessRecord(
+
+    // Unique record identifier
+    val id: Int = 0,
+
+    // Hours of sleep
+    val sleepHours: Double,
+
+    // Exercise activity (e.g. Running, Swimming)
+    val exerciseActivity: String,
+
+    // Exercise duration in minutes
+    val exerciseDuration: Int,
+
+    // Record date (yyyy-MM-dd)
+    val recordDate: String,
+
+    // Additional notes
+    val notes: String
+)
