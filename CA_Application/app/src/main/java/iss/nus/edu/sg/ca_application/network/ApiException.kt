@@ -1,6 +1,17 @@
 package iss.nus.edu.sg.ca_application.network
 
-/** Thrown when the backend returns an HTTP error (4xx or 5xx). */
+/**
+ * Author: Wang Songyu
+ *
+ * Custom exception used for backend API requests.
+ *
+ * This exception is thrown whenever the server returns
+ * an HTTP error response (4xx or 5xx).
+ *
+ * The exception contains:
+ * - HTTP status code
+ * - Response body returned by the server
+ */
 class ApiException(
     val code: Int,
     val body: String

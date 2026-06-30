@@ -16,7 +16,12 @@ import iss.nus.edu.sg.ca_application.auth.TokenManager
 import iss.nus.edu.sg.ca_application.network.ApiClient
 import iss.nus.edu.sg.ca_application.network.ApiException
 
-/** Displays a single wellness record with Edit and Delete actions. */
+/**
+ * Author: Wang Songyu
+ *
+ * Displays the details of a wellness record.
+ * Users can edit or delete the selected record.
+ */
 class WellnessDetailActivity : AppCompatActivity() {
 
     private lateinit var tvDetailDate: TextView
@@ -84,6 +89,9 @@ class WellnessDetailActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Displays the selected wellness record.
+     */
     private fun displayRecord() {
         tvDetailDate.text = recordDate
         tvDetailSleep.text = getString(R.string.sleep_format, sleepHours)
@@ -91,6 +99,9 @@ class WellnessDetailActivity : AppCompatActivity() {
         tvDetailNotes.text = if (notes.isNotEmpty()) notes else getString(R.string.no_notes)
     }
 
+    /**
+     * Shows a confirmation dialog before deleting the record.
+     */
     private fun confirmDelete() {
         AlertDialog.Builder(this)
             .setTitle(getString(R.string.confirm_delete_title))
@@ -102,6 +113,9 @@ class WellnessDetailActivity : AppCompatActivity() {
             .show()
     }
 
+    /**
+     * Deletes the current wellness record through the backend API.
+     */
     private fun deleteRecord() {
         showLoading(true)
 
@@ -170,6 +184,9 @@ class WellnessDetailActivity : AppCompatActivity() {
         }.start()
     }
 
+    /**
+     * Shows or hides the loading indicator.
+     */
     private fun showLoading(loading: Boolean) {
         progressBar.visibility = if (loading) View.VISIBLE else View.GONE
         btnEdit.isEnabled = !loading
