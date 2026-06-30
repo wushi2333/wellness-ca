@@ -11,8 +11,10 @@ import android.content.SharedPreferences
  * Token lifecycle:
  * 1. LoginActivity calls POST /login and receives:
  *      {
- *          "access_token": "...",
- *          "token_type": "bearer"
+ *          "accessToken": "...",
+ *          "tokenType": "bearer",
+ *          "userId": 1,
+ *          "username": "alice"
  *      }
  * 2. saveToken() stores the token locally.
  * 3. getToken() retrieves the token for authenticated API requests.

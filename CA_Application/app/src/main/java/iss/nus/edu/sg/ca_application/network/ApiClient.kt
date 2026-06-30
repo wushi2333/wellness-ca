@@ -117,10 +117,10 @@ object ApiClient {
                     records.add(
                         WellnessRecord(
                             id = obj.getInt("id"),
-                            sleepHours = obj.getDouble("sleep_hours"),
-                            exerciseActivity = obj.getString("exercise_activity"),
-                            exerciseDuration = obj.getInt("exercise_duration"),
-                            recordDate = obj.getString("record_date"),
+                            sleepHours = obj.getDouble("sleepHours"),
+                            exerciseActivity = obj.getString("exerciseActivity"),
+                            exerciseDuration = obj.getInt("exerciseDuration"),
+                            recordDate = obj.getString("recordDate"),
                             notes = obj.optString("notes", "")
                         )
                     )
@@ -162,10 +162,10 @@ object ApiClient {
             connection = createConnection("/records", "POST", token)
 
             val jsonBody = JSONObject().apply {
-                put("sleep_hours", entry.sleepHours)
-                put("exercise_activity", entry.exerciseActivity)
-                put("exercise_duration", entry.exerciseDuration)
-                put("record_date", entry.recordDate)
+                put("sleepHours", entry.sleepHours)
+                put("exerciseActivity", entry.exerciseActivity)
+                put("exerciseDuration", entry.exerciseDuration)
+                put("recordDate", entry.recordDate)
                 put("notes", entry.notes)
             }
 
@@ -226,10 +226,10 @@ object ApiClient {
             connection = createConnection("/records/$id", "PUT", token)
 
             val jsonBody = JSONObject().apply {
-                put("sleep_hours", entry.sleepHours)
-                put("exercise_activity", entry.exerciseActivity)
-                put("exercise_duration", entry.exerciseDuration)
-                put("record_date", entry.recordDate)
+                put("sleepHours", entry.sleepHours)
+                put("exerciseActivity", entry.exerciseActivity)
+                put("exerciseDuration", entry.exerciseDuration)
+                put("recordDate", entry.recordDate)
                 put("notes", entry.notes)
             }
 

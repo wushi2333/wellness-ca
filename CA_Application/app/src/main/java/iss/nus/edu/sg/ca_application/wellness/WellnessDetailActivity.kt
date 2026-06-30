@@ -63,22 +63,22 @@ class WellnessDetailActivity : AppCompatActivity() {
         btnDelete = findViewById(R.id.btnDelete)
         progressBar = findViewById(R.id.progressBar)
 
-        recordId = intent.getIntExtra("record_id", -1)
-        sleepHours = intent.getDoubleExtra("sleep_hours", 0.0)
-        exerciseActivity = intent.getStringExtra("exercise_activity") ?: ""
-        exerciseDuration = intent.getIntExtra("exercise_duration", 0)
-        recordDate = intent.getStringExtra("record_date") ?: ""
+        recordId = intent.getIntExtra("recordId", -1)
+        sleepHours = intent.getDoubleExtra("sleepHours", 0.0)
+        exerciseActivity = intent.getStringExtra("exerciseActivity") ?: ""
+        exerciseDuration = intent.getIntExtra("exerciseDuration", 0)
+        recordDate = intent.getStringExtra("recordDate") ?: ""
         notes = intent.getStringExtra("notes") ?: ""
 
         displayRecord()
 
         btnEdit.setOnClickListener {
             val intent = Intent(this, WellnessEntryActivity::class.java).apply {
-                putExtra("record_id", recordId)
-                putExtra("sleep_hours", sleepHours)
-                putExtra("exercise_activity", exerciseActivity)
-                putExtra("exercise_duration", exerciseDuration)
-                putExtra("record_date", recordDate)
+                putExtra("recordId", recordId)
+                putExtra("sleepHours", sleepHours)
+                putExtra("exerciseActivity", exerciseActivity)
+                putExtra("exerciseDuration", exerciseDuration)
+                putExtra("recordDate", recordDate)
                 putExtra("notes", notes)
             }
             editLauncher.launch(intent)
