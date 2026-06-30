@@ -94,9 +94,9 @@ class WellnessDetailActivity : AppCompatActivity() {
      */
     private fun displayRecord() {
         tvDetailDate.text = recordDate
-        tvDetailSleep.text = "Sleep: ${sleepHours}h"
-        tvDetailExercise.text = "$exerciseActivity (${exerciseDuration} min)"
-        tvDetailNotes.text = if (notes.isNotEmpty()) notes else "No notes"
+        tvDetailSleep.text = getString(R.string.sleep_format, sleepHours)
+        tvDetailExercise.text = getString(R.string.exercise_format, exerciseActivity, exerciseDuration)
+        tvDetailNotes.text = if (notes.isNotEmpty()) notes else getString(R.string.no_notes)
     }
 
     /**
@@ -104,12 +104,12 @@ class WellnessDetailActivity : AppCompatActivity() {
      */
     private fun confirmDelete() {
         AlertDialog.Builder(this)
-            .setTitle("Delete Record")
-            .setMessage("Are you sure you want to delete this wellness record?")
-            .setPositiveButton("Delete") { _, _ ->
+            .setTitle(getString(R.string.confirm_delete_title))
+            .setMessage(getString(R.string.confirm_delete_message))
+            .setPositiveButton(getString(R.string.delete_confirm)) { _, _ ->
                 deleteRecord()
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton(getString(R.string.cancel), null)
             .show()
     }
 
@@ -126,7 +126,7 @@ class WellnessDetailActivity : AppCompatActivity() {
                 runOnUiThread {
                     Toast.makeText(
                         this,
-                        "Record deleted successfully.",
+                        getString(R.string.delete_success),
                         Toast.LENGTH_SHORT
                     ).show()
 
@@ -143,19 +143,19 @@ class WellnessDetailActivity : AppCompatActivity() {
                     when (e.code) {
                         401 -> Toast.makeText(
                             this,
-                            "Session expired. Please log in again.",
+                            getString(R.string.session_expired),
                             Toast.LENGTH_SHORT
                         ).show()
 
                         403 -> Toast.makeText(
                             this,
-                            "API gateway authentication failed.",
+                            getString(R.string.api_forbidden),
                             Toast.LENGTH_SHORT
                         ).show()
 
                         404 -> Toast.makeText(
                             this,
-                            "Record not found.",
+                            getString(R.string.record_not_found),
                             Toast.LENGTH_SHORT
                         ).show()
 
@@ -175,7 +175,7 @@ class WellnessDetailActivity : AppCompatActivity() {
 
                     Toast.makeText(
                         this,
-                        "Network error: ${e.message}",
+                        getString(R.string.network_error),
                         Toast.LENGTH_SHORT
                     ).show()
                 }

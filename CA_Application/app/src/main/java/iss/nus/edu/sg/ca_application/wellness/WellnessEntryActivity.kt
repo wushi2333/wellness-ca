@@ -55,7 +55,7 @@ class WellnessEntryActivity : AppCompatActivity() {
             etExerciseDuration.setText(intent.getIntExtra("exerciseDuration", 0).toString())
             etRecordDate.setText(intent.getStringExtra("recordDate") ?: "")
             etNotes.setText(intent.getStringExtra("notes") ?: "")
-            btnSave.text = "Update"
+            btnSave.text = getString(R.string.update_record)
         }
 
         etRecordDate.setOnClickListener {
@@ -128,7 +128,7 @@ class WellnessEntryActivity : AppCompatActivity() {
         ) {
             Toast.makeText(
                 this,
-                "Please complete all required fields.",
+                getString(R.string.field_required),
                 Toast.LENGTH_SHORT
             ).show()
             return
@@ -140,7 +140,7 @@ class WellnessEntryActivity : AppCompatActivity() {
         if (sleepHours == null || exerciseDuration == null) {
             Toast.makeText(
                 this,
-                "Invalid numeric input.",
+                getString(R.string.invalid_numeric),
                 Toast.LENGTH_SHORT
             ).show()
             return
@@ -149,7 +149,7 @@ class WellnessEntryActivity : AppCompatActivity() {
         if (sleepHours < 0 || sleepHours > 24) {
             Toast.makeText(
                 this,
-                "Sleep hours must be between 0 and 24.",
+                getString(R.string.sleep_range),
                 Toast.LENGTH_SHORT
             ).show()
             return
@@ -158,7 +158,7 @@ class WellnessEntryActivity : AppCompatActivity() {
         if (exerciseDuration < 0 || exerciseDuration > 1440) {
             Toast.makeText(
                 this,
-                "Exercise duration must be between 0 and 1440 minutes.",
+                getString(R.string.exercise_range),
                 Toast.LENGTH_SHORT
             ).show()
             return
@@ -167,7 +167,7 @@ class WellnessEntryActivity : AppCompatActivity() {
         if (!recordDate.matches(Regex("\\d{4}-\\d{2}-\\d{2}"))) {
             Toast.makeText(
                 this,
-                "Please select a valid date.",
+                getString(R.string.date_invalid),
                 Toast.LENGTH_SHORT
             ).show()
             return
@@ -197,7 +197,7 @@ class WellnessEntryActivity : AppCompatActivity() {
 
                     Toast.makeText(
                         this,
-                        "Record saved successfully.",
+                        getString(R.string.save_success),
                         Toast.LENGTH_SHORT
                     ).show()
 
@@ -215,19 +215,19 @@ class WellnessEntryActivity : AppCompatActivity() {
 
                         401 -> Toast.makeText(
                             this,
-                            "Session expired. Please log in again.",
+                            getString(R.string.session_expired),
                             Toast.LENGTH_SHORT
                         ).show()
 
                         403 -> Toast.makeText(
                             this,
-                            "API gateway authentication failed.",
+                            getString(R.string.api_forbidden),
                             Toast.LENGTH_SHORT
                         ).show()
 
                         404 -> Toast.makeText(
                             this,
-                            "Record not found.",
+                            getString(R.string.record_not_found),
                             Toast.LENGTH_SHORT
                         ).show()
 
@@ -247,7 +247,7 @@ class WellnessEntryActivity : AppCompatActivity() {
 
                     Toast.makeText(
                         this,
-                        "Network error: ${e.message}",
+                        getString(R.string.network_error),
                         Toast.LENGTH_SHORT
                     ).show()
                 }

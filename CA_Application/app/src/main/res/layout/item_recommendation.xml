@@ -1,7 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<!--
+    Recommendation item — not yet implemented.
+
+    When building this item, bind to the system theme:
+    - title: textAppearance @style/Body (bold), textColor @color/text_primary
+    - body:  textAppearance @style/Caption, textColor @color/text_secondary
+
+    Example:
+    ┌─────────────────────────────────────────────────────────┐
+    │ <TextView                                                │
+    │     android:id="@+id/tvRecoTitle"                        │
+    │     android:textAppearance="@style/Body"                 │
+    │     android:textStyle="bold"                             │
+    │     android:textColor="@color/text_primary" />           │
+    │                                                          │
+    │ <TextView                                                │
+    │     android:id="@+id/tvRecoBody"                         │
+    │     android:textAppearance="@style/Caption"              │
+    │     android:textColor="@color/text_secondary" />         │
+    └─────────────────────────────────────────────────────────┘
+-->
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="12dp">
+
 </LinearLayout>

@@ -1,6 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<!--
+    Chat screen — not yet implemented.
+
+    When building this screen, bind to the system theme:
+
+    1. TEXT COLORS: use @color/text_primary, @color/text_secondary, etc.
+       (Never hardcode #RRGGBB.)
+
+    2. TYPOGRAPHY: use @style/Heading3 for title, @style/Body for messages,
+       @style/ChatMessage for chat bubbles.
+
+    3. STRINGS: use @string/chat_title, @string/send, @string/type_message.
+
+    4. BUBBLE COLORS: use @color/bubble_user, @color/bubble_ai.
+       These are defined in values/colors.xml and change globally.
+
+    Example of a chat bubble (AI side):
+    ┌─────────────────────────────────────────────────────────┐
+    │ <TextView                                                │
+    │     android:layout_width="wrap_content"                  │
+    │     android:layout_height="wrap_content"                 │
+    │     android:background="@drawable/bubble_ai_bg"          │
+    │     android:textAppearance="@style/ChatMessage"          │
+    │     android:textColor="@color/bubble_ai_text" />         │
+    └─────────────────────────────────────────────────────────┘
+-->
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
+
 </LinearLayout>

@@ -1,6 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<!--
+    AI Recommendations screen — not yet implemented.
+
+    When building this screen, bind to the system theme:
+
+    1. TEXT COLORS: use @color/ references (not #RRGGBB).
+    2. TYPOGRAPHY: use @style/Heading2 for title, @style/Body for content.
+    3. STRINGS: use @string/recommendations, @string/get_recommendations.
+    4. BUTTONS: Material theme applies colorPrimary automatically.
+
+    Example:
+    ┌─────────────────────────────────────────────────────────┐
+    │ <TextView                                                │
+    │     android:text="@string/recommendations"               │
+    │     android:textAppearance="@style/Heading2"             │
+    │     android:textColor="@color/text_primary" />           │
+    └─────────────────────────────────────────────────────────┘
+-->
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
+
 </LinearLayout>

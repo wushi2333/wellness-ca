@@ -1,6 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<!--
+    Login screen — not yet implemented.
+
+    When building this screen, bind to the system theme:
+
+    1. TEXT COLORS — use @color/ references instead of #RRGGBB:
+       android:textColor="@color/text_primary"
+       android:textColorHint="@color/text_hint"
+
+    2. TYPOGRAPHY — use @style/ references instead of raw sp:
+       android:textAppearance="@style/Heading2"
+       android:textAppearance="@style/Body"
+       android:textAppearance="@style/Caption"
+
+    3. STRINGS — use @string/ references (defined in values/strings.xml):
+       android:text="@string/login"
+       android:hint="@string/username"
+
+    4. BACKGROUND — use theme attributes:
+       android:background="?attr/colorSurface"
+
+    Example of a properly themed TextView:
+    ┌─────────────────────────────────────────────────────────┐
+    │ <TextView                                                │
+    │     android:layout_width="match_parent"                  │
+    │     android:layout_height="wrap_content"                 │
+    │     android:text="@string/login"                         │
+    │     android:textAppearance="@style/Heading2"             │
+    │     android:textColor="@color/text_primary" />           │
+    └─────────────────────────────────────────────────────────┘
+
+    Available theme resources (see values/):
+    - colors:    primary, secondary, text_primary, text_secondary,
+                 text_hint, background, surface, error, success, outline
+    - typography: Heading1, Heading2, Heading3, BodyLarge, Body,
+                  Caption, Label, ButtonText, ChatMessage
+    - strings:   login, register, username, password, etc.
+-->
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
+
 </LinearLayout>
