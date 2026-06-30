@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-    Author: Wang Songyu
-
     Wellness List screen.
-    Displays all wellness records and allows users
-    to add a new wellness record.
+    Displays all wellness records and allows users to add a new one.
+
+    Theme binding:
+    - empty state:  @string/no_records, textColor @color/text_hint
+    - button:       @string/add_record
 -->
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -22,9 +23,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="No wellness records found.\nTap the button below to add one."
-        android:textSize="16sp"
-        android:textColor="#888888"
+        android:text="@string/no_records"
+        android:textAppearance="@style/BodyLarge"
+        android:textColor="@color/text_hint"
         android:visibility="gone" />
 
     <ProgressBar
@@ -40,6 +41,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
-        android:text="+ Add Record" />
+        android:text="@string/add_record" />
 
 </FrameLayout>

@@ -1,7 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<!--
+    Chat bubble — AI side (left-aligned).
+
+    When building this item, bind to the system theme:
+    - background: @drawable/bubble_ai_bg (or use @color/bubble_ai)
+    - textAppearance: @style/ChatMessage
+    - textColor: @color/bubble_ai_text
+
+    Example:
+    ┌─────────────────────────────────────────────────────────┐
+    │ <TextView                                                │
+    │     android:layout_width="wrap_content"                  │
+    │     android:layout_height="wrap_content"                 │
+    │     android:background="@color/bubble_ai"                │
+    │     android:textAppearance="@style/ChatMessage"          │
+    │     android:textColor="@color/bubble_ai_text"            │
+    │     android:padding="12dp" />                            │
+    └─────────────────────────────────────────────────────────┘
+-->
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="start"
     android:padding="8dp">
+
 </LinearLayout>

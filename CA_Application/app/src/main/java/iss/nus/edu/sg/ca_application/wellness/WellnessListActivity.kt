@@ -89,10 +89,10 @@ class WellnessListActivity : AppCompatActivity() {
 
     private fun confirmDelete(recordId: Int) {
         AlertDialog.Builder(this)
-            .setTitle("Delete Record")
-            .setMessage("Are you sure you want to delete this wellness record?")
-            .setPositiveButton("Delete") { _, _ -> deleteRecord(recordId) }
-            .setNegativeButton("Cancel", null)
+            .setTitle(getString(R.string.confirm_delete_title))
+            .setMessage(getString(R.string.confirm_delete_message))
+            .setPositiveButton(getString(R.string.delete_confirm)) { _, _ -> deleteRecord(recordId) }
+            .setNegativeButton(getString(R.string.cancel), null)
             .show()
     }
 
@@ -102,23 +102,23 @@ class WellnessListActivity : AppCompatActivity() {
             try {
                 ApiClient.deleteRecord(currentToken, recordId)
                 runOnUiThread {
-                    Toast.makeText(this, "Record deleted successfully.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.delete_success), Toast.LENGTH_SHORT).show()
                     loadRecords()
                 }
             } catch (e: ApiException) {
                 runOnUiThread {
                     showLoading(false)
                     when (e.code) {
-                        401 -> Toast.makeText(this, "Session expired. Please log in again.", Toast.LENGTH_SHORT).show()
-                        403 -> Toast.makeText(this, "API gateway authentication failed.", Toast.LENGTH_SHORT).show()
-                        404 -> Toast.makeText(this, "Record not found or has already been deleted.", Toast.LENGTH_SHORT).show()
+                        401 -> Toast.makeText(this, getString(R.string.session_expired), Toast.LENGTH_SHORT).show()
+                        403 -> Toast.makeText(this, getString(R.string.api_forbidden), Toast.LENGTH_SHORT).show()
+                        404 -> Toast.makeText(this, getString(R.string.record_not_found), Toast.LENGTH_SHORT).show()
                         else -> Toast.makeText(this, "Failed to delete record: ${e.code}", Toast.LENGTH_SHORT).show()
                     }
                 }
             } catch (e: Exception) {
                 runOnUiThread {
                     showLoading(false)
-                    Toast.makeText(this, "Network error: ${e.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.network_error), Toast.LENGTH_SHORT).show()
                 }
             }
         }.start()
@@ -138,15 +138,15 @@ class WellnessListActivity : AppCompatActivity() {
                 runOnUiThread {
                     showLoading(false)
                     when (e.code) {
-                        401 -> Toast.makeText(this, "Session expired. Please log in again.", Toast.LENGTH_SHORT).show()
-                        403 -> Toast.makeText(this, "API gateway authentication failed.", Toast.LENGTH_SHORT).show()
+                        401 -> Toast.makeText(this, getString(R.string.session_expired), Toast.LENGTH_SHORT).show()
+                        403 -> Toast.makeText(this, getString(R.string.api_forbidden), Toast.LENGTH_SHORT).show()
                         else -> Toast.makeText(this, "Request failed: ${e.code}", Toast.LENGTH_SHORT).show()
                     }
                 }
             } catch (e: Exception) {
                 runOnUiThread {
                     showLoading(false)
-                    Toast.makeText(this, "Network error: ${e.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.network_error), Toast.LENGTH_SHORT).show()
                 }
             }
         }.start()

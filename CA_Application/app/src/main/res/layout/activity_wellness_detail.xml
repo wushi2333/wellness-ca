@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-    Author: Wang Songyu
-
     Wellness Detail screen.
-    Displays a single wellness record and provides
-    Edit and Delete actions.
+    Displays a single wellness record and provides Edit and Delete actions.
+
+    Theme binding:
+    - typography:   @style/Heading2, @style/BodyLarge, @style/Body
+    - text colors:  inherited from typography styles (@color/text_primary)
+    - labels:       @string/ resources
+    - buttons:      Material theme ?attr/colorPrimary applied automatically
 -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -18,37 +21,37 @@
         android:id="@+id/tvDetailDate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="22sp"
-        android:textStyle="bold" />
+        android:textAppearance="@style/Heading2" />
 
     <TextView
         android:id="@+id/tvDetailSleep"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:textSize="16sp" />
+        android:textAppearance="@style/BodyLarge" />
 
     <TextView
         android:id="@+id/tvDetailExercise"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:textSize="16sp" />
+        android:textAppearance="@style/BodyLarge" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="Notes"
-        android:textSize="14sp"
-        android:textStyle="bold" />
+        android:text="@string/notes"
+        android:textAppearance="@style/Body"
+        android:textStyle="bold"
+        android:textColor="@color/text_primary" />
 
     <TextView
         android:id="@+id/tvDetailNotes"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:textSize="16sp" />
+        android:textAppearance="@style/BodyLarge" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -62,7 +65,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginEnd="8dp"
-            android:text="Edit" />
+            android:text="@string/edit_record" />
 
         <Button
             android:id="@+id/btnDelete"
@@ -70,7 +73,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginStart="8dp"
-            android:text="Delete" />
+            android:text="@string/delete_record" />
 
     </LinearLayout>
 

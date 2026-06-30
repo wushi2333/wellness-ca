@@ -37,10 +37,11 @@ class WellnessAdapter(
     override fun onBindViewHolder(holder: WellnessViewHolder, position: Int) {
         val record = records[position]
 
+        val context = holder.itemView.context
         holder.tvDate.text = record.recordDate
-        holder.tvSleep.text = "Sleep: ${record.sleepHours}h"
+        holder.tvSleep.text = context.getString(R.string.sleep_format, record.sleepHours)
         holder.tvExercise.text =
-            "${record.exerciseActivity} (${record.exerciseDuration} min)"
+            context.getString(R.string.exercise_format, record.exerciseActivity, record.exerciseDuration)
 
         holder.itemView.setOnClickListener {
             onItemClick(record)
