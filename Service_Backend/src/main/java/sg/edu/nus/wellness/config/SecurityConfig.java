@@ -1,7 +1,8 @@
-// Author: Xia Zihang
+// Author: Xia Zihang, Yutong Luo
 package sg.edu.nus.wellness.config;
 import sg.edu.nus.wellness.security.*;
 import org.springframework.context.annotation.*;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -17,7 +18,10 @@ public class SecurityConfig {
             .formLogin(f -> f.disable())
             .httpBasic(b -> b.disable())
             .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(a -> a.anyRequest().permitAll())
+            .authorizeHttpRequests(a -> a
+                    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                    .requestMatchers(HttpMethod.POST, "/register", "/login").permitAll()
+                    .anyRequest().authenticated())
             .addFilterBefore(gw, UsernamePasswordAuthenticationFilter.class)
             .addFilterAfter(jwt, GatewayFilter.class);
         return http.build();

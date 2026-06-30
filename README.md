@@ -24,7 +24,7 @@ wellness-ca/
 │       └── agent/                 Agentic AI (Cai Peilin, FastAPI :8002)
 
 └── docs/
-    └── agentic-api.md             Agentic AI API specification
+    └── api-reference.pdf          Backend API reference
 ```
 
 ## Quick Start
@@ -45,6 +45,12 @@ java -jar target/wellness-backend-1.0.jar
 ```
 
 Requires: `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `JWT_SECRET_KEY`, `DEEPSEEK_API_KEY`, `API_GATEWAY_TOKEN`.
+
+Backend notes and test commands:
+
+- `Service_Backend/BACKEND_NOTES.md`
+- `Service_Backend/API_TESTING.md`
+- `Service_Backend/application.properties.example`
 
 ## Architecture
 
@@ -67,6 +73,7 @@ Android App ──HTTP──→ Spring Boot :8000 ──→ Aiven MySQL (cloud)
 | Module | Author |
 |--------|:--:|
 | Spring Boot backend (base) | Xia Zihang |
+| Backend DB/JWT hardening + wellness records | Yutong Luo |
 | RAG chatbot + ChromaDB | Huang Qianer |
 | Agentic AI recommendation | Cai Peilin |
 | Android app | Team members |

@@ -1,4 +1,4 @@
-// Author: Xia Zihang
+// Author: Xia Zihang, Yutong Luo
 package sg.edu.nus.wellness.security;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
@@ -15,6 +15,11 @@ public class GatewayFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
             throws ServletException, IOException {
+        if ("OPTIONS".equalsIgnoreCase(req.getMethod()) || "/error".equals(req.getServletPath())) {
+            chain.doFilter(req, res);
+            return;
+        }
+
         if (!token.equals(req.getHeader("X-API-Token"))) { res.sendError(403, "Forbidden"); return; }
         chain.doFilter(req, res);
     }

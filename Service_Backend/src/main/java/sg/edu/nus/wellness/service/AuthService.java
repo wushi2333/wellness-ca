@@ -1,4 +1,4 @@
-// Author: Xia Zihang
+// Author: Xia Zihang, Yutong Luo
 package sg.edu.nus.wellness.service;
 import sg.edu.nus.wellness.dto.AuthResponse;
 import sg.edu.nus.wellness.model.User;
@@ -13,13 +13,15 @@ public class AuthService {
     public AuthService(UserRepo u, JwtTokenProvider j, PasswordEncoder e) { users=u; jwt=j; encoder=e; }
 
     public Long register(String username, String password) {
+        username = username.trim();
         if (users.findByUsername(username).isPresent()) throw new RuntimeException("Username exists");
         return users.save(new User(username, encoder.encode(password))).getId();
     }
 
     public AuthResponse login(String username, String password) {
+        username = username.trim();
         User u = users.findByUsername(username).orElseThrow(()->new RuntimeException("Bad credentials"));
         if (!encoder.matches(password, u.getHashedPassword())) throw new RuntimeException("Bad credentials");
-        return AuthResponse.of(jwt.createToken(u.getId().toString()));
+        return AuthResponse.of(jwt.createToken(u.getId().toString()), u.getId(), u.getUsername());
     }
 }

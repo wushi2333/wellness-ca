@@ -1,4 +1,4 @@
-// Author: Xia Zihang
+// Author: Xia Zihang, Yutong Luo
 package sg.edu.nus.wellness.security;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -15,6 +15,9 @@ public class JwtTokenProvider {
 
     public JwtTokenProvider(@Value("${app.jwt.secret}") String secret,
                             @Value("${app.jwt.expiration}") long expirationMin) {
+        if (secret == null || secret.length() < 32) {
+            throw new IllegalArgumentException("app.jwt.secret must be at least 32 characters");
+        }
         this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         this.expirationMs = expirationMin * 60_000;
     }

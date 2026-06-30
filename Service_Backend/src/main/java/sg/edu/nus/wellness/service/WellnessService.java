@@ -1,6 +1,7 @@
-// Author: Huang Qianer, Xia Zihang
+// Author: Huang Qianer, Xia Zihang, Yutong Luo
 package sg.edu.nus.wellness.service;
 import sg.edu.nus.wellness.dto.WellnessRequest;
+import sg.edu.nus.wellness.dto.WellnessResponse;
 import sg.edu.nus.wellness.model.WellnessRecord;
 import sg.edu.nus.wellness.repository.WellnessRepo;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,7 +20,12 @@ public class WellnessService {
         repo=r; ragUrl=rag;
     }
 
-    public List<WellnessRecord> list(Long userId) { return repo.findByUserIdOrderByRecordDateDesc(userId); }
+    public List<WellnessResponse> list(Long userId) {
+        return repo.findByUserIdOrderByRecordDateDesc(userId)
+                .stream()
+                .map(WellnessResponse::from)
+                .toList();
+    }
 
     public Long create(Long userId, WellnessRequest req) {
         Long id = repo.save(toEntity(userId, req)).getId();
@@ -50,7 +56,8 @@ public class WellnessService {
 
     private void apply(WellnessRecord r, WellnessRequest req) {
         r.setSleepHours(req.sleepHours); r.setExerciseActivity(req.exerciseActivity);
-        r.setExerciseDuration(req.exerciseDuration); r.setRecordDate(LocalDate.parse(req.recordDate));
+        r.setExerciseDuration(req.exerciseDuration); r.setMoodScore(req.moodScore);
+        r.setRecordDate(LocalDate.parse(req.recordDate));
         r.setNotes(req.notes);
     }
 
@@ -62,6 +69,7 @@ public class WellnessService {
             sync.put("sleep_hours", req.sleepHours);
             sync.put("exercise_activity", req.exerciseActivity);
             sync.put("exercise_duration", req.exerciseDuration);
+            sync.put("mood_score", req.moodScore);
             sync.put("record_date", req.recordDate);
             sync.put("notes", req.notes);
             http.postForEntity(ragUrl+"/sync", sync, String.class);
