@@ -47,13 +47,13 @@ class WellnessEntryActivity : AppCompatActivity() {
         btnSave = findViewById(R.id.btnSave)
         progressBar = findViewById(R.id.progressBar)
 
-        editingRecordId = intent.getIntExtra("record_id", -1)
+        editingRecordId = intent.getIntExtra("recordId", -1)
 
         if (editingRecordId != -1) {
-            etSleepHours.setText(intent.getDoubleExtra("sleep_hours", 0.0).toString())
-            etExerciseActivity.setText(intent.getStringExtra("exercise_activity") ?: "")
-            etExerciseDuration.setText(intent.getIntExtra("exercise_duration", 0).toString())
-            etRecordDate.setText(intent.getStringExtra("record_date") ?: "")
+            etSleepHours.setText(intent.getDoubleExtra("sleepHours", 0.0).toString())
+            etExerciseActivity.setText(intent.getStringExtra("exerciseActivity") ?: "")
+            etExerciseDuration.setText(intent.getIntExtra("exerciseDuration", 0).toString())
+            etRecordDate.setText(intent.getStringExtra("recordDate") ?: "")
             etNotes.setText(intent.getStringExtra("notes") ?: "")
             btnSave.text = "Update"
         }

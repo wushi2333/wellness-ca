@@ -63,11 +63,11 @@ class WellnessListActivity : AppCompatActivity() {
             records = emptyList(),
             onItemClick = { record ->
                 val intent = Intent(this, WellnessDetailActivity::class.java).apply {
-                    putExtra("record_id", record.id)
-                    putExtra("sleep_hours", record.sleepHours)
-                    putExtra("exercise_activity", record.exerciseActivity)
-                    putExtra("exercise_duration", record.exerciseDuration)
-                    putExtra("record_date", record.recordDate)
+                    putExtra("recordId", record.id)
+                    putExtra("sleepHours", record.sleepHours)
+                    putExtra("exerciseActivity", record.exerciseActivity)
+                    putExtra("exerciseDuration", record.exerciseDuration)
+                    putExtra("recordDate", record.recordDate)
                     putExtra("notes", record.notes)
                 }
                 entryActivityLauncher.launch(intent)
