@@ -8,7 +8,13 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import iss.nus.edu.sg.ca_application.wellness.WellnessListActivity
 
-/** Redirects to WellnessListActivity for CRUD testing. */
+/**
+ * Author: Wang Songyu
+ *
+ * Main entry activity of the application.
+ *
+ * Currently redirects to WellnessListActivity for CRUD testing.
+ */
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,6 +29,7 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
+        // Temporary navigation for testing the Wellness CRUD module.
         startActivity(Intent(this, WellnessListActivity::class.java))
     }
 }
