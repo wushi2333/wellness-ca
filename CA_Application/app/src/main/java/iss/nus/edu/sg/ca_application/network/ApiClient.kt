@@ -64,8 +64,8 @@ object ApiClient {
         val connection = url.openConnection() as HttpURLConnection
 
         connection.requestMethod = method
-        connection.connectTimeout = 10000  // 10秒连接超时
-        connection.readTimeout = 10000     // 10秒读取超时
+        connection.connectTimeout = 10000
+        connection.readTimeout = 10000
 
         connection.setRequestProperty("Content-Type", "application/json")
         connection.setRequestProperty("X-API-Token", API_GATEWAY_TOKEN)
@@ -126,7 +126,6 @@ object ApiClient {
                     )
                 }
             } else {
-                // 401/403 等情况，按你注释里的规范处理
                 val errorBody = connection.errorStream?.bufferedReader()?.use { it.readText() }
                     ?: "No error details"
                 throw ApiException(responseCode, errorBody)
@@ -182,7 +181,7 @@ object ApiClient {
                 val obj = JSONObject(response)
                 val newId = obj.getInt("id")
 
-                // 后端不返回完整记录，自己用 entry + 新 id 拼出来
+                // Backend returns only id; reconstruct locally
                 return WellnessRecord(
                     id = newId,
                     sleepHours = entry.sleepHours,
@@ -242,7 +241,7 @@ object ApiClient {
             val responseCode = connection.responseCode
 
             if (responseCode == HttpURLConnection.HTTP_OK) {
-                // 后端只返回 {"message": "Updated"}，不需要解析，直接拼出结果
+                // Backend returns only message; reconstruct locally
                 return WellnessRecord(
                     id = id,
                     sleepHours = entry.sleepHours,
@@ -282,7 +281,6 @@ object ApiClient {
             connection = createConnection("/records/$id", "DELETE", token)
             val responseCode = connection.responseCode
 
-            // DELETE 成功常见返回 200 (OK) 或 204 (No Content)
             if (responseCode != HttpURLConnection.HTTP_OK &&
                 responseCode != HttpURLConnection.HTTP_NO_CONTENT) {
 
@@ -290,7 +288,6 @@ object ApiClient {
                     ?: "No error details"
                 throw ApiException(responseCode, errorBody)
             }
-            // 成功则什么都不返回（Unit）
         } finally {
             connection?.disconnect()
         }
