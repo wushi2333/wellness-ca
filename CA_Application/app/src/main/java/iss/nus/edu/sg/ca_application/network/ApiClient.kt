@@ -1,5 +1,8 @@
 package iss.nus.edu.sg.ca_application.network
 
+import java.net.HttpURLConnection
+import java.net.URL
+
 /**
  * Centralized HTTP client for all backend API calls.
  *
@@ -40,3 +43,23 @@ package iss.nus.edu.sg.ca_application.network
 
 const val BASE_URL = "http://152.42.181.66:8000"
 const val API_GATEWAY_TOKEN = "team-wellness-2025"
+
+
+fun openAuthenticatedConnection(
+    path: String,
+    method: String,
+    bearerToken: String? = null
+): HttpURLConnection {
+    val url = URL("$BASE_URL$path")
+    return (url.openConnection() as HttpURLConnection).apply {
+        requestMethod = method
+        setRequestProperty("X-API-Token", API_GATEWAY_TOKEN)
+        setRequestProperty("Content-Type", "application/json")
+        if (bearerToken != null) {
+            setRequestProperty("Authorization", "Bearer $bearerToken")
+        }
+        connectTimeout = 10_000
+        // Agent calls can take 5-15 seconds; allow up to 30 to be safe.
+        readTimeout = 30_000
+    }
+}

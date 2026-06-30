@@ -22,9 +22,31 @@
     <string name="send">Send</string>
     <string name="type_message">Type a message…</string>
 
-    <!-- Agentic AI -->
-    <string name="recommendations">AI Recommendations</string>
-    <string name="get_recommendations">Get Recommendations</string>
+    <!-- Agentic AI feature (author: Cai Peilin) -->
+    <string name="agent_screen_title">Wellness Insights</string>
+    <string name="agent_main_title">Get a personalized recommendation</string>
+    <string name="agent_main_subtitle">based on your recent wellness data.</string>
+    <string name="agent_generate_button">Generate Recommendation</string>
+    <string name="agent_view_history">View History</string>
+
+    <string name="agent_loading_step_1">Loading your wellness records…</string>
+    <string name="agent_loading_step_2">Analyzing sleep pattern…</string>
+    <string name="agent_loading_step_3">Analyzing exercise pattern…</string>
+    <string name="agent_loading_step_4">Generating recommendation…</string>
+    <string name="agent_loading_step_format">Step %1$d of 4</string>
+
+    <string name="agent_result_title">Today\'s Recommendation</string>
+    <string name="agent_evidence_section">How AI arrived at this</string>
+    <string name="agent_generate_again">Generate Again</string>
+
+    <string name="agent_history_title">Past Recommendations</string>
+    <string name="agent_history_empty">No recommendations yet. Generate your first one!</string>
+
+    <string name="agent_error_generic">Could not generate recommendation. Try again.</string>
+    <string name="agent_error_no_records">Add some wellness records first, then come back.</string>
+    <string name="agent_error_unauthorized">Session expired. Please log in again.</string>
+    <string name="agent_retry">Retry</string>
+    <string name="agent_evidence_row">%1$d.&#160;&#160;%2$s</string>
 
     <!-- Navigation -->
     <string name="dashboard">Dashboard</string>

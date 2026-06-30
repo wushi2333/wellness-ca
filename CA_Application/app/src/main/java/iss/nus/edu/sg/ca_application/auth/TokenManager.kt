@@ -1,5 +1,8 @@
 package iss.nus.edu.sg.ca_application.auth
 
+import android.content.Context
+import android.content.SharedPreferences
+
 /**
  * Manages JWT access token persistence and retrieval.
  *
@@ -21,3 +24,32 @@ package iss.nus.edu.sg.ca_application.auth
  * Storage: SharedPreferences (private to the app)
  * Key names: "jwt_access_token", "jwt_token_type"
  */
+class TokenManager(context: Context) {
+
+    private val prefs: SharedPreferences =
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+
+    fun saveToken(accessToken: String, tokenType: String = "bearer") {
+        prefs.edit()
+            .putString(KEY_TOKEN, accessToken)
+            .putString(KEY_TYPE, tokenType)
+            .apply()
+    }
+
+    fun getToken(): String? = prefs.getString(KEY_TOKEN, null)
+
+    fun getAuthHeader(): String? {
+        val token = getToken() ?: return null
+        return "Bearer $token"
+    }
+
+    fun clearToken() {
+        prefs.edit().remove(KEY_TOKEN).remove(KEY_TYPE).apply()
+    }
+
+    companion object {
+        private const val PREFS_NAME = "wellness_auth"
+        private const val KEY_TOKEN = "jwtAccessToken"
+        private const val KEY_TYPE = "jwtTokenType"
+    }
+}
