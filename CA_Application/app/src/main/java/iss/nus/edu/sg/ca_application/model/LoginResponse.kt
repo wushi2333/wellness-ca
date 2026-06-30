@@ -8,6 +8,11 @@ package iss.nus.edu.sg.ca_application.model
  * This class models the JSON response:
  * {
  *   "accessToken": "...",
- *   "tokenType": "bearer"
+ *   "tokenType": "bearer",
+ *   "userId": 1,
+ *   "username": "alice"
  * }
+ *
+ * Updated by Yutong Luo: login now returns userId and username
+ * so Android can store them locally without decoding the JWT.
  */
