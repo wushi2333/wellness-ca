@@ -1,27 +1,214 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<!--
-    AI Recommendations screen — not yet implemented.
-
-    When building this screen, bind to the system theme:
-
-    1. TEXT COLORS: use @color/ references (not #RRGGBB).
-    2. TYPOGRAPHY: use @style/Heading2 for title, @style/Body for content.
-    3. STRINGS: use @string/recommendations, @string/get_recommendations.
-    4. BUTTONS: Material theme applies colorPrimary automatically.
-
-    Example:
-    ┌─────────────────────────────────────────────────────────┐
-    │ <TextView                                                │
-    │     android:text="@string/recommendations"               │
-    │     android:textAppearance="@style/Heading2"             │
-    │     android:textColor="@color/text_primary" />           │
-    └─────────────────────────────────────────────────────────┘
--->
-
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:background="@color/background">
 
-</LinearLayout>
+    <!-- Top toolbar -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/surface"
+        app:elevation="0dp">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/surface"
+            app:titleTextColor="@color/text_primary"
+            app:title="@string/agent_screen_title" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- Scrollable content area -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:paddingTop="32dp"
+            android:paddingBottom="32dp">
+
+            <!-- Headline -->
+            <TextView
+                android:id="@+id/headlineText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/Heading2"
+                android:text="@string/agent_main_title" />
+
+            <TextView
+                android:id="@+id/subheadText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/Body"
+                android:textColor="@color/text_secondary"
+                android:lineSpacingExtra="2sp"
+                android:layout_marginTop="8dp"
+                android:text="@string/agent_main_subtitle" />
+
+            <!-- Idle state: Generate button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/generateButton"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="32dp"
+                android:backgroundTint="@color/primary"
+                android:textColor="@color/on_primary"
+                android:text="@string/agent_generate_button"
+                android:textAllCaps="false"
+                app:cornerRadius="12dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/viewHistoryButton"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_marginTop="8dp"
+                android:textColor="@color/primary"
+                android:text="@string/agent_view_history"
+                android:textAllCaps="false" />
+
+            <!-- Loading state (hidden by default) -->
+            <LinearLayout
+                android:id="@+id/loadingContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="48dp"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <ProgressBar
+                    android:id="@+id/loadingBar"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="6dp"
+                    android:indeterminate="true"
+                    android:indeterminateTint="@color/primary" />
+
+                <TextView
+                    android:id="@+id/loadingStatusText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/BodyLarge"
+                    android:textAlignment="center"
+                    android:layout_marginTop="16dp"
+                    tools:text="Analyzing sleep pattern…" />
+
+                <TextView
+                    android:id="@+id/loadingStepText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/Caption"
+                    android:textColor="@color/text_secondary"
+                    android:textAlignment="center"
+                    android:layout_marginTop="8dp"
+                    tools:text="Step 2 of 4" />
+
+            </LinearLayout>
+
+            <!-- Result state (hidden by default) -->
+            <LinearLayout
+                android:id="@+id/resultContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="32dp"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardBackgroundColor="@color/surface"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp"
+                    app:strokeWidth="0dp">
+
+                    <TextView
+                        android:id="@+id/recommendationText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="@style/BodyLarge"
+                        android:lineSpacingExtra="4sp"
+                        android:padding="20dp"
+                        tools:text="Your sleep has declined from 7.5h to 4.5h this week, with 3 nights below 6 hours. Try winding down 30 minutes earlier tonight." />
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Evidence section -->
+                <TextView
+                    android:id="@+id/evidenceToggleText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/Body"
+                    android:textColor="@color/primary"
+                    android:layout_marginTop="20dp"
+                    android:padding="8dp"
+                    tools:text="How AI arrived at this  ▾" />
+
+                <LinearLayout
+                    android:id="@+id/evidenceContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginTop="8dp"
+                    android:background="@color/surface_variant"
+                    android:padding="16dp"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+
+                <!-- Action buttons -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="24dp">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/generateAgainButton"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="8dp"
+                        android:textColor="@color/primary"
+                        app:strokeColor="@color/primary"
+                        android:text="@string/agent_generate_again"
+                        android:textAllCaps="false"
+                        app:cornerRadius="12dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/viewHistoryInResultButton"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:layout_marginStart="8dp"
+                        android:textColor="@color/primary"
+                        app:strokeColor="@color/primary"
+                        android:text="@string/agent_view_history"
+                        android:textAllCaps="false"
+                        app:cornerRadius="12dp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

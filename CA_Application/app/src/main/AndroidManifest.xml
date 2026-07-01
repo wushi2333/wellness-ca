@@ -36,6 +36,13 @@
             android:name=".wellness.WellnessDetailActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".agentic.RecommendationActivity"
+            android:exported="false" />
+        <activity
+            android:name=".agentic.RecommendationHistoryActivity"
+            android:exported="false" />
+
 
     </application>
 

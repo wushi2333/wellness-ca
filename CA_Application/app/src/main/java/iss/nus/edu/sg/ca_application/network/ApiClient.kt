@@ -293,3 +293,23 @@ object ApiClient {
         }
     }
 }
+
+
+fun openAuthenticatedConnection(
+    path: String,
+    method: String,
+    bearerToken: String? = null
+): HttpURLConnection {
+    val url = URL("$BASE_URL$path")
+    return (url.openConnection() as HttpURLConnection).apply {
+        requestMethod = method
+        setRequestProperty("X-API-Token", API_GATEWAY_TOKEN)
+        setRequestProperty("Content-Type", "application/json")
+        if (bearerToken != null) {
+            setRequestProperty("Authorization", "Bearer $bearerToken")
+        }
+        connectTimeout = 10_000
+        // Agent calls can take 5-15 seconds; allow up to 30 to be safe.
+        readTimeout = 30_000
+    }
+}
