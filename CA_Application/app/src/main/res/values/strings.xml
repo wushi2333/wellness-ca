@@ -11,50 +11,47 @@
     <!-- Wellness -->
     <string name="sleep_hours">Sleep Hours</string>
     <string name="exercise_activity">Exercise Activity</string>
-    <string name="exercise_duration">Exercise Duration (minutes)</string>
-    <string name="record_date">Record Date</string>
-    <string name="notes">Notes</string>
-    <string name="save_record">Save</string>
-    <string name="delete_record">Delete</string>
-    <string name="edit_record">Edit</string>
-    <string name="no_records">No wellness records found.\nTap the button below to add one.</string>
-    <string name="hint_sleep_hours">e.g. 7.5</string>
-    <string name="hint_exercise_activity">e.g. Running</string>
-    <string name="hint_exercise_duration">e.g. 30</string>
-    <string name="hint_notes">Optional notes</string>
-    <string name="hint_select_date">Tap to select date</string>
-    <string name="add_record">+ Add Record</string>
-    <string name="update_record">Update</string>
-    <string name="confirm_delete_title">Delete Record</string>
-    <string name="confirm_delete_message">Are you sure you want to delete this wellness record?</string>
-    <string name="delete_success">Record deleted successfully.</string>
-    <string name="save_success">Record saved successfully.</string>
-    <string name="no_notes">No notes</string>
-    <string name="record_not_found">Record not found.</string>
-    <string name="api_forbidden">API gateway authentication failed.</string>
-    <string name="field_required">Please complete all required fields.</string>
-    <string name="invalid_numeric">Invalid numeric input.</string>
-    <string name="sleep_range">Sleep hours must be between 0 and 24.</string>
-    <string name="exercise_range">Exercise duration must be between 0 and 1440 minutes.</string>
-    <string name="date_invalid">Please select a valid date.</string>
-    <string name="cancel">Cancel</string>
-    <string name="delete_confirm">Delete</string>
-    <string name="sleep_format">Sleep: %sh</string>
-    <string name="exercise_format">%s (%d min)</string>
+    <string name="exercise_duration">Duration (mins)</string>
+    <string name="record_date">Date</string>
+    <string name="save_record">Save Record</string>
+    <string name="delete_record">Delete Record</string>
+    <string name="edit_record">Edit Record</string>
 
     <!-- Chat -->
     <string name="chat_title">AI Wellness Assistant</string>
     <string name="send">Send</string>
     <string name="type_message">Type a message…</string>
 
-    <!-- Agentic AI -->
-    <string name="recommendations">AI Recommendations</string>
-    <string name="get_recommendations">Get Recommendations</string>
+    <!-- Agentic AI feature (author: Cai Peilin) -->
+    <string name="agent_screen_title">Wellness Insights</string>
+    <string name="agent_main_title">Get a personalized recommendation</string>
+    <string name="agent_main_subtitle">based on your recent wellness data.</string>
+    <string name="agent_generate_button">Generate Recommendation</string>
+    <string name="agent_view_history">View History</string>
+
+    <string name="agent_loading_step_1">Loading your wellness records…</string>
+    <string name="agent_loading_step_2">Analyzing sleep pattern…</string>
+    <string name="agent_loading_step_3">Analyzing exercise pattern…</string>
+    <string name="agent_loading_step_4">Generating recommendation…</string>
+    <string name="agent_loading_step_format">Step %1$d of 4</string>
+
+    <string name="agent_result_title">Today\'s Recommendation</string>
+    <string name="agent_evidence_section">How AI arrived at this</string>
+    <string name="agent_generate_again">Generate Again</string>
+
+    <string name="agent_history_title">Past Recommendations</string>
+    <string name="agent_history_empty">No recommendations yet. Generate your first one!</string>
+
+    <string name="agent_error_generic">Could not generate recommendation. Try again.</string>
+    <string name="agent_error_no_records">Add some wellness records first, then come back.</string>
+    <string name="agent_error_unauthorized">Session expired. Please log in again.</string>
+    <string name="agent_retry">Retry</string>
+    <string name="agent_evidence_row">%1$d.&#160;&#160;%2$s</string>
 
     <!-- Navigation -->
     <string name="dashboard">Dashboard</string>
     <string name="view_records">View Records</string>
-    <string name="nav_add_record">Add Record</string>
+    <string name="add_record">Add Record</string>
     <string name="chat">Chat</string>
 
     <!-- Network -->
