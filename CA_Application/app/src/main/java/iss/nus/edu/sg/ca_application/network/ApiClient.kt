@@ -1,42 +1,143 @@
 package iss.nus.edu.sg.ca_application.network
 
-/**
- * Centralized HTTP client for all backend API calls.
- *
- * Server:
- *   Ubuntu 24.04 running Spring Boot on port 8000
- *
- * Required headers on EVERY authenticated request:
- *   Authorization: Bearer <jwtAccessToken>
- *   X-API-Token:   team-wellness-2025
- *   Content-Type:  application/json
- *
- * The API gateway token (team-wellness-2025) is a shared team secret.
- * It is NOT the DeepSeek API key — that never leaves the server.
- *
- * Endpoints consumed by the Android app:
- *   POST   /login              — authenticate and receive JWT
- *   POST   /register           — create new user account
- *   GET    /records             — list user's wellness records
- *   POST   /records             — create a new wellness record
- *   PUT    /records/{id}        — update an existing record
- *   DELETE /records/{id}        — delete a record
- *   POST   /chat                — send a message to the AI chatbot
- *   GET    /recommendations     — retrieve AI-generated recommendations
- *
- * Error handling:
- *   HTTP 401 → JWT expired or invalid → redirect to LoginActivity
- *   HTTP 403 → API gateway token rejected
- *   HTTP 4xx/5xx → show user-friendly Toast/Dialog
- *
- * Threading:
- *   All network calls MUST run on a background thread (Thread { }).
- *   UI updates MUST use runOnUiThread { }.
- *
- * Dependencies:
- *   java.net.HttpURLConnection (as taught in 07_Image_Download.pdf)
- *   org.json.JSONObject (for JSON parsing)
- */
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
+import com.google.gson.Gson
+import iss.nus.edu.sg.ca_application.model.LoginRequest
+import iss.nus.edu.sg.ca_application.model.LoginResponse
+import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONObject
+import java.io.IOException
 
-const val BASE_URL = "http://152.42.181.66:8000"
-const val API_GATEWAY_TOKEN = "team-wellness-2025"
+object ApiClient {
+
+    const val BASE_URL = "http://10.0.2.2:8000"
+    const val API_TOKEN = "team-wellness-2025"
+
+    private val JSON = "application/json; charset=utf-8".toMediaType()
+    private val client = OkHttpClient()
+    private val handler = Handler(Looper.getMainLooper())
+    private val gson = Gson()
+
+    interface LoginCallback {
+        fun onSuccess(response: LoginResponse)
+        fun onFailure(message: String)
+    }
+
+    interface RegisterCallback {
+        fun onSuccess(message: String)
+        fun onFailure(message: String)
+    }
+
+    // ================= LOGIN =================
+    fun login(
+        username: String,
+        password: String,
+        callback: LoginCallback
+    ) {
+
+        val requestObject = LoginRequest(username, password)
+        val json = gson.toJson(requestObject)
+        val body = json.toRequestBody(JSON)
+
+        val request = Request.Builder()
+            .url("$BASE_URL/login")
+            .addHeader("X-API-Token", API_TOKEN)
+            .addHeader("Content-Type", "application/json")
+            .post(body)
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+
+            override fun onFailure(call: Call, e: IOException) {
+                handler.post {
+                    callback.onFailure(e.message ?: "Network Error")
+                }
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+
+                val resultString = response.body?.string()
+
+                if (response.isSuccessful && resultString != null) {
+
+                    val loginResponse =
+                        gson.fromJson(resultString, LoginResponse::class.java)
+
+                    handler.post {
+                        callback.onSuccess(loginResponse)
+                    }
+
+                } else {
+
+                    val message = try {
+                        val error = resultString ?: "Login Failed"
+                        JSONObject(error).getString("detail")
+                    } catch (e: Exception) {
+                        "Login Failed"
+                    }
+
+                    handler.post {
+                        callback.onFailure(message)
+                    }
+                }
+            }
+        })
+    }
+
+    // ================= REGISTER =================
+    fun register(
+        username: String,
+        password: String,
+        callback: RegisterCallback
+    ) {
+
+        val requestObject = LoginRequest(username, password)
+        val json = gson.toJson(requestObject)
+        val body = json.toRequestBody(JSON)
+
+        val request = Request.Builder()
+            .url("$BASE_URL/register")
+            .addHeader("X-API-Token", API_TOKEN)
+            .addHeader("Content-Type", "application/json")
+            .post(body)
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+
+            override fun onFailure(call: Call, e: IOException) {
+                handler.post {
+                    callback.onFailure(e.message ?: "Network Error")
+                }
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+
+                val resultString = response.body?.string()
+
+                if (response.isSuccessful) {
+
+                    handler.post {
+                        callback.onSuccess("Register Successful")
+                    }
+
+                } else {
+
+                    val message = try {
+                        val error = resultString ?: "Register Failed"
+                        JSONObject(error).getString("detail")
+                    } catch (e: Exception) {
+                        "Register Failed"
+                    }
+
+                    handler.post {
+                        callback.onFailure(message)
+                    }
+                }
+            }
+        })
+    }
+}

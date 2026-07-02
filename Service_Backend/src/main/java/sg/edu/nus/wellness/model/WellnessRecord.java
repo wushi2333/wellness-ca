@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Entity @Table(name="wellness_records")
 public class WellnessRecord {
     @Id @GeneratedValue(strategy=GenerationType.IDENTITY) private Long id;
-    @Column(nullable=false) 
+    @Column(name = "user_id", nullable = false)
     private Long userId;
     private Double sleepHours;
     private String exerciseActivity;
