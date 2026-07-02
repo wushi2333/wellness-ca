@@ -1,29 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<!--
-    Chat bubble — user side (right-aligned).
-
-    When building this item, bind to the system theme:
-    - background: @drawable/bubble_user_bg (or use @color/bubble_user)
-    - textAppearance: @style/ChatMessage
-    - textColor: @color/bubble_user_text
-
-    Example:
-    ┌─────────────────────────────────────────────────────────┐
-    │ <TextView                                                │
-    │     android:layout_width="wrap_content"                  │
-    │     android:layout_height="wrap_content"                 │
-    │     android:background="@color/bubble_user"              │
-    │     android:textAppearance="@style/ChatMessage"          │
-    │     android:textColor="@color/bubble_user_text"          │
-    │     android:padding="12dp" />                            │
-    └─────────────────────────────────────────────────────────┘
--->
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="end"
+    android:orientation="vertical"
     android:padding="8dp">
+
+    <TextView
+        android:id="@+id/textViewMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="64dp"
+        android:background="@drawable/bubble_user_bg"
+        android:padding="12dp"
+        android:textAppearance="@style/ChatMessage"
+        android:textColor="@color/bubble_user_text" />
 
 </LinearLayout>

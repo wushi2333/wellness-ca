@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import iss.nus.edu.sg.ca_application.agentic.RecommendationActivity
 import iss.nus.edu.sg.ca_application.auth.LoginActivity
 import iss.nus.edu.sg.ca_application.auth.TokenManager
+import iss.nus.edu.sg.ca_application.chat.ChatActivity
 import iss.nus.edu.sg.ca_application.wellness.WellnessEntryActivity
 import iss.nus.edu.sg.ca_application.wellness.WellnessListActivity
 
@@ -38,6 +39,10 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.btnWellnessInsights).setOnClickListener {
             startActivity(Intent(this, RecommendationActivity::class.java))
+        }
+
+        findViewById<Button>(R.id.btnChat).setOnClickListener {
+            startActivity(Intent(this, ChatActivity::class.java))
         }
 
         findViewById<Button>(R.id.btnLogout).setOnClickListener {

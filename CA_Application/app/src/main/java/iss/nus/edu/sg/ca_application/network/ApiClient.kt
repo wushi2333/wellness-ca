@@ -1,5 +1,7 @@
 package iss.nus.edu.sg.ca_application.network
 
+import iss.nus.edu.sg.ca_application.model.ChatRequest
+import iss.nus.edu.sg.ca_application.model.ChatResponse
 import iss.nus.edu.sg.ca_application.model.LoginRequest
 import iss.nus.edu.sg.ca_application.model.LoginResponse
 import iss.nus.edu.sg.ca_application.model.WellnessEntry
@@ -397,6 +399,49 @@ object ApiClient {
                         "Register Successful"
                     }
                 }
+            } else {
+                val errorBody = connection.errorStream?.bufferedReader()?.use { it.readText() }
+                    ?: "No error details"
+                throw ApiException(responseCode, errorBody)
+            }
+        } finally {
+            connection?.disconnect()
+        }
+    }
+
+    /**
+     * Sends a message to the AI chatbot.
+     *
+     * Endpoint:
+     * POST /chat
+     *
+     * @param token JWT access token
+     * @param message Message to send
+     * @return AI's reply
+     * @throws ApiException if the server returns an error
+     */
+    fun sendChatMessage(token: String, message: String): String {
+        var connection: HttpURLConnection? = null
+
+        try {
+            connection = createConnection("/chat", "POST", token)
+
+            val jsonBody = JSONObject().apply {
+                put("message", message)
+            }
+
+            connection.outputStream.use { os ->
+                val writer = OutputStreamWriter(os, "UTF-8")
+                writer.write(jsonBody.toString())
+                writer.flush()
+            }
+
+            val responseCode = connection.responseCode
+
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                val response = connection.inputStream.bufferedReader().use { it.readText() }
+                val obj = JSONObject(response)
+                return obj.getString("reply")
             } else {
                 val errorBody = connection.errorStream?.bufferedReader()?.use { it.readText() }
                     ?: "No error details"
