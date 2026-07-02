@@ -33,13 +33,13 @@ public class WellnessController {
 
     @PutMapping("/records/{id}")
     public ResponseEntity<?> update(@PathVariable Long id, @Valid @RequestBody WellnessRequest r, HttpServletRequest req) {
-        try { ws.update(uid(req), id, r); return ResponseEntity.ok(Map.of("message","Updated")); }
-        catch (RuntimeException e) { return ResponseEntity.notFound().build(); }
+        ws.update(uid(req), id, r);
+        return ResponseEntity.ok(Map.of("message","Updated"));
     }
 
     @DeleteMapping("/records/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id, HttpServletRequest req) {
-        try { ws.delete(uid(req), id); return ResponseEntity.ok(Map.of("message","Deleted")); }
-        catch (RuntimeException e) { return ResponseEntity.notFound().build(); }
+        ws.delete(uid(req), id);
+        return ResponseEntity.ok(Map.of("message","Deleted"));
     }
 }

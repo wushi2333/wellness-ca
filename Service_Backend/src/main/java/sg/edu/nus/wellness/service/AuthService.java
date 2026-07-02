@@ -14,14 +14,14 @@ public class AuthService {
 
     public Long register(String username, String password) {
         username = username.trim();
-        if (users.findByUsername(username).isPresent()) throw new RuntimeException("Username exists");
+        if (users.findByUsername(username).isPresent()) throw new IllegalArgumentException("Username exists");
         return users.save(new User(username, encoder.encode(password))).getId();
     }
 
     public AuthResponse login(String username, String password) {
         username = username.trim();
-        User u = users.findByUsername(username).orElseThrow(()->new RuntimeException("Bad credentials"));
-        if (!encoder.matches(password, u.getHashedPassword())) throw new RuntimeException("Bad credentials");
+        User u = users.findByUsername(username).orElseThrow(()->new IllegalArgumentException("Bad credentials"));
+        if (!encoder.matches(password, u.getHashedPassword())) throw new IllegalArgumentException("Bad credentials");
         return AuthResponse.of(jwt.createToken(u.getId().toString()), u.getId(), u.getUsername());
     }
 }
