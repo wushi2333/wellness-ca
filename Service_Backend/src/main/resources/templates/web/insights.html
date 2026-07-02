@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wellness AI - Insights</title>
+    <link rel="stylesheet" th:href="@{/web/css/style.css}">
+    <script defer th:src="@{/web/js/app.js}"></script>
+</head>
+<body>
+<header class="topbar">
+    <a class="brand" th:href="@{/web/dashboard}">Wellness AI</a>
+    <nav class="nav">
+        <a th:href="@{/web/records}">Records</a>
+        <a th:href="@{/web/chat}">Chat</a>
+        <a th:href="@{/web/insights}" class="active">Insights</a>
+    </nav>
+    <form th:action="@{/web/logout}" method="post">
+        <button class="link-button" type="submit">Logout</button>
+    </form>
+</header>
+
+<main class="page narrow">
+    <div class="page-header">
+        <div>
+            <p class="eyebrow">Wellness Insights</p>
+            <h1>Get a personalized recommendation</h1>
+        </div>
+    </div>
+
+    <div class="alert error" th:if="${error}" th:text="${error}"></div>
+
+    <section class="insight-panel" th:if="${state == 'idle'}">
+        <p class="muted">Based on your recent wellness data.</p>
+        <form th:action="@{/web/insights/generate}" method="post" data-loading-form data-loading-target="insightLoading">
+            <button class="button primary" type="submit">Generate Recommendation</button>
+        </form>
+        <a class="button secondary" th:href="@{/web/insights/history}">View History</a>
+    </section>
+
+    <section class="loading-panel" id="insightLoading" hidden>
+        <strong>Generating recommendation...</strong>
+        <ol>
+            <li>Loading your wellness records</li>
+            <li>Analyzing sleep pattern</li>
+            <li>Analyzing exercise pattern</li>
+            <li>Generating recommendation</li>
+        </ol>
+    </section>
+
+    <section class="insight-result" th:if="${state == 'result'}">
+        <p class="eyebrow">Today's Recommendation</p>
+        <p class="recommendation-text" th:text="${recommendation}">Recommendation</p>
+
+        <details class="evidence-box">
+            <summary>How AI arrived at this</summary>
+            <ol>
+                <li th:each="item : ${evidence}" th:text="${item['summary']}">Evidence</li>
+            </ol>
+            <p class="muted" th:if="${iterations != null}" th:text="|Iterations: ${iterations}|">Iterations</p>
+        </details>
+
+        <div class="form-actions">
+            <form th:action="@{/web/insights/generate}" method="post" data-loading-form data-loading-target="insightLoading">
+                <button class="button primary" type="submit">Generate Again</button>
+            </form>
+            <a class="button secondary" th:href="@{/web/insights/history}">View History</a>
+        </div>
+    </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wellness AI - Chat</title>
+    <link rel="stylesheet" th:href="@{/web/css/style.css}">
+    <script defer th:src="@{/web/js/app.js}"></script>
+</head>
+<body>
+<header class="topbar">
+    <a class="brand" th:href="@{/web/dashboard}">Wellness AI</a>
+    <nav class="nav">
+        <a th:href="@{/web/records}">Records</a>
+        <a th:href="@{/web/chat}" class="active">Chat</a>
+        <a th:href="@{/web/insights}">Insights</a>
+    </nav>
+    <form th:action="@{/web/logout}" method="post">
+        <button class="link-button" type="submit">Logout</button>
+    </form>
+</header>
+
+<main class="page chat-page">
+    <div class="page-header">
+        <div>
+            <p class="eyebrow">AI Wellness Assistant</p>
+            <h1>Chat</h1>
+        </div>
+        <form th:action="@{/web/chat/clear}" method="post">
+            <button class="button secondary compact" type="submit">Clear</button>
+        </form>
+    </div>
+
+    <div class="alert error" th:if="${error}" th:text="${error}"></div>
+
+    <section class="chat-window" id="chatWindow" aria-live="polite">
+        <p class="empty-state" th:if="${#lists.isEmpty(messages)}">Ask the assistant about your wellness records.</p>
+        <div th:each="message : ${messages}"
+             th:class="${message.role == 'user'} ? 'chat-bubble user' : 'chat-bubble ai'">
+            <span th:text="${message.content}">Message</span>
+        </div>
+    </section>
+
+    <form class="chat-form" th:action="@{/web/chat}" method="post" data-loading-form>
+        <input name="message" type="text" placeholder="Type a message..." autocomplete="off" required>
+        <button class="button primary compact" type="submit">Send</button>
+    </form>
+</main>
+</body>
+</html>

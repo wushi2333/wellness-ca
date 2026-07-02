@@ -15,12 +15,21 @@ public class GatewayFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
             throws ServletException, IOException {
-        if ("OPTIONS".equalsIgnoreCase(req.getMethod()) || "/error".equals(req.getServletPath())) {
+        String path = req.getServletPath();
+        if ("OPTIONS".equalsIgnoreCase(req.getMethod()) || "/error".equals(path) || isWebRequest(path)) {
             chain.doFilter(req, res);
             return;
         }
 
         if (!token.equals(req.getHeader("X-API-Token"))) { res.sendError(403, "Forbidden"); return; }
         chain.doFilter(req, res);
+    }
+
+    private boolean isWebRequest(String path) {
+        return "/".equals(path)
+                || path.startsWith("/web")
+                || path.startsWith("/css")
+                || path.startsWith("/js")
+                || path.startsWith("/images");
     }
 }

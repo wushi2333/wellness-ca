@@ -44,6 +44,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String path = req.getServletPath();
         return "OPTIONS".equalsIgnoreCase(req.getMethod())
                 || "/error".equals(path)
+                || "/".equals(path)
+                || path.startsWith("/web")
+                || path.startsWith("/css")
+                || path.startsWith("/js")
+                || path.startsWith("/images")
                 || ("/register".equals(path) && "POST".equalsIgnoreCase(req.getMethod()))
                 || ("/login".equals(path) && "POST".equalsIgnoreCase(req.getMethod()));
     }

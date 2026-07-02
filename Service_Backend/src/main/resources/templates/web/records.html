@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wellness AI - Records</title>
+    <link rel="stylesheet" th:href="@{/web/css/style.css}">
+    <script defer th:src="@{/web/js/app.js}"></script>
+</head>
+<body>
+<header class="topbar">
+    <a class="brand" th:href="@{/web/dashboard}">Wellness AI</a>
+    <nav class="nav">
+        <a th:href="@{/web/records}" class="active">Records</a>
+        <a th:href="@{/web/chat}">Chat</a>
+        <a th:href="@{/web/insights}">Insights</a>
+    </nav>
+    <form th:action="@{/web/logout}" method="post">
+        <button class="link-button" type="submit">Logout</button>
+    </form>
+</header>
+
+<main class="page">
+    <div class="page-header">
+        <div>
+            <p class="eyebrow">Wellness</p>
+            <h1>Records</h1>
+        </div>
+        <a class="button primary compact" th:href="@{/web/records/new}">Add Record</a>
+    </div>
+
+    <div class="alert success" th:if="${success}" th:text="${success}"></div>
+    <div class="alert error" th:if="${error}" th:text="${error}"></div>
+
+    <p class="empty-state" th:if="${#lists.isEmpty(records)}">No wellness records yet</p>
+
+    <section class="record-list" th:if="${!#lists.isEmpty(records)}">
+        <article class="record-row" th:each="record : ${records}">
+            <a class="record-main" th:href="@{/web/records/{id}(id=${record.id})}">
+                <strong th:text="${record.recordDate}">2026-07-02</strong>
+                <span th:text="|Sleep: ${record.sleepHours} hrs|">Sleep: 7.5 hrs</span>
+                <span th:text="|Exercise: ${record.exerciseActivity} (${record.exerciseDuration} mins)|">Exercise</span>
+                <span th:if="${record.moodScore != null}" th:text="|Mood: ${record.moodScore}/5|">Mood</span>
+            </a>
+            <div class="row-actions">
+                <a class="button secondary small" th:href="@{/web/records/{id}/edit(id=${record.id})}">Edit</a>
+                <form th:action="@{/web/records/{id}/delete(id=${record.id})}" method="post" data-confirm="Delete this record?">
+                    <button class="button danger small" type="submit">Delete</button>
+                </form>
+            </div>
+        </article>
+    </section>
+</main>
+</body>
+</html>
