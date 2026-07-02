@@ -1,5 +1,7 @@
 package iss.nus.edu.sg.ca_application.model
 
+// Author: Liu Yu
+
 /**
  * API Contract: POST /login
  *
@@ -30,3 +32,8 @@ package iss.nus.edu.sg.ca_application.model
  *   Authorization: Bearer <accessToken>
  *   X-API-Token:   team-wellness-2025
  */
+
+data class LoginRequest(
+    val username: String,
+    val password: String
+)

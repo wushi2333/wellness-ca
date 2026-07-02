@@ -1,15 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<!--
-    Wellness Entry screen.
-    Used to create or update a wellness record.
-
-    Theme binding:
-    - labels:       @string/ resources, textColor @color/text_primary
-    - hints:        @string/hint_* resources
-    - button:       @string/save_record or @string/update_record (set in Kotlin)
-    - fontFamily:   inherited from Theme.CA_Application (Segoe UI)
--->
+<!-- Author: Wang Songyu. Wellness entry form screen. -->
 
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"

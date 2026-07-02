@@ -1,5 +1,7 @@
 package iss.nus.edu.sg.ca_application.network
 
+import iss.nus.edu.sg.ca_application.model.LoginRequest
+import iss.nus.edu.sg.ca_application.model.LoginResponse
 import iss.nus.edu.sg.ca_application.model.WellnessEntry
 import iss.nus.edu.sg.ca_application.model.WellnessRecord
 import org.json.JSONArray
@@ -11,7 +13,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 /**
- * Author: Wang Songyu
+ * Author: Wang Songyu, Liu Yu
  *
  * Centralized HTTP client for all backend API calls.
  *
@@ -284,6 +286,118 @@ object ApiClient {
             if (responseCode != HttpURLConnection.HTTP_OK &&
                 responseCode != HttpURLConnection.HTTP_NO_CONTENT) {
 
+                val errorBody = connection.errorStream?.bufferedReader()?.use { it.readText() }
+                    ?: "No error details"
+                throw ApiException(responseCode, errorBody)
+            }
+        } finally {
+            connection?.disconnect()
+        }
+    }
+
+    /**
+     * Authenticates a user with the backend.
+     *
+     * Endpoint:
+     * POST /login
+     *
+     * Request body: { "username": "...", "password": "..." }
+     * Response (200): { "accessToken": "...", "tokenType": "bearer", "userId": 1, "username": "..." }
+     *
+     * This method must be called on a background thread.
+     *
+     * @param username Username
+     * @param password Password
+     * @return LoginResponse with JWT and user info
+     * @throws ApiException if credentials are invalid or server returns an error
+     */
+    fun login(username: String, password: String): LoginResponse {
+        var connection: HttpURLConnection? = null
+
+        try {
+            connection = createConnection("/login", "POST", "")
+
+            val jsonBody = JSONObject().apply {
+                put("username", username)
+                put("password", password)
+            }
+
+            connection.outputStream.use { os ->
+                val writer = OutputStreamWriter(os, "UTF-8")
+                writer.write(jsonBody.toString())
+                writer.flush()
+            }
+
+            val responseCode = connection.responseCode
+
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                val response = connection.inputStream.bufferedReader().use { it.readText() }
+                val obj = JSONObject(response)
+                return LoginResponse(
+                    accessToken = obj.getString("accessToken"),
+                    tokenType = obj.getString("tokenType"),
+                    userId = obj.optLong("userId", -1),
+                    username = obj.optString("username", "")
+                )
+            } else {
+                val errorBody = connection.errorStream?.bufferedReader()?.use { it.readText() }
+                    ?: "No error details"
+                throw ApiException(responseCode, errorBody)
+            }
+        } finally {
+            connection?.disconnect()
+        }
+    }
+
+    /**
+     * Registers a new user account.
+     *
+     * Endpoint:
+     * POST /register
+     *
+     * Request body: { "username": "...", "password": "..." }
+     * Response (200/201): { "message": "User registered successfully" }
+     *
+     * This method must be called on a background thread.
+     *
+     * @param username Desired username
+     * @param password Desired password
+     * @return Success message from the server
+     * @throws ApiException if registration fails (e.g. username taken)
+     */
+    fun register(username: String, password: String): String {
+        var connection: HttpURLConnection? = null
+
+        try {
+            connection = createConnection("/register", "POST", "")
+
+            val jsonBody = JSONObject().apply {
+                put("username", username)
+                put("password", password)
+            }
+
+            connection.outputStream.use { os ->
+                val writer = OutputStreamWriter(os, "UTF-8")
+                writer.write(jsonBody.toString())
+                writer.flush()
+            }
+
+            val responseCode = connection.responseCode
+
+            if (responseCode == HttpURLConnection.HTTP_OK ||
+                responseCode == HttpURLConnection.HTTP_CREATED) {
+
+                return if (responseCode == HttpURLConnection.HTTP_CREATED) {
+                    "Register Successful"
+                } else {
+                    val response = connection.inputStream.bufferedReader().use { it.readText() }
+                    try {
+                        JSONObject(response).optString("message", "Register Successful")
+                    } catch (e: Exception) {
+                        "Register Successful"
+                    }
+                }
+            } else {
                 val errorBody = connection.errorStream?.bufferedReader()?.use { it.readText() }
                     ?: "No error details"
                 throw ApiException(responseCode, errorBody)

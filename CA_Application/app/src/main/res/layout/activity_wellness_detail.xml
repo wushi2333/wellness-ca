@@ -1,15 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<!--
-    Wellness Detail screen.
-    Displays a single wellness record and provides Edit and Delete actions.
-
-    Theme binding:
-    - typography:   @style/Heading2, @style/BodyLarge, @style/Body
-    - text colors:  inherited from typography styles (@color/text_primary)
-    - labels:       @string/ resources
-    - buttons:      Material theme ?attr/colorPrimary applied automatically
--->
+<!-- Author: Wang Songyu. Wellness record detail screen. -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"

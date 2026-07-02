@@ -1,13 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<!--
-    Item layout for a wellness record displayed in the RecyclerView.
-
-    Theme binding:
-    - background:   ?attr/selectableItemBackground (ripple from theme)
-    - title:        textAppearance @style/Body (bold), color @color/text_primary
-    - detail lines: textAppearance @style/Caption, color @color/text_secondary
--->
+<!-- Author: Wang Songyu. Wellness record RecyclerView item. -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"

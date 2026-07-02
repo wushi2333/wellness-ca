@@ -1,21 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Author: Liu Yu. Login screen. Flow: LoginActivity → (success) → MainActivity, (register) → RegisterActivity -->
+<!-- Author: Liu Yu. Register screen. Flow: RegisterActivity → (success) → finish() → back to LoginActivity -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/loginLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:gravity="center"
+    android:orientation="vertical"
     android:padding="24dp"
     android:background="@color/background">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/app_name"
+        android:text="@string/register_title"
         android:textAppearance="@style/Heading2"
-        android:textColor="@color/text_primary"
-        android:layout_marginBottom="32dp" />
+        android:layout_marginBottom="30dp" />
 
     <EditText
         android:id="@+id/etUsername"
@@ -31,7 +29,7 @@
         android:id="@+id/etPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="15dp"
         android:hint="@string/password"
         android:textAppearance="@style/Body"
         android:textColor="@color/text_primary"
@@ -39,27 +37,10 @@
         android:inputType="textPassword" />
 
     <Button
-        android:id="@+id/btnLogin"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:text="@string/login" />
-
-    <TextView
-        android:id="@+id/tvError"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAppearance="@style/Caption"
-        android:textColor="@color/error"
-        android:visibility="gone"
-        android:paddingTop="8dp"
-        android:gravity="center" />
-
-    <Button
         android:id="@+id/btnRegister"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="25dp"
         android:text="@string/register" />
 
 </LinearLayout>

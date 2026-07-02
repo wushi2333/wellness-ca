@@ -1,5 +1,7 @@
 package iss.nus.edu.sg.ca_application.model
 
+// Author: Yutong Luo, Liu Yu
+
 /**
  * API Contract: POST /login  (response)
  *
@@ -12,7 +14,11 @@ package iss.nus.edu.sg.ca_application.model
  *   "userId": 1,
  *   "username": "alice"
  * }
- *
- * Updated by Yutong Luo: login now returns userId and username
- * so Android can store them locally without decoding the JWT.
  */
+
+data class LoginResponse(
+    val accessToken: String,
+    val tokenType: String,
+    val userId: Long,
+    val username: String
+)
