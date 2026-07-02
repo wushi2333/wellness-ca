@@ -1,13 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<!--
-    Wellness List screen.
-    Displays all wellness records and allows users to add a new one.
-
-    Theme binding:
-    - empty state:  @string/no_records, textColor @color/text_hint
-    - button:       @string/add_record
--->
+<!-- Author: Wang Songyu. Wellness record list screen. -->
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"

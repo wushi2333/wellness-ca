@@ -7,15 +7,59 @@
     <string name="username">Username</string>
     <string name="password">Password</string>
     <string name="register">Register</string>
+    <string name="register_title">Create Account</string>
+    <string name="login_error_empty">Please enter username and password</string>
+    <string name="login_error_credentials">Incorrect username or password</string>
+    <string name="login_error_user_not_found">User does not exist</string>
+    <string name="login_error_generic">Login failed, please try again</string>
+    <string name="login_success">Login Successful</string>
+    <string name="register_error_empty">Please enter username and password</string>
+    <string name="register_success">Register Successful</string>
 
     <!-- Wellness -->
     <string name="sleep_hours">Sleep Hours</string>
     <string name="exercise_activity">Exercise Activity</string>
     <string name="exercise_duration">Duration (mins)</string>
     <string name="record_date">Date</string>
+    <string name="notes">Notes</string>
     <string name="save_record">Save Record</string>
     <string name="delete_record">Delete Record</string>
     <string name="edit_record">Edit Record</string>
+
+    <!-- Wellness hints -->
+    <string name="hint_sleep_hours">e.g. 7.5</string>
+    <string name="hint_exercise_activity">e.g. Running, Yoga</string>
+    <string name="hint_exercise_duration">e.g. 30</string>
+    <string name="hint_select_date">Tap to select date</string>
+    <string name="hint_notes">Optional notes…</string>
+
+    <!-- Wellness list -->
+    <string name="no_records">No wellness records yet</string>
+
+    <!-- Wellness format -->
+    <string name="sleep_format">Sleep: %.1f hrs</string>
+    <string name="exercise_format">Exercise: %s (%d mins)</string>
+    <string name="no_notes">No notes</string>
+    <string name="update_record">Update Record</string>
+
+    <!-- Wellness validation -->
+    <string name="field_required">All fields are required</string>
+    <string name="invalid_numeric">Please enter valid numbers</string>
+    <string name="sleep_range">Sleep hours must be between 0 and 24</string>
+    <string name="exercise_range">Exercise duration must be between 0 and 1440 minutes</string>
+    <string name="date_invalid">Please enter a valid date (YYYY-MM-DD)</string>
+    <string name="save_success">Record saved</string>
+    <string name="delete_success">Record deleted</string>
+
+    <!-- Wellness delete dialog -->
+    <string name="confirm_delete_title">Delete Record</string>
+    <string name="confirm_delete_message">Are you sure you want to delete this record?</string>
+    <string name="delete_confirm">Delete</string>
+    <string name="cancel">Cancel</string>
+
+    <!-- API errors -->
+    <string name="api_forbidden">You don\'t have permission to perform this action</string>
+    <string name="record_not_found">Record not found</string>
 
     <!-- Chat -->
     <string name="chat_title">AI Wellness Assistant</string>
