@@ -1,47 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Author: Liu Yu. Main dashboard after login. -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/main"
+<!-- Author: Liu Yu, Xia Zihang. Dashboard with agent FAB and popup. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical"
-    android:padding="24dp"
     android:background="@color/background">
 
-    <TextView
-        android:id="@+id/tvWelcome"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/dashboard"
-        android:textAppearance="@style/Heading2"
-        android:layout_marginBottom="32dp" />
-
-    <Button
-        android:id="@+id/btnViewRecords"
+    <!-- Original dashboard content -->
+    <LinearLayout
+        android:id="@+id/dashboardContent"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/view_records" />
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="24dp">
 
-    <Button
-        android:id="@+id/btnAddRecord"
+        <TextView
+            android:id="@+id/tvWelcome"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/dashboard"
+            android:textAppearance="@style/Heading2"
+            android:layout_marginBottom="32dp" />
+
+        <Button
+            android:id="@+id/btnViewRecords"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/view_records" />
+
+        <Button
+            android:id="@+id/btnAddRecord"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="@string/add_record" />
+
+        <Button
+            android:id="@+id/btnWellnessInsights"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="@string/agent_screen_title" />
+
+        <Button
+            android:id="@+id/btnCharacterChat"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="@string/character_chat" />
+
+        <Button
+            android:id="@+id/btnLogout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:text="@string/logout" />
+    </LinearLayout>
+
+    <!-- Dark scrim behind popup (dismisses popup on click) -->
+    <View
+        android:id="@+id/scrim"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:text="@string/add_record" />
+        android:layout_height="match_parent"
+        android:background="#80000000"
+        android:visibility="gone"
+        android:clickable="true"
+        android:focusable="true" />
 
+    <!-- FAB: Agent quick-access button -->
     <Button
-        android:id="@+id/btnWellnessInsights"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:text="@string/agent_screen_title" />
+        android:id="@+id/btnAgentFab"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/bg_fab_circle"
+        android:text="AI"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:elevation="8dp"
+        android:stateListAnimator="@null" />
 
-    <Button
-        android:id="@+id/btnLogout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        android:text="@string/logout" />
-
-</LinearLayout>
+    <!-- Agent chat popup (slides up from bottom) -->
+    <include layout="@layout/popup_agent_chat" />
+</FrameLayout>

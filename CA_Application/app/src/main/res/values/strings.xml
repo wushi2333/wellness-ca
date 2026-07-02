@@ -61,6 +61,9 @@
     <string name="api_forbidden">You don\'t have permission to perform this action</string>
     <string name="record_not_found">Record not found</string>
 
+    <!-- Character -->
+    <string name="character_chat">Chat with Yui 🌸</string>
+
     <!-- Chat -->
     <string name="chat_title">AI Wellness Assistant</string>
     <string name="send">Send</string>

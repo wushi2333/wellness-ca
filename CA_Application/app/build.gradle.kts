@@ -35,6 +35,7 @@ android {
 }
 
 dependencies {
+    implementation(files("libs/Live2DCubismCore.aar"))
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.constraintlayout)
