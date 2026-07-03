@@ -43,7 +43,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private boolean isPublicRequest(HttpServletRequest req) {
         String path = req.getServletPath();
         return "OPTIONS".equalsIgnoreCase(req.getMethod())
-                || "/error".equals(path)
+                || "/error".equals(path) || "/".equals(path)
+                || path.startsWith("/web/") || path.startsWith("/css/")
+                || path.startsWith("/js/") || path.startsWith("/images/")
                 || ("/register".equals(path) && "POST".equalsIgnoreCase(req.getMethod()))
                 || ("/login".equals(path) && "POST".equalsIgnoreCase(req.getMethod()));
     }

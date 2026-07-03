@@ -1,0 +1,51 @@
+<!-- Author: Guo Jiali -->
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wellness AI - Dashboard</title>
+    <link rel="stylesheet" th:href="@{/web/css/style.css}">
+</head>
+<body>
+<header class="topbar">
+    <a class="brand" th:href="@{/web/dashboard}">Wellness AI</a>
+    <nav class="nav">
+        <a th:href="@{/web/records}" th:classappend="${activePage == 'records'} ? 'active'">Records</a>
+        <a th:href="@{/web/chat}" th:classappend="${activePage == 'chat'} ? 'active'">Chat</a>
+        <a th:href="@{/web/insights}" th:classappend="${activePage == 'insights'} ? 'active'">Insights</a>
+    </nav>
+    <form th:action="@{/web/logout}" method="post">
+        <button class="link-button" type="submit">Logout</button>
+    </form>
+</header>
+
+<main class="page">
+    <div class="page-header">
+        <div>
+            <p class="eyebrow">Dashboard</p>
+            <h1>Welcome, <span th:text="${username}">user</span></h1>
+        </div>
+    </div>
+
+    <section class="action-grid" aria-label="Dashboard actions">
+        <a class="action-tile" th:href="@{/web/records}">
+            <span class="tile-title">View Records</span>
+            <span class="tile-copy">Review, edit, or delete wellness records.</span>
+        </a>
+        <a class="action-tile" th:href="@{/web/records/new}">
+            <span class="tile-title">Add Record</span>
+            <span class="tile-copy">Log sleep, exercise, mood, date, and notes.</span>
+        </a>
+        <a class="action-tile" th:href="@{/web/chat}">
+            <span class="tile-title">Chat</span>
+            <span class="tile-copy">Ask the AI wellness assistant for advice.</span>
+        </a>
+        <a class="action-tile" th:href="@{/web/insights}">
+            <span class="tile-title">Wellness Insights</span>
+            <span class="tile-copy">Generate an agentic recommendation.</span>
+        </a>
+    </section>
+</main>
+</body>
+</html>
