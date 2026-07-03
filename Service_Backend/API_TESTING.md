@@ -23,6 +23,14 @@ Protected APIs also need JWT:
 Authorization: Bearer <accessToken>
 ```
 
+Error responses use a shared JSON shape:
+
+```json
+{
+  "detail": "Error message"
+}
+```
+
 ## Register
 
 ```bash
@@ -193,7 +201,23 @@ curl -i -X POST http://localhost:8000/records \
     "moodScore": 9,
     "recordDate": "2026-06-30",
     "notes": "Invalid values"
-  }'
+}'
+```
+
+Expected result:
+
+```json
+{
+  "detail": "sleepHours: must be less than or equal to 24.0; exerciseDuration: must be greater than or equal to 0; moodScore: must be less than or equal to 5"
+}
 ```
 
 Another user's record should return 404 on update or delete because the service checks ownership before changing data.
+
+Expected result:
+
+```json
+{
+  "detail": "Record not found"
+}
+```

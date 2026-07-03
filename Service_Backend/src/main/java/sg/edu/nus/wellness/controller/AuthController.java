@@ -1,4 +1,4 @@
-// Author: Xia Zihang
+// Author: Xia Zihang, Yutong Luo
 package sg.edu.nus.wellness.controller;
 import sg.edu.nus.wellness.dto.AuthRequest;
 import sg.edu.nus.wellness.service.AuthService;

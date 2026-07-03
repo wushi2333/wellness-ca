@@ -58,6 +58,11 @@ public class WellnessService {
         r.setUserId(userId); apply(r, req); return r;
     }
 
+    private WellnessRecord findOwnedRecord(Long userId, Long id) {
+        return repo.findByIdAndUserId(id, userId)
+                .orElseThrow(() -> new NotFoundException("Record not found"));
+    }
+
     private void apply(WellnessRecord r, WellnessRequest req) {
         r.setSleepHours(req.sleepHours); r.setExerciseActivity(req.exerciseActivity);
         r.setExerciseDuration(req.exerciseDuration); r.setMoodScore(req.moodScore);

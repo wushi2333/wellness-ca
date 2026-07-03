@@ -119,6 +119,16 @@ Wellness records are always queried by the authenticated `userId`.
 
 Update and delete first check that the record belongs to the authenticated user. If it does not, the backend returns 404.
 
+The service uses `findByIdAndUserId(id, userId)` for update and delete. This means the database query only returns a record when both the record ID and authenticated user ID match.
+
+Error responses use a shared JSON shape:
+
+```json
+{
+  "detail": "Error message"
+}
+```
+
 ## Database Fields
 
 `users` includes:
