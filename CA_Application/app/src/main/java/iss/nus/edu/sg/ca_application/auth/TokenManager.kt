@@ -43,6 +43,7 @@ object TokenManager {
     private const val PREFS_NAME = "auth_prefs"
     private const val KEY_ACCESS_TOKEN = "jwt_access_token"
     private const val KEY_TOKEN_TYPE = "jwt_token_type"
+    private const val KEY_USERNAME = "username"
 
     private fun prefs(context: Context): SharedPreferences {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -91,6 +92,14 @@ object TokenManager {
         return getToken(context).isNotEmpty()
     }
 
+    fun saveUsername(context: Context, username: String) {
+        prefs(context).edit().putString(KEY_USERNAME, username).apply()
+    }
+
+    fun getUsername(context: Context): String {
+        return prefs(context).getString(KEY_USERNAME, "") ?: ""
+    }
+
     /**
      * Clears all locally stored authentication information.
      *
@@ -102,6 +111,7 @@ object TokenManager {
         prefs(context).edit()
             .remove(KEY_ACCESS_TOKEN)
             .remove(KEY_TOKEN_TYPE)
+            .remove(KEY_USERNAME)
             .apply()
     }
 }

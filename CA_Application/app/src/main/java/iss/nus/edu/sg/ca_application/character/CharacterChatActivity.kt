@@ -17,6 +17,7 @@ import android.view.MotionEvent
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.TextView
 import android.app.Dialog
 import android.widget.Toast
@@ -39,6 +40,7 @@ class CharacterChatActivity : AppCompatActivity() {
 
     private lateinit var token: String
     private var currentSessionId: Long? = null
+    private var hasSentMessage = false // track if user actually used this session
     private var currentMode = "chat"
     private val adapter = CharacterChatAdapter()
     private lateinit var drawer: DrawerLayout
@@ -94,7 +96,7 @@ class CharacterChatActivity : AppCompatActivity() {
         sessionRecycler.layoutManager = LinearLayoutManager(this)
         sessionRecycler.adapter = sessionAdapter
 
-        findViewById<Button>(R.id.btnSend).setOnClickListener { sendMessage() }
+        findViewById<ImageButton>(R.id.btnSend).setOnClickListener { sendMessage() }
 
         findViewById<Button>(R.id.btnMic).setOnTouchListener { v, event ->
             when (event.action) {
@@ -108,9 +110,34 @@ class CharacterChatActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.btnNewChat).setOnClickListener { createNewSession() }
         findViewById<Button>(R.id.btnSidebarNewChat).setOnClickListener { createNewSession() }
+        // Trash icon → toggle selection mode
+        findViewById<ImageButton>(R.id.btnTrash).setOnClickListener { sessionAdapter.toggleSelectionMode() }
+        // Selection action buttons
+        findViewById<Button>(R.id.btnDeleteSelected).setOnClickListener {
+            val n = sessionAdapter.selectedCount
+            if (n > 0) {
+                AlertDialog.Builder(this)
+                    .setTitle("Delete Selected")
+                    .setMessage("Delete $n selected chat(s)?")
+                    .setPositiveButton("Delete") { _, _ -> sessionAdapter.deleteSelected() }
+                    .setNegativeButton("Cancel", null).show()
+            }
+        }
+        findViewById<Button>(R.id.btnDeleteAll).setOnClickListener {
+            AlertDialog.Builder(this)
+                .setTitle("Delete All")
+                .setMessage("Delete ALL chats? This cannot be undone.")
+                .setPositiveButton("Delete All") { _, _ -> sessionAdapter.deleteAllSessions() }
+                .setNegativeButton("Cancel", null).show()
+        }
         findViewById<Button>(R.id.btnSessions).setOnClickListener {
             loadSessions(); drawer.openDrawer(Gravity.START)
         }
+        drawer.addDrawerListener(object : androidx.drawerlayout.widget.DrawerLayout.SimpleDrawerListener() {
+            override fun onDrawerClosed(drawerView: View) {
+                sessionAdapter.exitSelectionMode()
+            }
+        })
         btnMode.setOnClickListener { toggleMode() }
 
         // Test button: cycle through all emotions
@@ -132,7 +159,14 @@ class CharacterChatActivity : AppCompatActivity() {
             btnVoice.text = if (voiceEnabled) "🔊" else "🔇"
         }
 
-        createNewSession()
+        // Show cold-start welcome locally (no session created yet)
+        if (firstSessionAfterColdStart) {
+            firstSessionAfterColdStart = false
+            val username = TokenManager.getUsername(this).ifEmpty { "User" }
+            adapter.addAssistantMessage(getString(R.string.yui_welcome, username), null)
+        }
+
+        // Don't create session on server yet — defer to sendMessage()
     }
 
     override fun onResume() {
@@ -175,24 +209,18 @@ class CharacterChatActivity : AppCompatActivity() {
             drawer.closeDrawer(Gravity.START)
             return
         }
-        Thread {
-            try {
-                val s = CharacterApi.createSession(token, currentMode)
-                runOnUiThread {
-                    currentSessionId = s.id
-                    tvSessionTitle.text = "New Chat"
-                    adapter.setMessages(emptyList())
-                    etMessage.hint = "Chat with Yui 🌸"
-                    drawer.closeDrawer(Gravity.START)
-                }
-            } catch (e: Exception) {
-                runOnUiThread { toast("Failed to create session") }
-            }
-        }.start()
+        // Only reset local UI — session is created lazily on first sendMessage()
+        currentSessionId = null
+        hasSentMessage = false
+        tvSessionTitle.text = "New Chat"
+        adapter.setMessages(emptyList())
+        etMessage.hint = "Chat with Yui 🌸"
+        drawer.closeDrawer(Gravity.START)
     }
 
     private fun switchToSession(sessionId: Long, title: String) {
         currentSessionId = sessionId
+        hasSentMessage = true // existing session already has content
         tvSessionTitle.text = title
         adapter.setMessages(emptyList())
         etMessage.hint = "Chat with Yui 🌸"
@@ -205,6 +233,7 @@ class CharacterChatActivity : AppCompatActivity() {
                 val msgs = CharacterApi.getMessages(token, sessionId)
                 runOnUiThread {
                     adapter.setMessages(msgs)
+                    if (msgs.isNotEmpty()) hasSentMessage = true
                     recycler.scrollToPosition(adapter.itemCount - 1)
                 }
             } catch (e: Exception) { /* empty */ }
@@ -214,9 +243,10 @@ class CharacterChatActivity : AppCompatActivity() {
     private fun sendMessage() {
         val text = etMessage.text.toString().trim()
         if (text.isEmpty()) return
+        hasSentMessage = true
         etMessage.text.clear()
         etMessage.hint = "Type a message…"
-        findViewById<Button>(R.id.btnSend).isEnabled = false
+        findViewById<ImageButton>(R.id.btnSend).isEnabled = false
 
         // Show user message immediately
         adapter.addUserMessage(text)
@@ -228,6 +258,11 @@ class CharacterChatActivity : AppCompatActivity() {
 
         Thread {
             try {
+                // Create session lazily on first message (avoids empty sessions)
+                if (currentSessionId == null) {
+                    val s = CharacterApi.createSession(token, currentMode)
+                    currentSessionId = s.id
+                }
                 val resp = CharacterApi.chat(token, text, currentMode, currentSessionId)
                 runOnUiThread {
                     currentSessionId = resp.sessionId
@@ -236,7 +271,7 @@ class CharacterChatActivity : AppCompatActivity() {
                     recycler.scrollToPosition(adapter.lastIndex)
                     // Play TTS with mouth sync
                     if (voiceEnabled) speakResponse(resp.reply, resp.emotion)
-                    findViewById<Button>(R.id.btnSend).isEnabled = true
+                    findViewById<ImageButton>(R.id.btnSend).isEnabled = true
 
                     // Poll for updated title (generated async on server)
                     pollSessionTitle(resp.sessionId)
@@ -251,13 +286,13 @@ class CharacterChatActivity : AppCompatActivity() {
                         finish()
                     } else {
                         adapter.updateLoadingReply("Sorry, something went wrong. Try again?", "confused")
-                        findViewById<Button>(R.id.btnSend).isEnabled = true
+                        findViewById<ImageButton>(R.id.btnSend).isEnabled = true
                     }
                 }
             } catch (e: Exception) {
                 runOnUiThread {
                     adapter.updateLoadingReply("Network error. Please try again.", "confused")
-                    findViewById<Button>(R.id.btnSend).isEnabled = true
+                    findViewById<ImageButton>(R.id.btnSend).isEnabled = true
                 }
             }
         }.start()
@@ -445,65 +480,196 @@ class CharacterChatActivity : AppCompatActivity() {
         }
     }
 
-    companion object { private const val REQUEST_RECORD_AUDIO = 1001 }
+    companion object {
+        private const val REQUEST_RECORD_AUDIO = 1001
+        private var firstSessionAfterColdStart = true // reset only when process restarts
+    }
 
     private fun toast(msg: String) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
     }
 
-    // ---- Session sidebar adapter -------------------------------------------
+    // ---- Session sidebar adapter (multi-select delete + pin) -------------
 
     private inner class SessionAdapter : RecyclerView.Adapter<SessionAdapter.VH>() {
 
-        private var sessions = listOf<CharacterSession>()
+        private var rawSessions = listOf<CharacterSession>()
+        private var selectionMode = false
+        private val selectedIds = mutableSetOf<Long>()
+        private val pinnedIds = mutableSetOf<Long>() // local pin state
+
+        val selectedCount: Int get() = selectedIds.size
 
         fun setSessions(list: List<CharacterSession>) {
-            sessions = list; notifyDataSetChanged()
+            rawSessions = list; notifyDataSetChanged()
         }
+
+        /** Sorted: pinned first, then by updatedAt descending. */
+        private fun sortedSessions(): List<CharacterSession> {
+            return rawSessions.sortedWith(compareByDescending<CharacterSession> { pinnedIds.contains(it.id) }
+                .thenByDescending { it.updatedAt })
+        }
+
+        fun toggleSelectionMode() {
+            selectionMode = !selectionMode
+            if (!selectionMode) selectedIds.clear()
+            notifyDataSetChanged()
+            updateSelectionUI()
+            // Update trash icon tint
+            val trash = findViewById<ImageButton>(R.id.btnTrash)
+            trash.imageTintList = resources.getColorStateList(
+                if (selectionMode) R.color.error else R.color.text_hint, null)
+        }
+
+        fun exitSelectionMode() {
+            if (!selectionMode) return
+            selectionMode = false
+            selectedIds.clear()
+            notifyDataSetChanged()
+            updateSelectionUI()
+            findViewById<ImageButton>(R.id.btnTrash).imageTintList =
+                resources.getColorStateList(R.color.text_hint, null)
+        }
+
+        private fun updateSelectionUI() {
+            findViewById<View>(R.id.layoutSelectionActions).visibility =
+                if (selectionMode) View.VISIBLE else View.GONE
+        }
+
+        fun deleteSelected() {
+            val ids = selectedIds.toList()
+            if (ids.isEmpty()) return
+            Thread {
+                var count = 0
+                for (id in ids) {
+                    try { CharacterApi.deleteSession(token, id); count++ } catch (_: Exception) {}
+                }
+                runOnUiThread {
+                    pinnedIds.removeAll(ids.toSet())
+                    selectedIds.clear()
+                    exitSelectionMode()
+                    loadSessions()
+                    resetCurrentIfDeleted(ids)
+                    toast("Deleted $count chat(s)")
+                }
+            }.start()
+        }
+
+        fun deleteAllSessions() {
+            if (rawSessions.isEmpty()) return
+            Thread {
+                var count = 0
+                for (s in rawSessions) {
+                    try { CharacterApi.deleteSession(token, s.id); count++ } catch (_: Exception) {}
+                }
+                runOnUiThread {
+                    pinnedIds.clear()
+                    selectedIds.clear()
+                    exitSelectionMode()
+                    loadSessions()
+                    currentSessionId = null
+                    tvSessionTitle.text = "New Chat"
+                    adapter.setMessages(emptyList())
+                    etMessage.hint = "Chat with Yui 🌸"
+                    toast("Deleted $count chat(s)")
+                }
+            }.start()
+        }
+
+        private fun resetCurrentIfDeleted(ids: List<Long>) {
+            if (currentSessionId != null && ids.contains(currentSessionId!!)) {
+                currentSessionId = null
+                tvSessionTitle.text = "New Chat"
+                adapter.setMessages(emptyList())
+                etMessage.hint = "Chat with Yui 🌸"
+            }
+        }
+
+        /** Called from onBindViewHolder via post() to avoid RecyclerView layout crash. */
+        private fun toggleSelection(id: Long) {
+            if (selectedIds.contains(id)) selectedIds.remove(id) else selectedIds.add(id)
+            notifyDataSetChanged()
+            updateSelectionUI()
+            if (selectedIds.isEmpty()) exitSelectionMode()
+        }
+
+        private fun togglePin(id: Long) {
+            if (pinnedIds.contains(id)) pinnedIds.remove(id) else pinnedIds.add(id)
+            notifyDataSetChanged()
+        }
+
+        private fun isPinned(id: Long) = pinnedIds.contains(id)
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
             return VH(layoutInflater.inflate(R.layout.item_character_session, parent, false))
         }
 
         override fun onBindViewHolder(holder: VH, pos: Int) {
-            val s = sessions[pos]
+            val sorted = sortedSessions()
+            if (pos >= sorted.size) return
+            val s = sorted[pos]
+            val pinned = isPinned(s.id)
+
             holder.title.text = s.title
-            holder.meta.text = "${s.mode} · ${s.messageCount} msgs"
-            holder.itemView.setOnClickListener {
-                switchToSession(s.id, s.title); drawer.closeDrawer(Gravity.START)
-            }
-            holder.itemView.setOnLongClickListener {
-                AlertDialog.Builder(this@CharacterChatActivity)
-                    .setTitle("Delete Chat")
-                    .setMessage("Delete \"${s.title}\"?")
-                    .setPositiveButton("Delete") { _, _ ->
-                        Thread {
-                            try {
-                                CharacterApi.deleteSession(token, s.id)
-                                runOnUiThread {
-                                    loadSessions()
-                                    if (s.id == currentSessionId) {
-                                        currentSessionId = null
-                                        tvSessionTitle.text = "New Chat"
-                                        adapter.setMessages(emptyList())
-                                        etMessage.hint = "Chat with Yui 🌸"
-                                    }
+            holder.meta.text = "${s.mode} · ${s.messageCount} msgs" + if (pinned) " · 📌" else ""
+
+            if (selectionMode) {
+                holder.checkbox.visibility = View.VISIBLE
+                holder.checkbox.setOnCheckedChangeListener(null)
+                holder.checkbox.isChecked = selectedIds.contains(s.id)
+                // Use post() to avoid IllegalStateException during layout
+                holder.checkbox.setOnCheckedChangeListener { _, _ ->
+                    holder.itemView.post { toggleSelection(s.id) }
+                }
+                holder.itemView.setOnClickListener {
+                    holder.itemView.post { toggleSelection(s.id) }
+                }
+                holder.itemView.setOnLongClickListener(null)
+            } else {
+                holder.checkbox.visibility = View.GONE
+                holder.checkbox.setOnCheckedChangeListener(null)
+                holder.itemView.setOnClickListener {
+                    switchToSession(s.id, s.title); drawer.closeDrawer(Gravity.START)
+                }
+                holder.itemView.setOnLongClickListener {
+                    val pinLabel = if (isPinned(s.id)) "Unpin" else "Pin to Top"
+                    AlertDialog.Builder(this@CharacterChatActivity)
+                        .setTitle(s.title)
+                        .setItems(arrayOf(pinLabel, "Delete", "Cancel")) { _, which ->
+                            when (which) {
+                                0 -> togglePin(s.id)
+                                1 -> {
+                                    AlertDialog.Builder(this@CharacterChatActivity)
+                                        .setTitle("Delete Chat")
+                                        .setMessage("Delete \"${s.title}\"?")
+                                        .setPositiveButton("Delete") { _, _ ->
+                                            Thread {
+                                                try { CharacterApi.deleteSession(token, s.id)
+                                                    runOnUiThread {
+                                                        pinnedIds.remove(s.id)
+                                                        loadSessions()
+                                                        resetCurrentIfDeleted(listOf(s.id))
+                                                    }
+                                                } catch (e: Exception) {
+                                                    runOnUiThread { toast("Delete failed") }
+                                                }
+                                            }.start()
+                                        }
+                                        .setNegativeButton("Cancel", null).show()
                                 }
-                            } catch (e: Exception) {
-                                runOnUiThread { toast("Delete failed") }
                             }
-                        }.start()
-                    }
-                    .setNegativeButton("Cancel", null).show()
-                true
+                        }.show()
+                    true
+                }
             }
         }
 
-        override fun getItemCount() = sessions.size
+        override fun getItemCount() = rawSessions.size
 
         inner class VH(view: View) : RecyclerView.ViewHolder(view) {
             val title: TextView = view.findViewById(R.id.tvSessionItemTitle)
             val meta: TextView = view.findViewById(R.id.tvSessionItemMeta)
+            val checkbox: android.widget.CheckBox = view.findViewById(R.id.cbSessionSelect)
         }
     }
 }

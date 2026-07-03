@@ -63,6 +63,11 @@
 
     <!-- Character -->
     <string name="character_chat">Chat with Yui 🌸</string>
+    <string name="delete_selected">Delete Selected</string>
+    <string name="delete_all">Delete All</string>
+    <string name="pin_chat">Pin to Top</string>
+    <string name="unpin_chat">Unpin</string>
+    <string name="yui_welcome">Hello, %1$s! I\'m Yui (結衣), your cheerful wellness companion 🌸\n\nI can help you track your health, analyze your wellness data, and answer questions about using this app.\n\n• Switch to Agent mode to let me analyze your records\n• Just chat with me about your day — I\'m here to listen!\n\nWhat would you like to do today?</string>
 
     <!-- Chat -->
     <string name="chat_title">AI Wellness Assistant</string>

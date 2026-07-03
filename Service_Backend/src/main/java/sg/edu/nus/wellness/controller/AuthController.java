@@ -14,13 +14,11 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody AuthRequest req) {
-        try { return ResponseEntity.status(201).body(Map.of("message","Registered","userId",auth.register(req.username,req.password))); }
-        catch (RuntimeException e) { return ResponseEntity.badRequest().body(Map.of("detail",e.getMessage())); }
+        return ResponseEntity.status(201).body(Map.of("message","Registered","userId",auth.register(req.username,req.password)));
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody AuthRequest req) {
-        try { return ResponseEntity.ok(auth.login(req.username, req.password)); }
-        catch (RuntimeException e) { return ResponseEntity.badRequest().body(Map.of("detail",e.getMessage())); }
+        return ResponseEntity.ok(auth.login(req.username, req.password));
     }
 }

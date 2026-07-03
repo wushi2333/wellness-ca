@@ -1,0 +1,12 @@
+=== API Key Reference (DO NOT COMMIT TO GIT) ===
+
+Server: 152.42.181.66
+Environment variables (set in /home/wellness-dev/.bashrc):
+
+  export VOLCANO_TTS_APPID=9516529328
+  export VOLCANO_TTS_TOKEN=zdiAFzSbag3Q4C4gu24b6mC5uTNQ71jY
+  export VOLCANO_TTS_SPEAKER=zh_female_vv_uranus_bigtts
+
+TTS endpoint: https://openspeech.bytedance.com/api/v1/tts (V1)
+Auth: Authorization: Bearer;{token}
+Output: MP3, 24kHz, mono, base64-encoded in JSON "data" field

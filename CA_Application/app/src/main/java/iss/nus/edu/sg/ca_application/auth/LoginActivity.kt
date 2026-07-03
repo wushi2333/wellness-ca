@@ -79,6 +79,7 @@ class LoginActivity : AppCompatActivity() {
                             response.accessToken,
                             response.tokenType
                         )
+                        TokenManager.saveUsername(this@LoginActivity, response.username)
 
                         Toast.makeText(
                             this@LoginActivity,

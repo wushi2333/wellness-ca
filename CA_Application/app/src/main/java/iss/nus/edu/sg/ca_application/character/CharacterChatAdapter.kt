@@ -30,6 +30,12 @@ class CharacterChatAdapter : RecyclerView.Adapter<CharacterChatAdapter.VH>() {
         notifyItemInserted(items.size - 1)
     }
 
+    /** Add a complete assistant message (e.g. welcome, no ID, not saved to server). */
+    fun addAssistantMessage(text: String, tools: List<String>?) {
+        items.add(CharacterMessage(0, "assistant", text, "", "", tools))
+        notifyItemInserted(items.size - 1)
+    }
+
     fun showLoading() {
         if (!loading) {
             loading = true

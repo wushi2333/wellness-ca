@@ -2,6 +2,7 @@
 package sg.edu.nus.wellness.service;
 import sg.edu.nus.wellness.dto.WellnessRequest;
 import sg.edu.nus.wellness.dto.WellnessResponse;
+import sg.edu.nus.wellness.exception.NotFoundException;
 import sg.edu.nus.wellness.model.WellnessRecord;
 import sg.edu.nus.wellness.repository.WellnessRepo;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,20 +35,23 @@ public class WellnessService {
     }
 
     public void update(Long userId, Long id, WellnessRequest req) {
-        WellnessRecord r = repo.findById(id).orElseThrow(()->new RuntimeException("Not found"));
-        if (!r.getUserId().equals(userId)) throw new RuntimeException("Not found");
+        WellnessRecord r = findOwnedRecord(userId, id);
         apply(r, req); repo.save(r);
         syncRag(id, userId, req);
     }
 
     public void delete(Long userId, Long id) {
-        WellnessRecord r = repo.findById(id).orElseThrow(()->new RuntimeException("Not found"));
-        if (!r.getUserId().equals(userId)) throw new RuntimeException("Not found");
+        WellnessRecord r = findOwnedRecord(userId, id);
         repo.delete(r);
         try { http.delete(ragUrl+"/sync/"+id); } catch (Exception ignored) {}
     }
 
     public List<WellnessRecord> last7(Long userId) { return repo.findTop7ByUserIdOrderByRecordDateDesc(userId); }
+
+    private WellnessRecord findOwnedRecord(Long userId, Long id) {
+        return repo.findByIdAndUserId(id, userId)
+                .orElseThrow(() -> new NotFoundException("Record not found"));
+    }
 
     private WellnessRecord toEntity(Long userId, WellnessRequest req) {
         WellnessRecord r = new WellnessRecord();

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Agent chat popup for dashboard overlay -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/agentPopup"
     android:layout_width="match_parent"
     android:layout_height="400dp"
@@ -105,12 +106,13 @@
             android:paddingStart="4dp"
             android:paddingEnd="4dp" />
 
-        <Button
+        <ImageButton
             android:id="@+id/btnPopupSend"
-            style="@style/Widget.Material3.Button.TextButton"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:text="→"
-            android:textSize="18sp" />
+            android:src="@drawable/ic_send"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/send"
+            app:tint="@color/primary" />
     </LinearLayout>
 </LinearLayout>

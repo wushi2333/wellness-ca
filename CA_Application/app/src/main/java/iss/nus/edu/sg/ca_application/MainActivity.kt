@@ -15,6 +15,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -129,7 +130,7 @@ class MainActivity : AppCompatActivity() {
 
         etPopupMsg = findViewById(R.id.etPopupMessage)
 
-        findViewById<Button>(R.id.btnPopupSend).setOnClickListener { sendPopupMessage() }
+        findViewById<ImageButton>(R.id.btnPopupSend).setOnClickListener { sendPopupMessage() }
         findViewById<Button>(R.id.btnPopupMic).setOnTouchListener { _, event ->
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> { startPopupRecording(); true }
@@ -226,7 +227,7 @@ class MainActivity : AppCompatActivity() {
         val text = etPopupMsg?.text.toString().trim()
         if (text.isEmpty()) return
         etPopupMsg?.text?.clear()
-        findViewById<Button>(R.id.btnPopupSend).isEnabled = false
+        findViewById<ImageButton>(R.id.btnPopupSend).isEnabled = false
 
         popupAdapter?.addUserMsg(text)
         popupAdapter?.addAssistantPlaceholder()
@@ -239,7 +240,7 @@ class MainActivity : AppCompatActivity() {
                     popupSessionId = resp.sessionId
                     popupAdapter?.updateAssistantReply(resp.reply, resp.tools)
                     popupRecycler?.scrollToPosition(popupAdapter!!.lastIndex)
-                    findViewById<Button>(R.id.btnPopupSend).isEnabled = true
+                    findViewById<ImageButton>(R.id.btnPopupSend).isEnabled = true
                     // TTS voice output
                     if (voiceEnabled) speakPopupReply(resp.reply, resp.emotion)
                     resp.intent?.let { handlePopupIntent(it) }
@@ -252,13 +253,13 @@ class MainActivity : AppCompatActivity() {
                         finish()
                     } else {
                         popupAdapter?.updateAssistantReply("Oops! Something went wrong. Try again?")
-                        findViewById<Button>(R.id.btnPopupSend).isEnabled = true
+                        findViewById<ImageButton>(R.id.btnPopupSend).isEnabled = true
                     }
                 }
             } catch (e: Exception) {
                 runOnUiThread {
                     popupAdapter?.updateAssistantReply("Network error. Please try again.")
-                    findViewById<Button>(R.id.btnPopupSend).isEnabled = true
+                    findViewById<ImageButton>(R.id.btnPopupSend).isEnabled = true
                 }
             }
         }.start()
