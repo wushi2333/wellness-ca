@@ -24,6 +24,7 @@ public class SecurityConfig {
                 .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
             .authorizeHttpRequests(a -> a
                     .requestMatchers("/error").permitAll()
+                    .requestMatchers("/", "/web/**", "/css/**", "/js/**", "/images/**").permitAll()
                     .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                     .requestMatchers(HttpMethod.POST, "/register", "/login").permitAll()
                     .anyRequest().authenticated())

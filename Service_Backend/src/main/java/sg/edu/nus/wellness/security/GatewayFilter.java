@@ -15,7 +15,11 @@ public class GatewayFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
             throws ServletException, IOException {
-        if ("OPTIONS".equalsIgnoreCase(req.getMethod()) || "/error".equals(req.getServletPath())) {
+        String path = req.getServletPath();
+        if ("OPTIONS".equalsIgnoreCase(req.getMethod())
+                || "/error".equals(path) || "/".equals(path)
+                || path.startsWith("/web/") || path.startsWith("/css/")
+                || path.startsWith("/js/") || path.startsWith("/images/")) {
             chain.doFilter(req, res);
             return;
         }
