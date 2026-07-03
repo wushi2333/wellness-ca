@@ -1,0 +1,41 @@
+<!-- Author: Guo Jiali -->
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wellness AI - Login</title>
+    <link rel="stylesheet" th:href="@{/web/css/style.css}">
+</head>
+<body class="auth-page">
+<main class="auth-shell">
+    <section class="auth-panel" aria-labelledby="loginTitle">
+        <p class="eyebrow">Wellness AI</p>
+        <h1 id="loginTitle">Login</h1>
+
+        <div class="alert success" th:if="${success}" th:text="${success}"></div>
+        <div class="alert error" th:if="${error}" th:text="${error}"></div>
+
+        <form class="form-stack" th:action="@{/web/login}" method="post">
+            <label for="username">Username</label>
+            <input id="username"
+                   name="username"
+                   type="text"
+                   autocomplete="username"
+                   th:value="${usernameInput}"
+                   required>
+
+            <label for="password">Password</label>
+            <input id="password"
+                   name="password"
+                   type="password"
+                   autocomplete="current-password"
+                   required>
+
+            <button class="button primary" type="submit">Login</button>
+            <a class="button secondary" th:href="@{/web/register}">Register</a>
+        </form>
+    </section>
+</main>
+</body>
+</html>
