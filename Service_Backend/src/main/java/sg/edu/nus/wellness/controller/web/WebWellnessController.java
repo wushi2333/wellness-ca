@@ -45,6 +45,7 @@ public class WebWellnessController {
         }
 
         WellnessRequest form = new WellnessRequest();
+        form.sleepHours = 0.0;
         form.exerciseActivity = "";
         form.exerciseDuration = 0;
         form.recordDate = LocalDate.now().toString();

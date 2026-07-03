@@ -26,7 +26,7 @@ public class ChatService {
         // RAG: retrieve relevant wellness context from ChromaDB sidecar
         String context = "";
         try {
-            Map<String,Object> ragReq = Map.of("query",message,"userId",userId,"k",4);
+            Map<String,Object> ragReq = Map.of("query",message,"user_id",userId,"k",4);
             ResponseEntity<Map> ragResp = http.postForEntity(ragUrl+"/search", ragReq, Map.class);
             if (ragResp.getBody() != null) context = (String) ragResp.getBody().getOrDefault("context","");
         } catch (Exception ignored) {}
