@@ -65,6 +65,8 @@
     <string name="chat_title">AI Wellness Assistant</string>
     <string name="send">Send</string>
     <string name="type_message">Type a message…</string>
+    <string name="new_chat">New Chat</string>
+    <string name="chat_history">History</string>
 
     <!-- Agentic AI feature (author: Cai Peilin) -->
     <string name="agent_screen_title">Wellness Insights</string>

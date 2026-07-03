@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import iss.nus.edu.sg.ca_application.R
 
 /**
- * Author: Wang Songyu
+ * Author: Huang Qianer
  * Adapter for the Chat RecyclerView.
  */
 class ChatAdapter(private val messages: List<ChatMessage>) :

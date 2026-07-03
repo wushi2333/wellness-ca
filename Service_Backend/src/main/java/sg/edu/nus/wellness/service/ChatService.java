@@ -12,18 +12,20 @@ import java.util.*;
 public class ChatService {
     private final RestTemplate http = new RestTemplate();
     private final ChatHistoryRepo repo;
+    private final WellnessService wellnessService; // Added
     private final String key, url = "https://api.deepseek.com/chat/completions";
     private final String ragUrl;
 
     public ChatService(ChatHistoryRepo r,
+                       WellnessService ws, // Added
                        @Value("${app.deepseek.key}") String k,
                        @Value("${app.rag.url:http://localhost:8001}") String rag) {
-        repo=r; key=k; ragUrl=rag;
+        repo=r; wellnessService=ws; key=k; ragUrl=rag;
     }
 
     @SuppressWarnings("unchecked")
     public String chat(Long userId, String message) {
-        // RAG: retrieve relevant wellness context from ChromaDB sidecar
+        // 1. RAG: retrieve relevant wellness context from ChromaDB sidecar
         String context = "";
         try {
             Map<String,Object> ragReq = Map.of("query",message,"userId",userId,"k",4);
@@ -31,8 +33,21 @@ public class ChatService {
             if (ragResp.getBody() != null) context = (String) ragResp.getBody().getOrDefault("context","");
         } catch (Exception ignored) {}
 
-        String systemPrompt = "You are a friendly wellness assistant. Give concise, practical health advice.";
-        if (!context.isEmpty()) systemPrompt += "\n\nRelevant user data:\n"+context;
+        // 2. FALLBACK: If RAG returns nothing, pull the most recent records directly from DB
+        if (context == null || context.trim().isEmpty()) {
+            List<sg.edu.nus.wellness.model.WellnessRecord> recent = wellnessService.last7(userId);
+            if (!recent.isEmpty()) {
+                StringBuilder sb = new StringBuilder("Summary of recent wellness records:\n");
+                for (sg.edu.nus.wellness.model.WellnessRecord r : recent) {
+                    sb.append(String.format("- Date: %s, Sleep: %.1f hrs, Exercise: %s (%d mins)\n",
+                        r.getRecordDate(), r.getSleepHours(), r.getExerciseActivity(), r.getExerciseDuration()));
+                }
+                context = sb.toString();
+            }
+        }
+
+        String systemPrompt = "You are a friendly wellness assistant. Give concise, practical health advice based on the user's data provided.";
+        if (context != null && !context.isEmpty()) systemPrompt += "\n\n[User Data Context]:\n" + context;
 
         HttpHeaders h = new HttpHeaders(); h.setBearerAuth(key); h.setContentType(MediaType.APPLICATION_JSON);
         Map<String,Object> body = Map.of("model","deepseek-chat","messages",List.of(

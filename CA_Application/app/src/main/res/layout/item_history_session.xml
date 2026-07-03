@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Author: Huang Qianer -->
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="12dp"
+    android:background="?attr/selectableItemBackground">
+
+    <LinearLayout
+        android:id="@+id/layoutText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toStartOf="@+id/btnDeleteSession"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/textViewSessionTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/Body"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:text="Session Title" />
+
+        <TextView
+            android:id="@+id/textViewSessionDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/Caption"
+            android:text="Date" />
+    </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/btnDeleteSession"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@android:drawable/ic_menu_delete"
+        android:contentDescription="Delete Session"
+        android:tint="@color/error" />
+
+</RelativeLayout>
