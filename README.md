@@ -167,4 +167,3 @@ Web Browser ──HTTP──→ Spring Boot :8000 (Thymeleaf pages)
 | RAG chatbot + ChromaDB | Huang Qianer |
 | Agentic AI recommendation | Cai Peilin |
 | Web UI (Thymeleaf) | Guo Jiali |
-| Android app | Wang Songyu, Liu Yu, Xia Zihang |
