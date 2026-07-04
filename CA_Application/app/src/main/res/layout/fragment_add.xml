@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Add tab: two large record-type cards centered on screen -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="#F8FAFC">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/new_record"
+        android:textSize="20sp"
+        android:textColor="#1E293B"
+        android:fontFamily="@font/segoe_ui"
+        android:textStyle="bold"
+        android:layout_marginBottom="24dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:orientation="horizontal"
+        android:baselineAligned="false">
+
+        <!-- Sleep card -->
+        <LinearLayout
+            android:id="@+id/cardAddSleep"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="@drawable/bg_card_sleep"
+            android:layout_marginEnd="10dp"
+            android:elevation="2dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground">
+
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="💤" android:textSize="40sp" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="@string/add_sleep" android:textSize="16sp" android:textColor="#475569"
+                android:fontFamily="@font/segoe_ui" android:textStyle="bold" android:layout_marginTop="12dp" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="@string/add_sleep_subtitle"
+                android:textSize="11sp" android:textColor="#94A3B8"
+                android:fontFamily="@font/segoe_ui" android:layout_marginTop="6dp" />
+        </LinearLayout>
+
+        <!-- Exercise card -->
+        <LinearLayout
+            android:id="@+id/cardAddExercise"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="@drawable/bg_card_exercise"
+            android:layout_marginStart="10dp"
+            android:elevation="2dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground">
+
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="🏃" android:textSize="40sp" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="@string/add_exercise" android:textSize="16sp" android:textColor="#475569"
+                android:fontFamily="@font/segoe_ui" android:textStyle="bold" android:layout_marginTop="12dp" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="@string/add_exercise_subtitle"
+                android:textSize="11sp" android:textColor="#94A3B8"
+                android:fontFamily="@font/segoe_ui" android:layout_marginTop="6dp" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

@@ -21,11 +21,11 @@
         android:id="@+id/etUsername"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/username"
+        android:hint="@string/username_or_email"
         android:textAppearance="@style/Body"
         android:textColor="@color/text_primary"
         android:textColorHint="@color/text_hint"
-        android:inputType="textPersonName" />
+        android:inputType="textPersonName|textEmailAddress" />
 
     <EditText
         android:id="@+id/etPassword"
@@ -61,5 +61,19 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:text="@string/register" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="12dp"
+        android:background="@color/divider" />
+
+    <Button
+        android:id="@+id/btnGoogleSignIn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Sign in with Google"
+        android:backgroundTint="#4285F4" />
 
 </LinearLayout>

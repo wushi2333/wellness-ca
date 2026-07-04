@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Sleep detail: top bar + stat cards + rounded bar chart + sleep schedule timeline -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F8FAFC"
+    android:clipToPadding="false">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Top bar -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="12dp"
+            android:paddingEnd="16dp"
+            android:background="#FFFFFF"
+            android:elevation="1dp">
+
+            <ImageView
+                android:id="@+id/btnBack"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/ic_back"
+                android:padding="4dp" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:text="@string/sleep"
+                android:textSize="18sp"
+                android:textColor="#1E293B"
+                android:fontFamily="@font/segoe_ui"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnEdit"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="@string/edit"
+                android:textSize="14sp"
+                android:textColor="#007AFF"
+                android:fontFamily="@font/segoe_ui"
+                style="@style/Widget.Material3.Button.TextButton" />
+        </LinearLayout>
+
+        <!-- Stat cards row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="8dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:background="@drawable/bg_card_default"
+                android:padding="14dp"
+                android:layout_marginEnd="6dp"
+                android:elevation="1dp">
+
+                <TextView
+                    android:id="@+id/tvDetailSleepAvg"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="--"
+                    android:textSize="22sp"
+                    android:textColor="#2563EB"
+                    android:fontFamily="@font/segoe_ui"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/detail_avg_hours"
+                    android:textSize="11sp"
+                    android:textColor="#94A3B8"
+                    android:fontFamily="@font/segoe_ui"
+                    android:layout_marginTop="2dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:background="@drawable/bg_card_default"
+                android:padding="14dp"
+                android:layout_marginStart="3dp"
+                android:layout_marginEnd="3dp"
+                android:elevation="1dp">
+
+                <TextView
+                    android:id="@+id/tvDetailSleepBest"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="--"
+                    android:textSize="22sp"
+                    android:textColor="#1E293B"
+                    android:fontFamily="@font/segoe_ui"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/detail_best_night"
+                    android:textSize="11sp"
+                    android:textColor="#94A3B8"
+                    android:fontFamily="@font/segoe_ui"
+                    android:layout_marginTop="2dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:background="@drawable/bg_card_default"
+                android:padding="14dp"
+                android:layout_marginStart="6dp"
+                android:elevation="1dp">
+
+                <TextView
+                    android:id="@+id/tvDetailSleepMood"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="—"
+                    android:textSize="22sp"
+                    android:textColor="#F59E0B"
+                    android:fontFamily="@font/segoe_ui"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/detail_avg_mood"
+                    android:textSize="11sp"
+                    android:textColor="#94A3B8"
+                    android:fontFamily="@font/segoe_ui"
+                    android:layout_marginTop="2dp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Week navigation -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp">
+
+            <ImageView
+                android:id="@+id/btnPrevWeek"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_back"
+                android:padding="6dp"
+                android:alpha="0.25"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <TextView
+                android:id="@+id/tvWeekLabel"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="--"
+                android:textSize="14sp"
+                android:textColor="#1E293B"
+                android:fontFamily="@font/segoe_ui"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/btnNextWeek"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_back"
+                android:rotation="180"
+                android:padding="6dp"
+                android:alpha="0.25"
+                android:clickable="true"
+                android:focusable="true" />
+        </LinearLayout>
+
+        <!-- Section label -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/chart_sleep_hours_title"
+            android:textSize="13sp"
+            android:textColor="#64748B"
+            android:fontFamily="@font/segoe_ui"
+            android:textStyle="bold"
+            android:paddingStart="20dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="4dp" />
+
+        <!-- Rounded gradient bar chart -->
+        <com.github.mikephil.charting.charts.BarChart
+            android:id="@+id/sleepBarChart"
+            android:layout_width="match_parent"
+            android:layout_height="280dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="24dp" />
+
+    </LinearLayout>
+</ScrollView>

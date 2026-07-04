@@ -20,5 +20,6 @@ data class LoginResponse(
     val accessToken: String,
     val tokenType: String,
     val userId: Long,
-    val username: String
+    val username: String,
+    val email: String? = null
 )

@@ -16,10 +16,7 @@ public class GatewayFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
             throws ServletException, IOException {
         String path = req.getServletPath();
-        if ("OPTIONS".equalsIgnoreCase(req.getMethod())
-                || "/error".equals(path) || "/".equals(path)
-                || path.startsWith("/web/") || path.startsWith("/css/")
-                || path.startsWith("/js/") || path.startsWith("/images/")) {
+        if (SecurityUtils.isPublicPath(path, req.getMethod())) {
             chain.doFilter(req, res);
             return;
         }

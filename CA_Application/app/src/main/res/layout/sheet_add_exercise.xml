@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_card_default"
+    android:padding="24dp"
+    android:fillViewport="true"
+    android:paddingBottom="32dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/add_exercise"
+            android:textSize="20sp"
+            android:textColor="#1E293B"
+            android:fontFamily="@font/segoe_ui"
+            android:textStyle="bold"
+            android:layout_marginBottom="24dp" />
+
+        <!-- Date -->
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="@string/record_date" android:textSize="13sp" android:textColor="#64748B"
+            android:fontFamily="@font/segoe_ui" android:layout_marginBottom="6dp" />
+
+        <EditText android:id="@+id/etExDate" android:layout_width="match_parent"
+            android:layout_height="52dp" android:hint="@string/hint_date_format"
+            android:textSize="16sp" android:textColor="#1E293B" android:textColorHint="#94A3B8"
+            android:fontFamily="@font/segoe_ui" android:inputType="datetime"
+            android:background="@drawable/bg_input_field" android:paddingStart="16dp"
+            android:paddingEnd="16dp" android:layout_marginBottom="16dp" />
+
+        <!-- Exercise type -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/label_type"
+            android:textSize="13sp"
+            android:textColor="#64748B"
+            android:fontFamily="@font/segoe_ui"
+            android:layout_marginBottom="6dp" />
+
+        <Spinner
+            android:id="@+id/spExerciseType"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:background="@drawable/bg_input_field"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:layout_marginBottom="20dp" />
+
+        <!-- Duration -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/label_duration_minutes"
+            android:textSize="13sp"
+            android:textColor="#64748B"
+            android:fontFamily="@font/segoe_ui"
+            android:layout_marginBottom="6dp" />
+
+        <EditText
+            android:id="@+id/etExDuration"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:hint="@string/hint_exercise_duration"
+            android:textSize="16sp"
+            android:textColor="#1E293B"
+            android:textColorHint="#94A3B8"
+            android:fontFamily="@font/segoe_ui"
+            android:inputType="number"
+            android:background="@drawable/bg_input_field"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:layout_marginBottom="20dp" />
+
+        <!-- Notes -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/notes"
+            android:textSize="13sp"
+            android:textColor="#64748B"
+            android:fontFamily="@font/segoe_ui"
+            android:layout_marginBottom="6dp" />
+
+        <EditText
+            android:id="@+id/etExNotes"
+            android:layout_width="match_parent"
+            android:layout_height="84dp"
+            android:hint="@string/hint_exercise_notes"
+            android:textSize="15sp"
+            android:textColor="#1E293B"
+            android:textColorHint="#94A3B8"
+            android:fontFamily="@font/segoe_ui"
+            android:gravity="top|start"
+            android:inputType="textMultiLine|textCapSentences"
+            android:background="@drawable/bg_input_field"
+            android:padding="14dp"
+            android:layout_marginBottom="24dp" />
+
+        <Button
+            android:id="@+id/btnSaveEx"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:text="@string/confirm"
+            android:textSize="16sp"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:background="@drawable/bg_save_button"
+            app:backgroundTint="@null"
+            android:stateListAnimator="@null"
+            android:elevation="2dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp" />
+    </LinearLayout>
+</ScrollView>

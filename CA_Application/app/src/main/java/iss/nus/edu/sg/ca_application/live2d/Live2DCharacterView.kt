@@ -15,20 +15,33 @@ class Live2DCharacterView @JvmOverloads constructor(
 
     private val glView: GLSurfaceView
     private var delegate: LAppMinimumDelegate? = null
+    private var glStarted = false
 
     init {
         glView = GLSurfaceView(context)
         glView.setEGLContextClientVersion(2)
+        // Don't set renderer or add to layout yet — wait for onStart() with valid Activity
+    }
+
+    var onModelReady: (() -> Unit)? = null
+
+    private fun ensureGLStarted(activity: android.app.Activity) {
+        if (glStarted) return
+        glStarted = true
+        delegate = LAppMinimumDelegate.getInstance()
+        delegate?.onStart(activity)
         glView.setRenderer(GLRendererMinimum())
         glView.renderMode = GLSurfaceView.RENDERMODE_CONTINUOUSLY
         addView(glView, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
     }
 
-    var onModelReady: (() -> Unit)? = null
+    fun onStart(activity: android.app.Activity) {
+        ensureGLStarted(activity)
+    }
 
+    /** Convenience for when context IS an Activity (legacy callers). */
     fun onStart() {
-        delegate = LAppMinimumDelegate.getInstance()
-        delegate?.onStart(context as android.app.Activity)
+        ensureGLStarted(context as android.app.Activity)
     }
 
     /** Whether model data is already cached from a previous session. */
@@ -86,16 +99,64 @@ class Live2DCharacterView @JvmOverloads constructor(
         name?.let { setExpression(it) }
     }
 
+    // Track touch start for tap vs swipe detection
+    private var touchStartX = 0f
+    private var touchStartY = 0f
+    private val TAP_THRESHOLD = 0.05f  // normalized coords, ~2% of screen
+
+    // Auto-reset to default expression after idle timeout
+    private var currentTapExpression: String? = null
+    private val idleResetHandler = android.os.Handler(android.os.Looper.getMainLooper())
+    private val idleResetRunnable = Runnable { resetToIdleExpression() }
+    private val IDLE_RESET_MS = 5000L
+
+    private fun resetIdleTimer() {
+        idleResetHandler.removeCallbacks(idleResetRunnable)
+        idleResetHandler.postDelayed(idleResetRunnable, IDLE_RESET_MS)
+    }
+
+    private fun resetToIdleExpression() {
+        val model = LAppMinimumLive2DManager.getInstance().getModel(0) as? LAppMinimumModel ?: return
+        currentTapExpression = null
+        model.stopAllExpressions()
+    }
+
     override fun onTouchEvent(event: MotionEvent): Boolean {
         val d = delegate ?: return false
         val px = event.x / width * 2f - 1f
         val py = event.y / height * 2f - 1f
         when (event.action) {
-            MotionEvent.ACTION_DOWN -> d.onTouchBegan(px, py)
-            MotionEvent.ACTION_MOVE -> d.onTouchMoved(px, py)
-            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> d.onTouchEnd(px, py)
+            MotionEvent.ACTION_DOWN -> {
+                touchStartX = px
+                touchStartY = py
+                d.onTouchBegan(px, py)
+                resetIdleTimer()
+            }
+            MotionEvent.ACTION_MOVE -> {
+                d.onTouchMoved(px, py)
+                resetIdleTimer()
+            }
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                val dx = px - touchStartX
+                val dy = py - touchStartY
+                val dist = dx * dx + dy * dy
+                if (dist < TAP_THRESHOLD * TAP_THRESHOLD) {
+                    onTap()
+                }
+                d.onTouchEnd(px, py)
+                resetIdleTimer()
+            }
         }
         return true
+    }
+
+    private fun onTap() {
+        val model = LAppMinimumLive2DManager.getInstance().getModel(0) as? LAppMinimumModel ?: return
+        val candidates = listOf("blackFace", "tears", "cry").filter { it != currentTapExpression }
+        val name = if (candidates.isNotEmpty()) candidates.random() else listOf("blackFace", "tears", "cry").random()
+        currentTapExpression = name
+        model.startExpression(name)
+        resetIdleTimer()
     }
 
     fun onSurfaceChanged(w: Int, h: Int) { delegate?.onSurfaceChanged(w, h) }

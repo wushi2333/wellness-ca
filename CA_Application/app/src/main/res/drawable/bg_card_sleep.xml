@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Sleep card: soft blue tint, subtle sheen, rounded -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#F0F4FF"/>
+            <corners android:radius="20dp"/>
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <gradient android:type="linear" android:angle="135"
+                android:startColor="#60FFFFFF" android:centerColor="#00FFFFFF"
+                android:endColor="#10FFFFFF"/>
+            <corners android:radius="20dp"/>
+        </shape>
+    </item>
+</layer-list>

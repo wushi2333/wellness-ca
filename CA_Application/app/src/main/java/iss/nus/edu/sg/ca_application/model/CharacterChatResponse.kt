@@ -5,6 +5,6 @@ data class CharacterChatResponse(
     val reply: String,
     val emotion: String,
     val sessionId: Long,
-    val intent: Map<String, String>? = null,
+    val intent: Map<String, Any?>? = null,
     val tools: List<String>? = null
 )

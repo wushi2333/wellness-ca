@@ -33,4 +33,13 @@
     <color name="bubble_ai">#FFF1F5F9</color>
     <color name="bubble_user_text">#FFFFFFFF</color>
     <color name="bubble_ai_text">#FF1E293B</color>
+
+    <!-- Chart gradients -->
+    <color name="chart_sleep_gradient_start">#FF1B7B9E</color>
+    <color name="chart_sleep_gradient_end">#FF93C5FD</color>
+    <color name="chart_exercise_gradient_start">#FF34C759</color>
+    <color name="chart_exercise_gradient_end">#FF86EFAC</color>
+    <color name="chart_target_line">#FFF59E0B</color>
+    <color name="chart_sleep_schedule">#FF7C8DFF</color>
+    <color name="chart_sleep_sparkline">#FF2563EB</color>
 </resources>

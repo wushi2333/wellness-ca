@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface CharacterSessionRepo extends JpaRepository<CharacterSession, Long> {
     List<CharacterSession> findByUserIdOrderByUpdatedAtDesc(Long userId);
+    void deleteAllByUserId(Long userId);
 }

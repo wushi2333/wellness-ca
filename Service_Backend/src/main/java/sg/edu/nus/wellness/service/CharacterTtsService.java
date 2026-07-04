@@ -12,17 +12,19 @@ import java.util.*;
 @Service
 public class CharacterTtsService {
 
-    private final RestTemplate http = new RestTemplate();
+    private final RestTemplate http;
     private final ObjectMapper mapper = new ObjectMapper();
     private final String appId, token, speaker;
 
     public CharacterTtsService(
             @Value("${app.volcano.tts.appid}") String appId,
             @Value("${app.volcano.tts.token}") String token,
-            @Value("${app.volcano.tts.speaker}") String speaker) {
+            @Value("${app.volcano.tts.speaker}") String speaker,
+            RestTemplate rt) {
         this.appId = appId;
         this.token = token;
         this.speaker = speaker;
+        this.http = rt;
     }
 
     private static final Map<String, String> EMOTION_CONTEXT = Map.of(

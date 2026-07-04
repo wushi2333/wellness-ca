@@ -225,12 +225,10 @@ public class LAppMinimumView implements AutoCloseable {
      * @param pointY スクリーンY座標
      */
     public void onTouchesMoved(float pointX, float pointY) {
-        float viewX = transformViewX(touchManager.getLastX());
-        float viewY = transformViewY(touchManager.getLastY());
-
         touchManager.touchesMoved(pointX, pointY);
 
-        LAppMinimumLive2DManager.getInstance().onDrag(viewX, viewY);
+        // Flip Y so dragging up makes the character look up (screen Y increases downward)
+        LAppMinimumLive2DManager.getInstance().onDrag(pointX, -pointY);
     }
 
     /**

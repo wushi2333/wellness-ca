@@ -152,6 +152,8 @@ public class LAppMinimumLive2DManager {
         model.loadExpressionFromFile("dizzy", "晕晕眼.exp3.json");
         model.loadExpressionFromFile("leanForward", "前倾.exp3.json");
         model.loadExpressionFromFile("tears", "流泪.exp3.json");
+        model.loadExpressionFromFile("blackFace", "黑脸.exp3.json");
+        model.loadExpressionFromFile("flyHead", "飞头.exp3.json");
         model.loadExpressionFromFile("watermark", "水印开关.exp3.json");
         // Register expression updater so expressions take effect
         model.setupManualExpressions();

@@ -9,4 +9,5 @@ public interface CharacterMessageRepo extends JpaRepository<CharacterMessage, Lo
     List<CharacterMessage> findBySessionIdOrderByCreatedAtAsc(Long sessionId);
     int countBySessionId(Long sessionId);
     List<CharacterMessage> findTop20BySessionIdAndIsCompressedFalseOrderByCreatedAtAsc(Long sessionId);
+    void deleteAllBySessionId(Long sessionId);
 }

@@ -1,49 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Author: Xia Zihang. Loading overlay for Live2D init. -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical"
-    android:padding="24dp"
-    android:background="@drawable/bg_loading_gradient">
+    android:background="#F8FAFC">
 
-    <Button
-        android:id="@+id/btnExit"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:text="✕"
-        android:textSize="16sp"
-        android:layout_gravity="start|top"
-        android:layout_marginStart="-8dp"
-        android:layout_marginTop="-8dp"
-        android:background="@android:color/transparent"
-        android:textColor="@color/text_secondary" />
-
-    <Space
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
-
-    <ProgressBar
-        android:id="@+id/progressLoading"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="200dp"
-        android:layout_height="6dp"
-        android:indeterminate="true"
-        android:indeterminateTint="@color/primary" />
-
-    <TextView
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Yui is getting ready… 🌸"
-        android:textAppearance="@style/Body"
-        android:textColor="@color/text_secondary"
-        android:layout_marginTop="16dp" />
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="vertical">
 
-    <Space
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_weight="1.2" />
+        <ProgressBar
+            android:id="@+id/progressLoading"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:indeterminateTint="#007AFF" />
 
-</LinearLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/loading_yui"
+            android:textSize="16sp"
+            android:textColor="#1E293B"
+            android:fontFamily="@font/segoe_ui" />
+
+    </LinearLayout>
+</FrameLayout>

@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Record Your Wellness</string>
+
+    <!-- Auth -->
+    <string name="login">登录</string>
+    <string name="logout">登出</string>
+    <string name="username">用户名</string>
+    <string name="username_or_email">用户名或邮箱</string>
+    <string name="password">密码</string>
+    <string name="register">注册</string>
+    <string name="register_title">创建账号</string>
+    <string name="login_error_empty">请输入用户名和密码</string>
+    <string name="login_error_credentials">用户名或密码错误</string>
+    <string name="login_error_user_not_found">用户不存在</string>
+    <string name="login_error_generic">登录失败，请重试</string>
+    <string name="login_success">登录成功</string>
+    <string name="register_error_empty">请输入用户名和密码</string>
+    <string name="register_success">注册成功</string>
+
+    <!-- Wellness -->
+    <string name="sleep_hours">睡眠时长</string>
+    <string name="exercise_activity">运动项目</string>
+    <string name="exercise_duration">时长（分钟）</string>
+    <string name="record_date">日期</string>
+    <string name="notes">备注</string>
+    <string name="save_record">保存记录</string>
+    <string name="delete_record">删除记录</string>
+    <string name="edit_record">编辑记录</string>
+
+    <!-- Wellness hints -->
+    <string name="hint_sleep_hours">例如 7.5</string>
+    <string name="hint_exercise_activity">例如 跑步、瑜伽</string>
+    <string name="hint_exercise_duration">例如 30</string>
+    <string name="hint_select_date">点击选择日期</string>
+    <string name="hint_notes">可选备注…</string>
+
+    <!-- Wellness list -->
+    <string name="no_records">暂无健康记录</string>
+
+    <!-- Wellness format -->
+    <string name="sleep_format">睡眠：%.1f 小时</string>
+    <string name="exercise_format">运动：%s（%d 分钟）</string>
+    <string name="no_notes">无备注</string>
+    <string name="update_record">更新记录</string>
+
+    <!-- Wellness validation -->
+    <string name="field_required">所有字段均为必填</string>
+    <string name="invalid_numeric">请输入有效数字</string>
+    <string name="sleep_range">睡眠时长必须在 0 到 24 小时之间</string>
+    <string name="exercise_range">运动时长必须在 0 到 1440 分钟之间</string>
+    <string name="date_invalid">请输入有效日期（YYYY-MM-DD）</string>
+    <string name="save_success">记录已保存</string>
+    <string name="delete_success">记录已删除</string>
+
+    <!-- Wellness delete dialog -->
+    <string name="confirm_delete_title">删除记录</string>
+    <string name="confirm_delete_message">确定要删除这条记录吗？</string>
+    <string name="delete_confirm">删除</string>
+    <string name="cancel">取消</string>
+
+    <!-- API errors -->
+    <string name="api_forbidden">您没有权限执行此操作</string>
+    <string name="record_not_found">未找到记录</string>
+
+    <!-- Character -->
+    <string name="character_chat">与 Yui 聊天 🌸</string>
+    <string name="delete_selected">删除选中</string>
+    <string name="delete_all">删除全部</string>
+    <string name="pin_chat">置顶</string>
+    <string name="unpin_chat">取消置顶</string>
+    <string name="yui_welcome">你好，%1$s！我是 Yui（結衣），你的快乐健康伙伴 🌸\n\n我可以帮你追踪健康状况、分析健康数据，并回答使用本应用的问题。\n\n• 切换到 Agent 模式让我分析你的记录\n• 随时和我聊聊你的一天——我在这里倾听！\n\n今天想做点什么呢？</string>
+
+    <!-- Chat -->
+    <string name="chat_title">AI 健康助手</string>
+    <string name="send">发送</string>
+    <string name="type_message">输入消息…</string>
+
+    <!-- Agentic AI feature -->
+    <string name="agent_screen_title">健康洞察</string>
+    <string name="agent_main_title">获取个性化建议</string>
+    <string name="agent_main_subtitle">基于你近期的健康数据。</string>
+    <string name="agent_generate_button">生成建议</string>
+    <string name="agent_view_history">查看历史</string>
+
+    <string name="agent_loading_step_1">正在加载你的健康记录…</string>
+    <string name="agent_loading_step_2">正在分析睡眠模式…</string>
+    <string name="agent_loading_step_3">正在分析运动模式…</string>
+    <string name="agent_loading_step_4">正在生成建议…</string>
+    <string name="agent_loading_step_format">第 %1$d 步，共 4 步</string>
+
+    <string name="agent_result_title">今日建议</string>
+    <string name="agent_evidence_section">AI 推理依据</string>
+    <string name="agent_generate_again">重新生成</string>
+
+    <string name="agent_history_title">历史建议</string>
+    <string name="agent_history_empty">暂无建议。生成你的第一条吧！</string>
+
+    <string name="agent_error_generic">无法生成建议，请重试。</string>
+    <string name="agent_error_no_records">请先添加一些健康记录，然后再来。</string>
+    <string name="agent_error_unauthorized">会话已过期，请重新登录。</string>
+    <string name="agent_retry">重试</string>
+    <string name="agent_evidence_row">%1$d.&#160;&#160;%2$s</string>
+
+    <!-- Navigation -->
+    <string name="dashboard">仪表盘</string>
+    <string name="view_records">查看记录</string>
+    <string name="add_record">添加记录</string>
+    <string name="chat">聊天</string>
+
+    <!-- Network -->
+    <string name="email_hint">邮箱（可选）</string>
+    <string name="invalid_email">请输入有效的邮箱地址</string>
+    <string name="network_error">网络错误，请重试</string>
+    <string name="session_expired">会话已过期，请重新登录</string>
+
+    <!-- Home tab -->
+    <string name="greeting_good_morning">早上好</string>
+    <string name="default_username">用户</string>
+    <string name="sleep">睡眠</string>
+    <string name="sleep_avg_placeholder">-- 小时</string>
+    <string name="avg_per_night">每晚平均</string>
+    <string name="vs_last_7d">对比过去7天</string>
+    <string name="exercise">运动</string>
+    <string name="exercise_avg_placeholder">-- 分钟</string>
+    <string name="avg_per_day">每天平均</string>
+    <string name="exercise_days_placeholder">-- 天</string>
+    <string name="todays_tip">今日小贴士</string>
+    <string name="default_tip_text">点击查看您的个性化健康建议</string>
+
+    <!-- Add tab -->
+    <string name="new_record">新记录</string>
+    <string name="add_sleep">添加睡眠</string>
+    <string name="add_sleep_subtitle">就寝时间 · 起床时间 · 心情</string>
+    <string name="add_exercise">添加运动</string>
+    <string name="add_exercise_subtitle">类型 · 时长 · 备注</string>
+
+    <!-- Chat tab -->
+    <string name="new_chat">新对话</string>
+    <string name="chat_hint">与 Yui 聊天…</string>
+    <string name="history_title">历史记录</string>
+    <string name="new_chat_button">+ 新建</string>
+
+    <!-- Add sleep sheet -->
+    <string name="label_date">日期</string>
+    <string name="hint_date_format">例如 2026-07-04</string>
+    <string name="label_bedtime">就寝时间 *</string>
+    <string name="hint_bedtime">例如 23:00</string>
+    <string name="label_wake_time">起床时间 *</string>
+    <string name="hint_wake_time">例如 07:00</string>
+    <string name="duration_placeholder">时长：--</string>
+    <string name="label_morning_mood">晨间心情</string>
+    <string name="hint_sleep_notes">例如 凌晨3点醒来，感到不安…</string>
+    <string name="confirm">确认</string>
+
+    <!-- Add exercise sheet -->
+    <string name="label_type">类型</string>
+    <string name="label_duration_minutes">时长（分钟）</string>
+    <string name="hint_exercise_notes">感觉如何？强度、地点…</string>
+
+    <!-- Detail -->
+    <string name="edit">编辑</string>
+    <string name="detail_avg_hours">平均小时</string>
+    <string name="detail_best_night">最佳夜晚</string>
+    <string name="detail_avg_mood">平均心情</string>
+    <string name="detail_avg_min_per_day">平均分钟/天</string>
+    <string name="detail_active_days">活跃天数</string>
+
+    <!-- Chart -->
+    <string name="chart_target_sleep">推荐7小时</string>
+    <string name="chart_target_exercise">目标30分钟</string>
+    <string name="chart_sleep_hours_title">睡眠时长</string>
+    <string name="chart_sleep_schedule_title">睡眠时间</string>
+    <string name="chart_exercise_minutes_title">运动时长</string>
+    <string name="chart_activity_breakdown">运动分布</string>
+    <string name="chart_unit_days">天</string>
+    <string name="chart_unit_min">分钟</string>
+    <string name="chart_no_activity">暂无运动数据</string>
+    <string name="pie_toggle_today">今天</string>
+    <string name="pie_toggle_week">本周</string>
+    <string name="manage_sleep_title">睡眠记录</string>
+    <string name="manage_exercise_title">运动记录</string>
+    <string name="confirm_delete_msg_sleep">确定删除 %s 的睡眠记录？</string>
+    <string name="confirm_delete_msg_exercise">确定删除 %s 的 %s 记录？</string>
+    <string name="toast_deleted">已删除</string>
+
+    <string-array name="exercise_types">
+        <item>跑步</item>
+        <item>骑行</item>
+        <item>游泳</item>
+        <item>瑜伽</item>
+        <item>力量训练</item>
+        <item>有氧运动</item>
+        <item>步行</item>
+        <item>HIIT</item>
+        <item>普拉提</item>
+        <item>其他</item>
+    </string-array>
+
+    <!-- Recommendations -->
+    <string name="recommendations_title">推荐</string>
+    <string name="generate_new_recommendation">生成新建议</string>
+
+    <!-- Loading -->
+    <string name="loading_yui">加载 Yui…</string>
+
+    <!-- Settings -->
+    <string name="settings_title">设置</string>
+    <string name="language">语言 / Language</string>
+    <string name="change_password">修改密码</string>
+    <string name="profile">个人资料</string>
+    <string name="account">账户</string>
+    <string name="settings">设置</string>
+
+    <!-- Change Password -->
+    <string name="change_password_title">修改密码</string>
+    <string name="old_password">当前密码</string>
+    <string name="new_password">新密码</string>
+    <string name="confirm_password">确认新密码</string>
+    <string name="password_changed">密码修改成功</string>
+    <string name="password_mismatch">两次输入的密码不一致</string>
+    <string name="password_weak">密码长度至少8位，且必须包含数字和字母</string>
+    <string name="password_wrong">当前密码错误</string>
+
+    <!-- Profile -->
+    <string name="profile_title">个人资料</string>
+    <string name="edit_profile">编辑资料</string>
+    <string name="change_photo">更换头像</string>
+    <string name="crop_avatar">裁剪头像</string>
+
+    <!-- Greetings -->
+    <string name="greeting_morning">早上好</string>
+    <string name="greeting_afternoon">下午好</string>
+    <string name="greeting_evening">晚上好</string>
+
+    <!-- Wellness tips -->
+    <string name="tip_hydrate">今天多喝水！💧</string>
+    <string name="tip_walk">午饭后散步10分钟 🌿</string>
+    <string name="tip_sleep">今晚保证7小时以上睡眠 🌙</string>
+    <string name="tip_stretch">每2小时拉伸一下 🧘</string>
+    <string name="tip_breathe">压力大时深呼吸</string>
+    <string name="basic_info">基本信息</string>
+    <string name="body_metrics">身体数据</string>
+    <string name="height_cm">身高 (cm)</string>
+    <string name="weight_kg">体重 (kg)</string>
+    <string name="age">年龄</string>
+    <string name="save_metrics">保存身体数据</string>
+    <string name="profile_updated">资料已更新</string>
+    <string name="edit_username">修改用户名</string>
+    <string name="change_username">修改用户名</string>
+    <string name="edit_email">修改邮箱</string>
+    <string name="bind_email">绑定邮箱</string>
+    <string name="change_email">修改邮箱</string>
+    <string name="email_bound">邮箱已更新</string>
+    <string name="email_conflict">此邮箱已注册到另一个账户。每个邮箱只能用于一个账户。</string>
+    <string name="email_conflict_title">无法绑定邮箱</string>
+    <string name="email_label">邮箱</string>
+    <string name="email_required">邮箱不能为空</string>
+    <string name="email_invalid">邮箱格式不正确</string>
+    <string name="username_taken">用户名已被使用</string>
+    <string name="provider_local">本地账户</string>
+    <string name="provider_google">Google 账户</string>
+    <string name="account_type">账户类型</string>
+    <string name="not_set">未设置</string>
+
+    <!-- Logout -->
+    <string name="logout_confirm_title">退出登录</string>
+    <string name="logout_confirm_message">确定要退出登录吗？</string>
+    <string name="logout_success">已退出登录</string>
+
+    <!-- Delete Account -->
+    <string name="delete_account">注销账号</string>
+    <string name="delete_account_confirm_title">注销账号</string>
+    <string name="delete_account_confirm_message">这将永久删除你的账号及所有相关数据（健康记录、聊天记录、个人资料、头像）。此操作不可撤销。\n\n请输入你的用户名以确认。</string>
+    <string name="delete_account_success">账号已删除</string>
+    <string name="delete_account_failed">删除账号失败</string>
+    <string name="google_no_password">Google 账户使用 Google 登录，无需密码</string>
+
+    <!-- Common -->
+    <string name="save">保存</string>
+    <string name="back">返回</string>
+</resources>

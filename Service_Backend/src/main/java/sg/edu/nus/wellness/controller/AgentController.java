@@ -5,42 +5,72 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import sg.edu.nus.wellness.repository.RecRepo;
+import java.util.List;
 import java.util.Map;
 
 @RestController
 public class AgentController {
-    private final RestTemplate http = new RestTemplate();
+    private final RestTemplate http;
     private final String agentUrl;
+    private final RecRepo recRepo;
 
-    public AgentController(@Value("${app.agent.url:http://localhost:8002}") String url) {
+    public AgentController(@Value("${app.agent.url:http://localhost:8002}") String url, RestTemplate rt, RecRepo recRepo) { http=rt;
+        this.recRepo = recRepo;
         agentUrl=url;
     }
 
+    @SuppressWarnings("unchecked")
     @PostMapping("/agent/recommend")
-    public ResponseEntity<?> recommend(HttpServletRequest req) {
+    public ResponseEntity<?> recommend(@RequestBody(required = false) Map<String, Object> requestBody, HttpServletRequest req) {
         String auth = req.getHeader("Authorization");
         String token = req.getHeader("X-API-Token");
+        Long userId = (Long) req.getAttribute("userId");
+        Map<String, Object> agentBody = new java.util.HashMap<>();
+        if (requestBody != null) agentBody.putAll(requestBody);
+        agentBody.put("user_id", userId);
         try {
             HttpHeaders h = new HttpHeaders(); h.set("Authorization",auth); h.set("X-API-Token",token);
             ResponseEntity<Map> resp = http.exchange(agentUrl+"/recommend", HttpMethod.POST,
-                new HttpEntity<>(null,h), Map.class);
+                new HttpEntity<>(agentBody, h), Map.class);
+            // Save to MySQL so history/delete work from RecRepo
+            if (resp.getBody() != null && userId != null) {
+                var body = resp.getBody();
+                String content = (String) body.getOrDefault("recommendation", "");
+                List<Map<String,String>> evidence = (List<Map<String,String>>) body.getOrDefault("evidence", List.of());
+                String evidenceJson = "[]";
+                try { evidenceJson = new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(evidence); } catch (Exception ignored) {}
+                Integer iterations = (Integer) body.getOrDefault("iterations", 1);
+                recRepo.save(new sg.edu.nus.wellness.model.Recommendation(userId, content, evidenceJson, iterations));
+            }
             return ResponseEntity.ok(resp.getBody());
         } catch (Exception e) {
             return ResponseEntity.status(502).body(Map.of("detail","Agent unavailable"));
+        }
+    }
+
+    @DeleteMapping("/agent/recommend/{id}")
+    public ResponseEntity<?> deleteRec(@PathVariable Long id, HttpServletRequest req) {
+        try {
+            recRepo.deleteById(id);
+            return ResponseEntity.ok(Map.of("message","Deleted"));
+        } catch (Exception e) {
+            return ResponseEntity.status(404).body(Map.of("detail","Not found"));
         }
     }
 
     @GetMapping("/agent/recommend/history")
     public ResponseEntity<?> history(HttpServletRequest req) {
-        String auth = req.getHeader("Authorization");
-        String token = req.getHeader("X-API-Token");
-        try {
-            HttpHeaders h = new HttpHeaders(); h.set("Authorization",auth); h.set("X-API-Token",token);
-            ResponseEntity<?> resp = http.exchange(agentUrl+"/recommend/history", HttpMethod.GET,
-                new HttpEntity<>(h), Object.class);
-            return ResponseEntity.ok(resp.getBody());
-        } catch (Exception e) {
-            return ResponseEntity.status(502).body(Map.of("detail","Agent unavailable"));
-        }
+        Long userId = (Long) req.getAttribute("userId");
+        if (userId == null) return ResponseEntity.status(401).body(Map.of("detail","Unauthorized"));
+        var recs = recRepo.findTop10ByUserIdOrderByCreatedAtDesc(userId);
+        var result = recs.stream().map(r -> Map.of(
+            "id", r.getId(),
+            "content", r.getContent(),
+            "evidence", r.getEvidence() != null ? r.getEvidence() : "[]",
+            "iterations", r.getIterations() != null ? r.getIterations() : 0,
+            "created_at", r.getCreatedAt() != null ? r.getCreatedAt().toString() : ""
+        )).toList();
+        return ResponseEntity.ok(result);
     }
 }

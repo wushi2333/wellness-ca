@@ -6,20 +6,14 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.OutputStreamWriter
 import java.net.HttpURLConnection
-import java.net.URL
 
 object CharacterApi {
 
-    private fun conn(path: String, method: String, token: String): HttpURLConnection {
-        val c = URL("$BASE_URL$path").openConnection() as HttpURLConnection
-        c.requestMethod = method
-        c.connectTimeout = 30000
-        c.readTimeout = 30000
-        c.setRequestProperty("Content-Type", "application/json")
-        c.setRequestProperty("X-API-Token", API_GATEWAY_TOKEN)
-        if (token.isNotEmpty()) c.setRequestProperty("Authorization", "Bearer $token")
-        c.doInput = true
-        if (method != "GET") c.doOutput = true
+    private const val CONNECT_TIMEOUT_MS = 30_000
+
+    private fun openConn(path: String, method: String, token: String): HttpURLConnection {
+        val c = openAuthenticatedConnection(path, method, if (token.isNotEmpty()) token else null)
+        c.connectTimeout = CONNECT_TIMEOUT_MS  // character API needs longer timeout
         return c
     }
 
@@ -33,7 +27,7 @@ object CharacterApi {
 
     fun getSessions(token: String): List<CharacterSession> {
         val list = mutableListOf<CharacterSession>()
-        val c = conn("/character/sessions", "GET", token)
+        val c = openConn("/character/sessions", "GET", token)
         if (ok(c)) {
             val arr = JSONArray(c.inputStream.bufferedReader().readText())
             for (i in 0 until arr.length()) {
@@ -47,7 +41,7 @@ object CharacterApi {
     }
 
     fun createSession(token: String, mode: String): CharacterSession {
-        val c = conn("/character/sessions", "POST", token)
+        val c = openConn("/character/sessions", "POST", token)
         body(c, JSONObject().apply { put("mode", mode) }.toString())
         if (ok(c)) {
             val o = JSONObject(c.inputStream.bufferedReader().readText())
@@ -58,14 +52,14 @@ object CharacterApi {
     }
 
     fun deleteSession(token: String, id: Long) {
-        val c = conn("/character/sessions/$id", "DELETE", token)
+        val c = openConn("/character/sessions/$id", "DELETE", token)
         if (!ok(c)) throw ApiException(c.responseCode, c.errorStream?.bufferedReader()?.readText() ?: "")
         c.disconnect()
     }
 
     fun getMessages(token: String, sessionId: Long): List<CharacterMessage> {
         val list = mutableListOf<CharacterMessage>()
-        val c = conn("/character/sessions/$sessionId/messages", "GET", token)
+        val c = openConn("/character/sessions/$sessionId/messages", "GET", token)
         if (ok(c)) {
             val arr = JSONArray(c.inputStream.bufferedReader().readText())
             for (i in 0 until arr.length()) {
@@ -83,7 +77,7 @@ object CharacterApi {
     }
 
     fun chat(token: String, message: String, mode: String, sessionId: Long?): CharacterChatResponse {
-        val c = conn(if (mode == "agent") "/character/agent" else "/character/chat", "POST", token)
+        val c = openConn(if (mode == "agent") "/character/agent" else "/character/chat", "POST", token)
         val json = JSONObject().apply {
             put("message", message); put("mode", mode)
             if (sessionId != null) put("sessionId", sessionId)
@@ -94,7 +88,11 @@ object CharacterApi {
             c.disconnect()
             val intent = if (o.has("intent") && !o.isNull("intent")) {
                 val i = o.getJSONObject("intent")
-                mapOf("action" to i.getString("action"), "target" to i.getString("target"))
+                val map = mutableMapOf<String, Any?>()
+                val keys = i.keys(); while (keys.hasNext()) {
+                    val k = keys.next(); map[k] = i.get(k)
+                }
+                map
             } else null
             val tools = if (o.has("tools") && !o.isNull("tools")) {
                 val arr = o.getJSONArray("tools")
@@ -106,9 +104,12 @@ object CharacterApi {
         throw ApiException(c.responseCode, c.errorStream?.bufferedReader()?.readText() ?: "")
     }
 
-    fun asr(token: String, base64Audio: String): String? {
-        val c = conn("/character/asr", "POST", token)
-        val json = JSONObject().apply { put("audio", base64Audio) }
+    fun asr(token: String, base64Audio: String, language: String = "zh-CN"): String? {
+        val c = openConn("/character/asr", "POST", token)
+        val json = JSONObject().apply {
+            put("audio", base64Audio)
+            put("language", language)
+        }
         body(c, json.toString())
         if (ok(c)) {
             val o = JSONObject(c.inputStream.bufferedReader().readText())
@@ -117,5 +118,24 @@ object CharacterApi {
         }
         c.disconnect()
         return null
+    }
+
+    /** Trigger async RAG preload. Call when chat opens so agent mode is fast later. */
+    fun preloadRag(token: String) {
+        val c = openConn("/character/preload-rag", "POST", token)
+        body(c, "{}")
+        c.disconnect()
+    }
+
+    /** Check if RAG wellness data is cached and ready for agent mode. */
+    fun isRagReady(token: String): Boolean {
+        val c = openConn("/character/rag-ready", "GET", token)
+        if (ok(c)) {
+            val o = JSONObject(c.inputStream.bufferedReader().readText())
+            c.disconnect()
+            return o.optBoolean("ready", false)
+        }
+        c.disconnect()
+        return false
     }
 }

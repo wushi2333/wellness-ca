@@ -7,12 +7,6 @@ import android.content.SharedPreferences
  * Author: Wang Songyu
  *
  * Token lifecycle:
- *   1. LoginActivity calls POST /login → receives { "accessToken": "...", "tokenType": "bearer" }
- *   2. saveToken(...) stores the token in SharedPreferences
- *   3. getToken() retrieves it for every authenticated API call
- *   4. clearToken() is called on logout or when a 401 is received
- *
- * Token lifecycle:
  * 1. LoginActivity calls POST /login and receives:
  *      {
  *          "accessToken": "...",
@@ -100,6 +94,14 @@ object TokenManager {
         return prefs(context).getString(KEY_USERNAME, "") ?: ""
     }
 
+    fun saveProvider(context: Context, provider: String) {
+        prefs(context).edit().putString("provider", provider).apply()
+    }
+
+    fun getProvider(context: Context): String {
+        return prefs(context).getString("provider", "") ?: ""
+    }
+
     /**
      * Clears all locally stored authentication information.
      *
@@ -112,6 +114,7 @@ object TokenManager {
             .remove(KEY_ACCESS_TOKEN)
             .remove(KEY_TOKEN_TYPE)
             .remove(KEY_USERNAME)
+            .remove("provider")
             .apply()
     }
 }

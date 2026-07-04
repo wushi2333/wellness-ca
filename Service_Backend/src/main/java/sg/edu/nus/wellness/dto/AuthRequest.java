@@ -11,4 +11,6 @@ public class AuthRequest {
     @NotBlank
     @Size(min = 6, max = 128)
     public String password;
+
+    public String email;
 }

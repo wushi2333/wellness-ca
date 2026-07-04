@@ -13,24 +13,26 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import sg.edu.nus.wellness.repository.AgentRecRepo;
+import sg.edu.nus.wellness.repository.RecRepo;
 
 import java.util.List;
 import java.util.Map;
 
 @Controller
 public class WebRecommendationController {
-    private final RestTemplate http = new RestTemplate();
-    private final AgentRecRepo agentRecRepo;
+    private final RestTemplate http;
+    private final RecRepo recRepo;
     private final String agentUrl;
     private final String gatewayToken;
 
-    public WebRecommendationController(AgentRecRepo agentRecRepo,
+    public WebRecommendationController(RecRepo recRepo,
                                        @Value("${app.agent.url:http://localhost:8002}") String agentUrl,
-                                       @Value("${app.gateway.token:team-wellness-2025}") String gatewayToken) {
-        this.agentRecRepo = agentRecRepo;
+                                       @Value("${app.gateway.token:team-wellness-2025}") String gatewayToken,
+                                       RestTemplate rt) {
+        this.recRepo = recRepo;
         this.agentUrl = agentUrl;
         this.gatewayToken = gatewayToken;
+        this.http = rt;
     }
 
     @GetMapping("/web/insights")
@@ -81,7 +83,7 @@ public class WebRecommendationController {
         }
 
         WebSession.addCommonModel(session, model, "insights");
-        model.addAttribute("items", agentRecRepo.findTop10ByUserIdOrderByCreatedAtDesc(userId));
+        model.addAttribute("items", recRepo.findTop10ByUserIdOrderByCreatedAtDesc(userId));
         return "web/insight-history";
     }
 }

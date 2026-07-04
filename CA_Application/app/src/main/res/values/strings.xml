@@ -1,10 +1,11 @@
 <resources>
-    <string name="app_name">Wellness AI</string>
+    <string name="app_name">Record Your Wellness</string>
 
     <!-- Auth -->
     <string name="login">Login</string>
     <string name="logout">Logout</string>
     <string name="username">Username</string>
+    <string name="username_or_email">Username or Email</string>
     <string name="password">Password</string>
     <string name="register">Register</string>
     <string name="register_title">Create Account</string>
@@ -107,6 +108,174 @@
     <string name="chat">Chat</string>
 
     <!-- Network -->
+    <string name="email_hint">Email (optional)</string>
+    <string name="invalid_email">Please enter a valid email address</string>
     <string name="network_error">Network error. Please try again.</string>
     <string name="session_expired">Session expired. Please login again.</string>
+
+    <!-- Home tab -->
+    <string name="greeting_good_morning">Good morning</string>
+    <string name="default_username">User</string>
+    <string name="sleep">Sleep</string>
+    <string name="sleep_avg_placeholder">-- h</string>
+    <string name="avg_per_night">avg per night</string>
+    <string name="vs_last_7d">vs last 7d</string>
+    <string name="exercise">Exercise</string>
+    <string name="exercise_avg_placeholder">-- min</string>
+    <string name="avg_per_day">avg per day</string>
+    <string name="exercise_days_placeholder">-- days</string>
+    <string name="todays_tip">Today\'s Tip</string>
+    <string name="default_tip_text">Tap to see your personalized wellness recommendations</string>
+
+    <!-- Add tab -->
+    <string name="new_record">New Record</string>
+    <string name="add_sleep">Add Sleep</string>
+    <string name="add_sleep_subtitle">Bedtime · Wake time · Mood</string>
+    <string name="add_exercise">Add Exercise</string>
+    <string name="add_exercise_subtitle">Type · Duration · Notes</string>
+
+    <!-- Chat tab -->
+    <string name="new_chat">New Chat</string>
+    <string name="chat_hint">Chat with Yui...</string>
+    <string name="history_title">History</string>
+    <string name="new_chat_button">+ New</string>
+
+    <!-- Add sleep sheet -->
+    <string name="label_date">Date</string>
+    <string name="hint_date_format">e.g. 2026-07-04</string>
+    <string name="label_bedtime">Bedtime *</string>
+    <string name="hint_bedtime">e.g. 23:00</string>
+    <string name="label_wake_time">Wake time *</string>
+    <string name="hint_wake_time">e.g. 07:00</string>
+    <string name="duration_placeholder">Duration: --</string>
+    <string name="label_morning_mood">Morning mood</string>
+    <string name="hint_sleep_notes">e.g. woke up at 3am, felt restless...</string>
+    <string name="confirm">Confirm</string>
+
+    <!-- Add exercise sheet -->
+    <string name="label_type">Type</string>
+    <string name="label_duration_minutes">Duration (minutes)</string>
+    <string name="hint_exercise_notes">How did it feel? Intensity, location...</string>
+
+    <!-- Detail -->
+    <string name="edit">Edit</string>
+    <string name="detail_avg_hours">Avg hours</string>
+    <string name="detail_best_night">Best night</string>
+    <string name="detail_avg_mood">Avg mood</string>
+    <string name="detail_avg_min_per_day">Avg min/day</string>
+    <string name="detail_active_days">Active days</string>
+
+    <!-- Chart -->
+    <string name="chart_target_sleep">7h recommended</string>
+    <string name="chart_target_exercise">30 min target</string>
+    <string name="chart_sleep_hours_title">Sleep Hours</string>
+    <string name="chart_sleep_schedule_title">Sleep Schedule</string>
+    <string name="chart_exercise_minutes_title">Exercise Minutes</string>
+    <string name="chart_activity_breakdown">Activity Breakdown</string>
+    <string name="chart_unit_days">days</string>
+    <string name="chart_unit_min">min</string>
+    <string name="chart_no_activity">No activity data</string>
+    <string name="pie_toggle_today">Today</string>
+    <string name="pie_toggle_week">This Week</string>
+    <string name="manage_sleep_title">Sleep Records</string>
+    <string name="manage_exercise_title">Exercise Records</string>
+    <string name="confirm_delete_msg_sleep">Delete sleep record from %s?</string>
+    <string name="confirm_delete_msg_exercise">Delete %s record from %s?</string>
+    <string name="toast_deleted">Deleted</string>
+
+    <string-array name="exercise_types">
+        <item>Running</item>
+        <item>Cycling</item>
+        <item>Swimming</item>
+        <item>Yoga</item>
+        <item>Strength Training</item>
+        <item>Cardio</item>
+        <item>Walking</item>
+        <item>HIIT</item>
+        <item>Pilates</item>
+        <item>Other</item>
+    </string-array>
+
+    <!-- Recommendations -->
+    <string name="recommendations_title">Recommendations</string>
+    <string name="generate_new_recommendation">Generate New Recommendation</string>
+
+    <!-- Loading -->
+    <string name="loading_yui">Loading Yui...</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="language">Language / 语言</string>
+    <string name="change_password">Change Password</string>
+    <string name="profile">Profile</string>
+    <string name="account">Account</string>
+    <string name="settings">Settings</string>
+
+    <!-- Change Password -->
+    <string name="change_password_title">Change Password</string>
+    <string name="old_password">Current Password</string>
+    <string name="new_password">New Password</string>
+    <string name="confirm_password">Confirm New Password</string>
+    <string name="password_changed">Password changed successfully</string>
+    <string name="password_mismatch">Passwords do not match</string>
+    <string name="password_weak">Password must be at least 8 characters with a digit and a letter</string>
+    <string name="password_wrong">Current password is incorrect</string>
+
+    <!-- Profile -->
+    <string name="profile_title">Profile</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="change_photo">Change Photo</string>
+    <string name="crop_avatar">Crop Avatar</string>
+
+    <!-- Greetings -->
+    <string name="greeting_morning">Good morning</string>
+    <string name="greeting_afternoon">Good afternoon</string>
+    <string name="greeting_evening">Good evening</string>
+
+    <!-- Wellness tips -->
+    <string name="tip_hydrate">Stay hydrated today! 💧</string>
+    <string name="tip_walk">Try a 10-min walk after lunch 🌿</string>
+    <string name="tip_sleep">Get 7+ hours of sleep tonight 🌙</string>
+    <string name="tip_stretch">Stretch every 2 hours 🧘</string>
+    <string name="tip_breathe">Take deep breaths when stressed</string>
+    <string name="basic_info">Basic Information</string>
+    <string name="body_metrics">Body Metrics</string>
+    <string name="height_cm">Height (cm)</string>
+    <string name="weight_kg">Weight (kg)</string>
+    <string name="age">Age</string>
+    <string name="save_metrics">Save Metrics</string>
+    <string name="profile_updated">Profile updated</string>
+    <string name="edit_username">Edit Username</string>
+    <string name="change_username">Change Username</string>
+    <string name="edit_email">Edit Email</string>
+    <string name="bind_email">Bind Email</string>
+    <string name="change_email">Change Email</string>
+    <string name="email_bound">Email updated</string>
+    <string name="email_conflict">This email is already registered to another account. Each email can only be used for one account.</string>
+    <string name="email_conflict_title">Cannot Bind Email</string>
+    <string name="email_label">Email</string>
+    <string name="email_required">Email cannot be empty</string>
+    <string name="email_invalid">Invalid email format</string>
+    <string name="username_taken">Username already taken</string>
+    <string name="provider_local">Local Account</string>
+    <string name="provider_google">Google Account</string>
+    <string name="account_type">Account Type</string>
+    <string name="not_set">Not set</string>
+
+    <!-- Logout -->
+    <string name="logout_confirm_title">Logout</string>
+    <string name="logout_confirm_message">Are you sure you want to logout?</string>
+    <string name="logout_success">Logged out</string>
+
+    <!-- Delete Account -->
+    <string name="delete_account">Delete Account</string>
+    <string name="delete_account_confirm_title">Delete Account</string>
+    <string name="delete_account_confirm_message">This will permanently delete your account and ALL associated data (wellness records, chat history, profile, avatar). This action CANNOT be undone.\n\nType your username to confirm.</string>
+    <string name="delete_account_success">Account deleted</string>
+    <string name="delete_account_failed">Failed to delete account</string>
+    <string name="google_no_password">Google accounts use Google login, not password</string>
+
+    <!-- Common -->
+    <string name="save">Save</string>
+    <string name="back">Back</string>
 </resources>

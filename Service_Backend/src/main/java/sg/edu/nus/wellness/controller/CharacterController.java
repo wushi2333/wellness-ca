@@ -34,6 +34,21 @@ public class CharacterController {
         return ResponseEntity.ok(service.chat(userId, req.sessionId, req.message, "chat"));
     }
 
+    /** Kick off async RAG preload so agent mode is fast when the user switches. */
+    @PostMapping("/character/preload-rag")
+    public ResponseEntity<Map<String, Object>> preloadRag(HttpServletRequest httpReq) {
+        Long userId = (Long) httpReq.getAttribute("userId");
+        service.preloadRag(userId);
+        return ResponseEntity.ok(Map.of("status", "started"));
+    }
+
+    /** Check whether RAG is ready (cached) for this user. */
+    @GetMapping("/character/rag-ready")
+    public ResponseEntity<Map<String, Object>> ragReady(HttpServletRequest httpReq) {
+        Long userId = (Long) httpReq.getAttribute("userId");
+        return ResponseEntity.ok(Map.of("ready", service.isRagReady(userId)));
+    }
+
     @PostMapping("/character/agent")
     public ResponseEntity<CharacterDTO.Resp> agent(
             @RequestBody CharacterDTO.Req req,
@@ -53,7 +68,7 @@ public class CharacterController {
 
     @PostMapping("/character/asr")
     public ResponseEntity<Map<String, String>> asr(@RequestBody Map<String, String> body) {
-        String text = asrService.recognize(body.get("audio"));
+        String text = asrService.recognize(body.get("audio"), body.getOrDefault("language", "zh-CN"));
         return text != null
             ? ResponseEntity.ok(Map.of("text", text))
             : ResponseEntity.status(502).body(Map.of("text", ""));

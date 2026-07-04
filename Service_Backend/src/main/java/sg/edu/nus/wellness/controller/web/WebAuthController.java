@@ -77,7 +77,7 @@ public class WebAuthController {
         }
 
         try {
-            authService.register(cleanUsername, cleanPassword);
+            authService.register(cleanUsername, cleanPassword, null);
             redirectAttributes.addFlashAttribute("success", "Register successful. Please log in.");
             return "redirect:/web/login";
         } catch (RuntimeException ex) {

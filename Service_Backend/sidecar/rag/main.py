@@ -15,12 +15,32 @@ class SearchReq(BaseModel):
 class SearchResp(BaseModel):
     context: str
 
+# ── old flat format (backward compat) ──
 class SyncReq(BaseModel):
     record_id: int
     user_id: int
-    sleep_hours: float
+    sleep_hours: float = 0.0
     exercise_activity: str = ""
     exercise_duration: int = 0
+    record_date: str
+    notes: str = ""
+
+# ── new split format ──
+class SyncSleepReq(BaseModel):
+    record_id: int
+    user_id: int
+    sleep_hours: float
+    sleep_time: str = ""
+    wake_time: str = ""
+    mood_score: int = 0
+    record_date: str
+    notes: str = ""
+
+class SyncExerciseReq(BaseModel):
+    record_id: int
+    user_id: int
+    exercise_activity: str
+    exercise_duration: int
     record_date: str
     notes: str = ""
 
@@ -31,6 +51,7 @@ def rag_search(req: SearchReq):
     return SearchResp(context=ctx)
 
 
+# Legacy sync (old flat format)
 @app.post("/sync")
 def rag_sync(req: SyncReq):
     text = chroma_store.textualize(
@@ -44,9 +65,43 @@ def rag_sync(req: SyncReq):
     return {"status": "ok"}
 
 
+@app.post("/sync/sleep")
+def rag_sync_sleep(req: SyncSleepReq):
+    data = req.model_dump()
+    text = chroma_store.textualize_sleep(data)
+    chroma_store.upsert_record(req.record_id, req.user_id, text, {
+        "source": "realtime", "type": "sleep",
+        "record_date": req.record_date,
+    }, prefix="sleep")
+    return {"status": "ok"}
+
+
+@app.post("/sync/exercise")
+def rag_sync_exercise(req: SyncExerciseReq):
+    data = req.model_dump()
+    text = chroma_store.textualize_exercise(data)
+    chroma_store.upsert_record(req.record_id, req.user_id, text, {
+        "source": "realtime", "type": "exercise",
+        "record_date": req.record_date,
+    }, prefix="exercise")
+    return {"status": "ok"}
+
+
 @app.delete("/sync/{record_id}")
 def rag_delete(record_id: int):
-    chroma_store.delete_record(record_id)
+    chroma_store.delete_record(record_id, prefix="record")
+    return {"status": "ok"}
+
+
+@app.delete("/sync/sleep/{record_id}")
+def rag_delete_sleep(record_id: int):
+    chroma_store.delete_record(record_id, prefix="sleep")
+    return {"status": "ok"}
+
+
+@app.delete("/sync/exercise/{record_id}")
+def rag_delete_exercise(record_id: int):
+    chroma_store.delete_record(record_id, prefix="exercise")
     return {"status": "ok"}
 
 

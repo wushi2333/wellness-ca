@@ -48,11 +48,20 @@ data class WellnessRecord(
     // Hours of sleep
     val sleepHours: Double,
 
+    // Bedtime (HH:mm)
+    val sleepTime: String = "",
+
+    // Wake time (HH:mm)
+    val wakeTime: String = "",
+
     // Exercise activity (e.g. Running, Swimming)
     val exerciseActivity: String,
 
     // Exercise duration in minutes
     val exerciseDuration: Int,
+
+    // Mood score (1-5)
+    val moodScore: Int = 0,
 
     // Record date (yyyy-MM-dd)
     val recordDate: String,

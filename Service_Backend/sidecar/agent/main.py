@@ -3,8 +3,14 @@
 import os
 from fastapi import FastAPI, Depends, Header, HTTPException, status
 from sqlalchemy.orm import Session
+from pydantic import BaseModel
 from jose import jwt, JWTError
+from typing import Optional
 import agent_core
+
+class RecommendReq(BaseModel):
+    language: Optional[str] = "en"
+    user_id: Optional[int] = None  # passed by Spring Boot, not used for auth
 
 app = FastAPI(title="Wellness Agent Sidecar", version="1.0")
 
@@ -25,8 +31,12 @@ def _uid(authorization: str = Header(None)) -> int:
 
 
 @app.post("/recommend")
-def recommend(_=Depends(_gw), user_id: int = Depends(_uid), db: Session = Depends(agent_core.get_db)):
-    try: return agent_core.run_agent(db=db, user_id=user_id)
+def recommend(body: RecommendReq, _=Depends(_gw),
+              user_id: int = Depends(_uid),
+              db: Session = Depends(agent_core.get_db)):
+    lang = body.language if body.language in ("zh", "en") else "en"
+    print(f"[recommend] body.language={body.language} -> lang={lang}", flush=True)
+    try: return agent_core.run_agent(db=db, user_id=user_id, language=lang)
     except agent_core.AgentError as e: raise HTTPException(502, detail=str(e))
 
 

@@ -551,6 +551,11 @@ public class LAppMinimumModel extends CubismUserModel {
         }
     }
 
+    /** Stop all active expression motions to restore default face. */
+    public void stopAllExpressions() {
+        expressionManager.stopAllMotions();
+    }
+
     /** Manually load an expression from file path (for models without "Expressions" in model3.json). */
     public void loadExpressionFromFile(String name, String fileName) {
         String path = modelHomeDirectory + "exp/" + fileName;

@@ -14,5 +14,10 @@
         <!-- Font — applies to all Material components -->
         <item name="fontFamily">@font/segoe_ui</item>
         <item name="android:fontFamily">@font/segoe_ui</item>
+
+        <!-- Edge-to-edge: draw behind status bar, handled per-layout via insets -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">true</item>
     </style>
 </resources>

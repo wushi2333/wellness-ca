@@ -10,20 +10,21 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import sg.edu.nus.wellness.model.*;
 import sg.edu.nus.wellness.repository.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
 public class CharacterMemoryService {
+    private static final Logger log = LoggerFactory.getLogger(CharacterMemoryService.class);
 
     private final CharacterSessionRepo sessionRepo;
     private final CharacterMessageRepo messageRepo;
     private final CharacterUserProfileRepo profileRepo;
-    private final RestTemplate http = new RestTemplate();
     private final ObjectMapper mapper = new ObjectMapper();
-    private final String key;
-    private final String apiUrl = "https://api.deepseek.com/chat/completions";
+    private final DeepSeekClient llm;
 
     private static final int CONTEXT_WINDOW = 20;
     private static final int COMPRESS_EVERY = 10;
@@ -32,11 +33,11 @@ public class CharacterMemoryService {
             CharacterSessionRepo sessionRepo,
             CharacterMessageRepo messageRepo,
             CharacterUserProfileRepo profileRepo,
-            @Value("${app.deepseek.key}") String key) {
+            DeepSeekClient llm) {
         this.sessionRepo = sessionRepo;
         this.messageRepo = messageRepo;
         this.profileRepo = profileRepo;
-        this.key = key;
+        this.llm = llm;
     }
 
     // ---- Sessions ----------------------------------------------------------
@@ -72,7 +73,7 @@ public class CharacterMemoryService {
         m.content = content;
         m.emotion = emotion;
         if (tools != null && !tools.isEmpty()) {
-            try { m.tools = mapper.writeValueAsString(tools); } catch (Exception ignored) {}
+            try { m.tools = mapper.writeValueAsString(tools); } catch (Exception e) { log.warn("Failed to serialize tools JSON for message session {}", sessionId, e); }
         }
         m = messageRepo.save(m);
 
@@ -116,6 +117,7 @@ public class CharacterMemoryService {
             }
             return sb.toString();
         } catch (Exception e) {
+            log.warn("Failed to parse profile facts for user {}", userId, e);
             return "";
         }
     }
@@ -248,23 +250,18 @@ public class CharacterMemoryService {
             profile.facts = mapper.writeValueAsString(existingFacts);
             profile.updatedAt = LocalDateTime.now();
             profileRepo.save(profile);
-        } catch (Exception ignored) {}
+        } catch (Exception e) {
+            log.warn("Profile extraction failed for user {}", userId, e);
+        }
     }
 
     // ---- LLM helper --------------------------------------------------------
 
-    @SuppressWarnings("unchecked")
     private String callLLM(String prompt, int maxTokens) {
         try {
-            HttpHeaders h = new HttpHeaders();
-            h.setBearerAuth(key);
-            h.setContentType(MediaType.APPLICATION_JSON);
-            Map<String, Object> body = Map.of("model", "deepseek-chat",
-                "messages", List.of(Map.of("role", "user", "content", prompt)),
-                "temperature", 0.3, "max_tokens", maxTokens);
-            ResponseEntity<Map> resp = http.exchange(apiUrl, HttpMethod.POST, new HttpEntity<>(body, h), Map.class);
-            return ((Map<String, String>) ((Map) ((List) resp.getBody().get("choices")).get(0)).get("message")).get("content");
+            return llm.complete(List.of(Map.of("role", "user", "content", prompt)), 0.3, maxTokens);
         } catch (Exception e) {
+            log.warn("LLM call failed for CharacterMemory (prompt len={})", prompt.length(), e);
             return null;
         }
     }

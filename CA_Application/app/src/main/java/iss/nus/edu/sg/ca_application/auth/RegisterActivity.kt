@@ -2,12 +2,15 @@ package iss.nus.edu.sg.ca_application.auth
 
 // Author: Liu Yu, Wang Songyu
 
+import android.content.Context
+import android.content.res.Configuration
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import iss.nus.edu.sg.ca_application.R
+import iss.nus.edu.sg.ca_application.SettingsActivity
 import iss.nus.edu.sg.ca_application.network.ApiClient
 
 /**
@@ -23,16 +26,22 @@ import iss.nus.edu.sg.ca_application.network.ApiClient
  */
 class RegisterActivity : AppCompatActivity() {
 
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(SettingsActivity.wrapContextForLocale(newBase))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
 
         val etUsername = findViewById<EditText>(R.id.etUsername)
+        val etEmail = findViewById<EditText>(R.id.etEmail)
         val etPassword = findViewById<EditText>(R.id.etPassword)
         val btnRegister = findViewById<Button>(R.id.btnRegister)
 
         btnRegister.setOnClickListener {
             val username = etUsername.text.toString().trim()
+            val email = etEmail.text.toString().trim()
             val password = etPassword.text.toString().trim()
 
             if (username.isEmpty() || password.isEmpty()) {
@@ -44,9 +53,18 @@ class RegisterActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
+            if (email.isNotEmpty() && !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                Toast.makeText(
+                    this,
+                    getString(R.string.invalid_email),
+                    Toast.LENGTH_SHORT
+                ).show()
+                return@setOnClickListener
+            }
+
             Thread {
                 try {
-                    val message = ApiClient.register(username, password)
+                    val message = ApiClient.register(username, password, email)
 
                     runOnUiThread {
                         Toast.makeText(

@@ -9,11 +9,17 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.access.intercept.AuthorizationFilter;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    @Bean
+    public JwtAuthFilter jwtAuthFilter(JwtTokenProvider jwt) {
+        return new JwtAuthFilter(jwt);
+    }
+
     @Bean
     public SecurityFilterChain chain(HttpSecurity http, GatewayFilter gw, JwtAuthFilter jwt) throws Exception {
         http.csrf(c -> c.disable())
@@ -24,11 +30,11 @@ public class SecurityConfig {
                 .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
             .authorizeHttpRequests(a -> a
                     .requestMatchers("/error").permitAll()
-                    .requestMatchers("/", "/web/**", "/css/**", "/js/**", "/images/**").permitAll()
+                    .requestMatchers("/", "/web/**", "/css/**", "/js/**", "/images/**", "/uploads/**").permitAll()
                     .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                    .requestMatchers(HttpMethod.POST, "/register", "/login").permitAll()
+                    .requestMatchers(HttpMethod.POST, "/register", "/login", "/auth/google").permitAll()
                     .anyRequest().authenticated())
-            .addFilterBefore(gw, UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(gw, AuthorizationFilter.class)
             .addFilterAfter(jwt, GatewayFilter.class);
         return http.build();
     }

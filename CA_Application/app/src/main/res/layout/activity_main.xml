@@ -1,88 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Author: Liu Yu, Xia Zihang. Dashboard with agent FAB and popup. -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/background">
+    android:layout_height="match_parent">
 
-    <!-- Original dashboard content -->
     <LinearLayout
-        android:id="@+id/dashboardContent"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center"
         android:orientation="vertical"
-        android:padding="24dp">
+        android:background="#F8FAFC">
 
-        <TextView
-            android:id="@+id/tvWelcome"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/dashboard"
-            android:textAppearance="@style/Heading2"
-            android:layout_marginBottom="32dp" />
-
-        <Button
-            android:id="@+id/btnViewRecords"
+        <!-- Content + add sheet above nav -->
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/view_records" />
+            android:layout_height="0dp"
+            android:layout_weight="1">
 
-        <Button
-            android:id="@+id/btnAddRecord"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="@string/add_record" />
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/viewPager"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
 
-        <Button
-            android:id="@+id/btnWellnessInsights"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="@string/agent_screen_title" />
+            <!-- Add sheet scrim -->
+            <View
+                android:id="@+id/addScrim"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#60000000"
+                android:visibility="gone"
+                android:clickable="true"
+                android:focusable="true" />
 
-        <Button
-            android:id="@+id/btnCharacterChat"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="@string/character_chat" />
+            <!-- Add sheet container above nav -->
+            <LinearLayout
+                android:id="@+id/addSheetContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:background="@drawable/bg_card_default"
+                android:paddingBottom="8dp" />
+        </FrameLayout>
 
-        <Button
-            android:id="@+id/btnLogout"
+        <iss.nus.edu.sg.ca_application.ui.bottomnav.AnimatedBottomNavBar
+            android:id="@+id/bottomNavBar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
-            android:text="@string/logout" />
+            android:layout_height="76dp" />
     </LinearLayout>
 
-    <!-- Dark scrim behind popup (dismisses popup on click) -->
-    <View
-        android:id="@+id/scrim"
+    <!-- Detail overlay on top of everything -->
+    <FrameLayout
+        android:id="@+id/detailOverlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#80000000"
-        android:visibility="gone"
-        android:clickable="true"
-        android:focusable="true" />
-
-    <!-- FAB: Agent quick-access button -->
-    <Button
-        android:id="@+id/btnAgentFab"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
-        android:layout_marginBottom="20dp"
-        android:background="@drawable/bg_fab_circle"
-        android:text="AI"
-        android:textColor="@android:color/white"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:elevation="8dp"
-        android:stateListAnimator="@null" />
-
-    <!-- Agent chat popup (slides up from bottom) -->
-    <include layout="@layout/popup_agent_chat" />
+        android:visibility="gone" />
 </FrameLayout>

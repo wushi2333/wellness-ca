@@ -20,10 +20,14 @@ import java.io.IOException
 object AgentApi {
 
     @Throws(IOException::class)
-    fun recommend(bearerToken: String): AgentRecommendation {
+    fun recommend(bearerToken: String, language: String = "en"): AgentRecommendation {
         val conn = openAuthenticatedConnection("/agent/recommend", "POST", bearerToken)
-        // The body is empty but Spring still needs the method to be POST.
-        conn.doOutput = false
+        conn.doOutput = true
+        val jsonBody = org.json.JSONObject().apply { put("language", language) }
+        conn.outputStream.use { os ->
+            val writer = java.io.OutputStreamWriter(os, "UTF-8")
+            writer.write(jsonBody.toString()); writer.flush()
+        }
         val code = conn.responseCode
         val body = if (code in 200..299) {
             conn.inputStream.bufferedReader().use { it.readText() }
@@ -32,6 +36,16 @@ object AgentApi {
             throw IOException("Agent /recommend returned $code: $err")
         }
         return parseRecommendation(JSONObject(body))
+    }
+
+    @Throws(IOException::class)
+    fun deleteRecommendation(bearerToken: String, id: Int) {
+        val conn = openAuthenticatedConnection("/agent/recommend/$id", "DELETE", bearerToken)
+        val code = conn.responseCode
+        if (code !in 200..299) {
+            val err = conn.errorStream?.bufferedReader()?.use { it.readText() } ?: ""
+            throw IOException("Delete failed: $code $err")
+        }
     }
 
     @Throws(IOException::class)
@@ -63,14 +77,24 @@ object AgentApi {
             savedId = obj.getInt("saved_id")
         )
 
-    private fun parseHistoryItem(obj: JSONObject): AgentHistoryItem =
-        AgentHistoryItem(
+    private fun parseHistoryItem(obj: JSONObject): AgentHistoryItem {
+        val evidence: List<ToolTrace> = try {
+            parseEvidence(obj.getJSONArray("evidence"))
+        } catch (_: Exception) {
+            try {
+                val evidenceStr = obj.optString("evidence", "[]")
+                if (evidenceStr == "[]" || evidenceStr.isBlank()) emptyList()
+                else parseEvidence(JSONArray(evidenceStr))
+            } catch (_: Exception) { emptyList() }
+        }
+        return AgentHistoryItem(
             id = obj.getInt("id"),
             content = obj.getString("content"),
-            evidence = parseEvidence(obj.getJSONArray("evidence")),
-            iterations = obj.getInt("iterations"),
-            createdAt = obj.getString("created_at")
+            evidence = evidence,
+            iterations = obj.optInt("iterations", 0),
+            createdAt = obj.optString("created_at", "")
         )
+    }
 
     private fun parseEvidence(arr: JSONArray): List<ToolTrace> =
         List(arr.length()) { i ->

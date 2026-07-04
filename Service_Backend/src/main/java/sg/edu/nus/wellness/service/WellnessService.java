@@ -1,87 +1,305 @@
-// Author: Huang Qianer, Xia Zihang, Yutong Luo
+// Author: Xia Zihang, Yutong Luo
 package sg.edu.nus.wellness.service;
-import sg.edu.nus.wellness.dto.WellnessRequest;
-import sg.edu.nus.wellness.dto.WellnessResponse;
+
+import sg.edu.nus.wellness.dto.*;
 import sg.edu.nus.wellness.exception.NotFoundException;
-import sg.edu.nus.wellness.model.WellnessRecord;
-import sg.edu.nus.wellness.repository.WellnessRepo;
-import org.springframework.beans.factory.annotation.Value;
+import sg.edu.nus.wellness.model.*;
+import sg.edu.nus.wellness.repository.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDate;
 import java.util.*;
 
 @Service
 public class WellnessService {
-    private final WellnessRepo repo;
-    private final RestTemplate http = new RestTemplate();
-    private final String ragUrl;
+    private static final Logger log = LoggerFactory.getLogger(WellnessService.class);
+    private final WellnessRepo dailyRepo;
+    private final SleepRecordRepo sleepRepo;
+    private final ExerciseRecordRepo exerciseRepo;
+    private final RagClient ragClient;
 
-    public WellnessService(WellnessRepo r, @Value("${app.rag.url:http://localhost:8001}") String rag) {
-        repo=r; ragUrl=rag;
+    public WellnessService(WellnessRepo dr, SleepRecordRepo sr, ExerciseRecordRepo er,
+                           RagClient rc) {
+        dailyRepo = dr; sleepRepo = sr; exerciseRepo = er;
+        ragClient = rc;
     }
 
+    // ── helpers ─────────────────────────────────────────────────────────
+
+    private WellnessRecord getOrCreateDaily(Long userId, LocalDate date) {
+        return dailyRepo.findFirstByUserIdAndRecordDateOrderByIdAsc(userId, date)
+                .orElseGet(() -> {
+                    WellnessRecord r = new WellnessRecord();
+                    r.setUserId(userId);
+                    r.setRecordDate(date);
+                    return dailyRepo.save(r);
+                });
+    }
+
+    // ── sleep CRUD ──────────────────────────────────────────────────────
+
+    public Long createSleep(Long userId, SleepRecordRequest req) {
+        LocalDate date = LocalDate.parse(req.recordDate);
+        WellnessRecord daily = getOrCreateDaily(userId, date);
+
+        if (daily.getSleepRecordId() != null) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                "Sleep data already exists for " + req.recordDate + ". Use PUT to edit.");
+        }
+
+        SleepRecord s = new SleepRecord();
+        applySleep(s, req);
+        s = sleepRepo.save(s);
+
+        daily.setSleepRecordId(s.getId());
+        dailyRepo.save(daily);
+
+        ragClient.syncSleep(s.getId(), userId, s.getSleepHours(),
+                s.getSleepTime(), s.getWakeTime(),
+                s.getMoodScore() != null ? s.getMoodScore() : 0,
+                date.toString(), s.getNotes());
+        log.info("Sleep created id={} for user={} date={}", s.getId(), userId, date);
+        return s.getId();
+    }
+
+    public void updateSleep(Long userId, Long sleepId, SleepRecordRequest req) {
+        SleepRecord s = sleepRepo.findById(sleepId)
+                .orElseThrow(() -> new NotFoundException("Sleep record not found"));
+        applySleep(s, req);
+        sleepRepo.save(s);
+        ragClient.syncSleep(s.getId(), userId, s.getSleepHours(),
+                s.getSleepTime(), s.getWakeTime(),
+                s.getMoodScore() != null ? s.getMoodScore() : 0,
+                "", s.getNotes());
+        log.info("Sleep updated id={}", sleepId);
+    }
+
+    @CacheEvict(value = "records", key = "#userId")
+    public void deleteSleep(Long userId, Long sleepId) {
+        // Unlink from daily record
+        dailyRepo.findAll().forEach(d -> {
+            if (sleepId.equals(d.getSleepRecordId())) {
+                d.setSleepRecordId(null);
+                dailyRepo.save(d);
+            }
+        });
+        sleepRepo.deleteById(sleepId);
+        ragClient.deleteSleep(sleepId);
+        log.info("Sleep deleted id={}", sleepId);
+    }
+
+    private void applySleep(SleepRecord s, SleepRecordRequest req) {
+        s.setSleepHours(req.sleepHours);
+        if (req.sleepTime != null && !req.sleepTime.isEmpty()) s.setSleepTime(req.sleepTime);
+        if (req.wakeTime != null && !req.wakeTime.isEmpty()) s.setWakeTime(req.wakeTime);
+        if (req.moodScore != null && req.moodScore > 0) s.setMoodScore(req.moodScore);
+        if (req.notes != null && !req.notes.isEmpty()) s.setNotes(req.notes);
+    }
+
+    // ── exercise CRUD ───────────────────────────────────────────────────
+
+    public Long createExercise(Long userId, ExerciseRecordRequest req) {
+        LocalDate date = LocalDate.parse(req.recordDate);
+        WellnessRecord daily = getOrCreateDaily(userId, date);
+
+        ExerciseRecord e = new ExerciseRecord();
+        e.setDailyRecordId(daily.getId());
+        applyExercise(e, req);
+        e = exerciseRepo.save(e);
+
+        ragClient.syncExercise(e.getId(), userId, e.getExerciseActivity(),
+                e.getExerciseDuration(), date.toString(), e.getNotes());
+        log.info("Exercise created id={} for user={} date={}", e.getId(), userId, date);
+        return e.getId();
+    }
+
+    public void updateExercise(Long userId, Long exerciseId, ExerciseRecordRequest req) {
+        ExerciseRecord e = exerciseRepo.findById(exerciseId)
+                .orElseThrow(() -> new NotFoundException("Exercise record not found"));
+        applyExercise(e, req);
+        exerciseRepo.save(e);
+        ragClient.syncExercise(e.getId(), userId, e.getExerciseActivity(),
+                e.getExerciseDuration(), "", e.getNotes());
+        log.info("Exercise updated id={}", exerciseId);
+    }
+
+    @CacheEvict(value = "records", key = "#userId")
+    public void deleteExercise(Long userId, Long exerciseId) {
+        exerciseRepo.deleteById(exerciseId);
+        ragClient.deleteExercise(exerciseId);
+        log.info("Exercise deleted id={}", exerciseId);
+    }
+
+    private void applyExercise(ExerciseRecord e, ExerciseRecordRequest req) {
+        e.setExerciseActivity(req.exerciseActivity);
+        e.setExerciseDuration(req.exerciseDuration);
+        if (req.notes != null && !req.notes.isEmpty()) e.setNotes(req.notes);
+    }
+
+    // ── aggregated daily query ─────────────────────────────────────────
+
+    @Cacheable(value = "records", key = "#userId")
+    public List<DailyWellnessResponse> listDaily(Long userId) {
+        List<WellnessRecord> dailies = dailyRepo.findByUserIdOrderByRecordDateDesc(userId);
+        return buildDailyResponses(dailies);
+    }
+
+    public PagedResponse<DailyWellnessResponse> listDailyPaged(Long userId, int page, int size) {
+        Page<WellnessRecord> p = dailyRepo.findByUserIdOrderByRecordDateDesc(userId,
+                PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "recordDate")));
+        List<DailyWellnessResponse> content = buildDailyResponses(p.getContent());
+        return new PagedResponse<>(content, p.getNumber(), p.getSize(),
+                p.getTotalElements(), p.getTotalPages(), p.isLast());
+    }
+
+    private List<DailyWellnessResponse> buildDailyResponses(List<WellnessRecord> dailies) {
+        // Batch-load exercises for all daily records
+        List<Long> dailyIds = dailies.stream().map(WellnessRecord::getId).toList();
+        Map<Long, List<ExerciseRecord>> exMap = new HashMap<>();
+        if (!dailyIds.isEmpty()) {
+            List<ExerciseRecord> allEx = exerciseRepo.findByDailyRecordIdIn(dailyIds);
+            for (ExerciseRecord e : allEx) {
+                exMap.computeIfAbsent(e.getDailyRecordId(), k -> new ArrayList<>()).add(e);
+            }
+        }
+
+        // Collect sleep IDs to batch-load
+        List<Long> sleepIds = dailies.stream()
+                .map(WellnessRecord::getSleepRecordId).filter(Objects::nonNull).toList();
+        Map<Long, SleepRecord> sleepMap = new HashMap<>();
+        if (!sleepIds.isEmpty()) {
+            sleepRepo.findAllById(sleepIds).forEach(s -> sleepMap.put(s.getId(), s));
+        }
+
+        return dailies.stream().map(d -> {
+            DailyWellnessResponse.SleepSummary sleep = null;
+            if (d.getSleepRecordId() != null) {
+                SleepRecord s = sleepMap.get(d.getSleepRecordId());
+                if (s != null) {
+                    sleep = new DailyWellnessResponse.SleepSummary(
+                            s.getId(), s.getSleepHours(), s.getSleepTime(),
+                            s.getWakeTime(), s.getMoodScore(), s.getNotes());
+                }
+            }
+            List<DailyWellnessResponse.ExerciseSummary> exercises =
+                    exMap.getOrDefault(d.getId(), List.of()).stream()
+                            .map(e -> new DailyWellnessResponse.ExerciseSummary(
+                                    e.getId(), e.getExerciseActivity(),
+                                    e.getExerciseDuration(), e.getNotes()))
+                            .toList();
+            return new DailyWellnessResponse(d.getId(),
+                    d.getRecordDate().toString(), sleep, exercises);
+        }).toList();
+    }
+
+    // ── backward-compat for WebWellnessController ───────────────────────
+
+    /** Old-style flat list → converts new model back to WellnessResponse. */
     public List<WellnessResponse> list(Long userId) {
-        return repo.findByUserIdOrderByRecordDateDesc(userId)
-                .stream()
-                .map(WellnessResponse::from)
-                .toList();
+        return listDaily(userId).stream().map(d -> {
+            WellnessResponse r = new WellnessResponse();
+            r.id = d.dailyRecordId;
+            r.recordDate = LocalDate.parse(d.recordDate);
+            if (d.sleep != null) {
+                r.sleepHours = d.sleep.sleepHours;
+                r.sleepTime = d.sleep.sleepTime;
+                r.wakeTime = d.sleep.wakeTime;
+                r.moodScore = d.sleep.moodScore;
+                r.notes = d.sleep.notes;
+            }
+            if (d.exercises != null && !d.exercises.isEmpty()) {
+                r.exerciseDuration = d.exercises.stream().mapToInt(e -> e.exerciseDuration).sum();
+                r.exerciseActivity = d.exercises.stream()
+                        .map(e -> e.exerciseActivity + " " + e.exerciseDuration + "min")
+                        .reduce((a, b) -> a + ", " + b).orElse("");
+            }
+            return r;
+        }).toList();
     }
 
+    /** Old-style create — delegates based on request content. */
     public Long create(Long userId, WellnessRequest req) {
-        Long id = repo.save(toEntity(userId, req)).getId();
-        syncRag(id, userId, req);
-        return id;
+        if (req.sleepHours != null && req.sleepHours > 0) {
+            SleepRecordRequest sr = new SleepRecordRequest();
+            sr.sleepHours = req.sleepHours;
+            sr.sleepTime = req.sleepTime;
+            sr.wakeTime = req.wakeTime;
+            sr.moodScore = req.moodScore;
+            sr.recordDate = req.recordDate;
+            sr.notes = req.notes;
+            return createSleep(userId, sr);
+        }
+        if (req.exerciseDuration != null && req.exerciseDuration > 0) {
+            ExerciseRecordRequest er = new ExerciseRecordRequest();
+            er.exerciseActivity = req.exerciseActivity;
+            er.exerciseDuration = req.exerciseDuration;
+            er.recordDate = req.recordDate;
+            er.notes = req.notes;
+            return createExercise(userId, er);
+        }
+        // Empty record — just create a daily entry
+        return getOrCreateDaily(userId, LocalDate.parse(req.recordDate)).getId();
     }
 
+    /** Old-style update by daily record ID. */
     public void update(Long userId, Long id, WellnessRequest req) {
-        WellnessRecord r = findOwnedRecord(userId, id);
-        apply(r, req); repo.save(r);
-        syncRag(id, userId, req);
+        WellnessRecord d = dailyRepo.findById(id)
+                .orElseThrow(() -> new NotFoundException("Record not found"));
+        if (req.sleepHours != null && req.sleepHours > 0 && d.getSleepRecordId() != null) {
+            SleepRecordRequest sr = new SleepRecordRequest();
+            sr.sleepHours = req.sleepHours;
+            sr.sleepTime = req.sleepTime;
+            sr.wakeTime = req.wakeTime;
+            sr.moodScore = req.moodScore;
+            sr.recordDate = req.recordDate;
+            sr.notes = req.notes;
+            updateSleep(userId, d.getSleepRecordId(), sr);
+        }
+        if (req.exerciseDuration != null && req.exerciseDuration > 0) {
+            ExerciseRecordRequest er = new ExerciseRecordRequest();
+            er.exerciseActivity = req.exerciseActivity;
+            er.exerciseDuration = req.exerciseDuration;
+            er.recordDate = req.recordDate;
+            er.notes = req.notes;
+            // Legacy: treat as replacing all exercise data for the day
+            exerciseRepo.deleteAllByDailyRecordId(id);
+            createExercise(userId, er);
+        }
     }
 
+    /** Old-style delete — removes the entire daily record and linked data. */
+    @CacheEvict(value = "records", key = "#userId")
     public void delete(Long userId, Long id) {
-        WellnessRecord r = findOwnedRecord(userId, id);
-        repo.delete(r);
-        try { http.delete(ragUrl+"/sync/"+id); } catch (Exception ignored) {}
-    }
-
-    public List<WellnessRecord> last7(Long userId) { return repo.findTop7ByUserIdOrderByRecordDateDesc(userId); }
-
-    private WellnessRecord findOwnedRecord(Long userId, Long id) {
-        return repo.findByIdAndUserId(id, userId)
+        WellnessRecord d = dailyRepo.findById(id)
                 .orElseThrow(() -> new NotFoundException("Record not found"));
+        if (d.getSleepRecordId() != null) sleepRepo.deleteById(d.getSleepRecordId());
+        exerciseRepo.deleteAllByDailyRecordId(d.getId());
+        dailyRepo.delete(d);
     }
 
-    private WellnessRecord toEntity(Long userId, WellnessRequest req) {
-        WellnessRecord r = new WellnessRecord();
-        r.setUserId(userId); apply(r, req); return r;
-    }
+    // ── account cleanup ─────────────────────────────────────────────────
 
-    private WellnessRecord findOwnedRecord(Long userId, Long id) {
-        return repo.findByIdAndUserId(id, userId)
-                .orElseThrow(() -> new NotFoundException("Record not found"));
-    }
-
-    private void apply(WellnessRecord r, WellnessRequest req) {
-        r.setSleepHours(req.sleepHours); r.setExerciseActivity(req.exerciseActivity);
-        r.setExerciseDuration(req.exerciseDuration); r.setMoodScore(req.moodScore);
-        r.setRecordDate(LocalDate.parse(req.recordDate));
-        r.setNotes(req.notes);
-    }
-
-    private void syncRag(Long recordId, Long userId, WellnessRequest req) {
-        try {
-            Map<String,Object> sync = new HashMap<>();
-            sync.put("record_id", recordId.intValue());
-            sync.put("user_id", userId.intValue());
-            sync.put("sleep_hours", req.sleepHours);
-            sync.put("exercise_activity", req.exerciseActivity);
-            sync.put("exercise_duration", req.exerciseDuration);
-            sync.put("mood_score", req.moodScore);
-            sync.put("record_date", req.recordDate);
-            sync.put("notes", req.notes);
-            http.postForEntity(ragUrl+"/sync", sync, String.class);
-        } catch (Exception ignored) {}
+    @CacheEvict(value = "records", key = "#userId")
+    public void deleteAllByUserId(Long userId) {
+        List<WellnessRecord> dailies = dailyRepo.findByUserIdOrderByRecordDateDesc(userId);
+        for (WellnessRecord d : dailies) {
+            if (d.getSleepRecordId() != null) {
+                ragClient.deleteSleep(d.getSleepRecordId());
+                sleepRepo.deleteById(d.getSleepRecordId());
+            }
+            List<ExerciseRecord> exList = exerciseRepo.findByDailyRecordId(d.getId());
+            for (ExerciseRecord ex : exList) {
+                ragClient.deleteExercise(ex.getId());
+            }
+            exerciseRepo.deleteAllByDailyRecordId(d.getId());
+        }
+        dailyRepo.deleteAllByUserId(userId);
+        log.info("All wellness data deleted for user={}", userId);
     }
 }

@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_card_default"
+    android:padding="24dp"
+    android:fillViewport="true"
+    android:paddingBottom="32dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/add_sleep"
+            android:textSize="20sp"
+            android:textColor="#1E293B"
+            android:fontFamily="@font/segoe_ui"
+            android:textStyle="bold"
+            android:layout_marginBottom="24dp" />
+
+        <!-- Date -->
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="@string/record_date" android:textSize="13sp" android:textColor="#64748B"
+            android:fontFamily="@font/segoe_ui" android:layout_marginBottom="6dp" />
+
+        <EditText android:id="@+id/etSleepDate" android:layout_width="match_parent"
+            android:layout_height="52dp" android:hint="@string/hint_date_format"
+            android:textSize="16sp" android:textColor="#1E293B" android:textColorHint="#94A3B8"
+            android:fontFamily="@font/segoe_ui" android:inputType="datetime"
+            android:background="@drawable/bg_input_field" android:paddingStart="16dp"
+            android:paddingEnd="16dp" android:layout_marginBottom="16dp" />
+
+        <!-- Sleep time -->
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="@string/label_bedtime" android:textSize="13sp" android:textColor="#64748B"
+            android:fontFamily="@font/segoe_ui" android:layout_marginBottom="6dp" />
+
+        <EditText android:id="@+id/etSleepTime" android:layout_width="match_parent"
+            android:layout_height="52dp" android:hint="@string/hint_bedtime"
+            android:textSize="16sp" android:textColor="#1E293B" android:textColorHint="#94A3B8"
+            android:fontFamily="@font/segoe_ui" android:inputType="datetime"
+            android:background="@drawable/bg_input_field" android:paddingStart="16dp"
+            android:paddingEnd="16dp" android:layout_marginBottom="16dp" />
+
+        <!-- Wake time -->
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="@string/label_wake_time" android:textSize="13sp" android:textColor="#64748B"
+            android:fontFamily="@font/segoe_ui" android:layout_marginBottom="6dp" />
+
+        <EditText android:id="@+id/etWakeTime" android:layout_width="match_parent"
+            android:layout_height="52dp" android:hint="@string/hint_wake_time"
+            android:textSize="16sp" android:textColor="#1E293B" android:textColorHint="#94A3B8"
+            android:fontFamily="@font/segoe_ui" android:inputType="datetime"
+            android:background="@drawable/bg_input_field" android:paddingStart="16dp"
+            android:paddingEnd="16dp" android:layout_marginBottom="12dp" />
+
+        <!-- Auto-calc duration -->
+        <TextView
+            android:id="@+id/tvCalcDuration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/duration_placeholder"
+            android:textSize="14sp"
+            android:textColor="#2563EB"
+            android:fontFamily="@font/segoe_ui"
+            android:layout_marginBottom="20dp" />
+
+        <!-- Mood selector -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/label_morning_mood"
+            android:textSize="13sp"
+            android:textColor="#64748B"
+            android:fontFamily="@font/segoe_ui"
+            android:layout_marginBottom="8dp" />
+
+        <LinearLayout
+            android:id="@+id/moodGroup"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:orientation="horizontal"
+            android:layout_marginBottom="20dp">
+
+            <TextView android:id="@+id/mood1" android:layout_width="0dp" android:layout_weight="1"
+                android:layout_height="48dp" android:gravity="center" android:text="😫"
+                android:textSize="24sp" android:background="@drawable/bg_mood_item"
+                android:clickable="true" android:focusable="true" />
+
+            <TextView android:id="@+id/mood2" android:layout_width="0dp" android:layout_weight="1"
+                android:layout_height="48dp" android:gravity="center" android:text="😟"
+                android:textSize="24sp" android:background="@drawable/bg_mood_item"
+                android:clickable="true" android:focusable="true" />
+
+            <TextView android:id="@+id/mood3" android:layout_width="0dp" android:layout_weight="1"
+                android:layout_height="48dp" android:gravity="center" android:text="😐"
+                android:textSize="24sp" android:background="@drawable/bg_mood_item"
+                android:clickable="true" android:focusable="true" />
+
+            <TextView android:id="@+id/mood4" android:layout_width="0dp" android:layout_weight="1"
+                android:layout_height="48dp" android:gravity="center" android:text="🙂"
+                android:textSize="24sp" android:background="@drawable/bg_mood_item"
+                android:clickable="true" android:focusable="true" />
+
+            <TextView android:id="@+id/mood5" android:layout_width="0dp" android:layout_weight="1"
+                android:layout_height="48dp" android:gravity="center" android:text="😄"
+                android:textSize="24sp" android:background="@drawable/bg_mood_item"
+                android:clickable="true" android:focusable="true" />
+        </LinearLayout>
+
+        <!-- Notes -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/notes"
+            android:textSize="13sp"
+            android:textColor="#64748B"
+            android:fontFamily="@font/segoe_ui"
+            android:layout_marginBottom="6dp" />
+
+        <EditText
+            android:id="@+id/etSleepNotes"
+            android:layout_width="match_parent"
+            android:layout_height="84dp"
+            android:hint="@string/hint_sleep_notes"
+            android:textSize="15sp"
+            android:textColor="#1E293B"
+            android:textColorHint="#94A3B8"
+            android:fontFamily="@font/segoe_ui"
+            android:gravity="top|start"
+            android:inputType="textMultiLine|textCapSentences"
+            android:background="@drawable/bg_input_field"
+            android:padding="14dp"
+            android:layout_marginBottom="24dp" />
+
+        <Button
+            android:id="@+id/btnSaveSleep"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:text="@string/confirm"
+            android:textSize="16sp"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:background="@drawable/bg_save_button"
+            app:backgroundTint="@null"
+            android:stateListAnimator="@null"
+            android:elevation="2dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp" />
+    </LinearLayout>
+</ScrollView>

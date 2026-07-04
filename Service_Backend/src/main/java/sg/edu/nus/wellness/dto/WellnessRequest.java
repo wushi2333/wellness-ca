@@ -16,6 +16,16 @@ public class WellnessRequest {
     public Double getSleepHours() { return sleepHours; }
     public void setSleepHours(Double v) { this.sleepHours = v; }
 
+    @Size(max = 5)
+    public String sleepTime;
+    public String getSleepTime() { return sleepTime; }
+    public void setSleepTime(String v) { this.sleepTime = v; }
+
+    @Size(max = 5)
+    public String wakeTime;
+    public String getWakeTime() { return wakeTime; }
+    public void setWakeTime(String v) { this.wakeTime = v; }
+
     @Size(max = 100)
     public String exerciseActivity = "";
     public String getExerciseActivity() { return exerciseActivity; }

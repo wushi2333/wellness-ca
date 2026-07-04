@@ -28,25 +28,7 @@
 
         <activity
             android:name=".MainActivity"
-            android:exported="false" />
-
-        <activity
-            android:name=".wellness.WellnessEntryActivity"
-            android:exported="false" />
-
-        <activity
-            android:name=".wellness.WellnessListActivity"
-            android:exported="false" />
-
-        <activity
-            android:name=".wellness.WellnessDetailActivity"
-            android:exported="false" />
-
-        <activity
-            android:name=".agentic.RecommendationActivity"
-            android:exported="false" />
-        <activity
-            android:name=".agentic.RecommendationHistoryActivity"
+            android:windowSoftInputMode="adjustResize"
             android:exported="false" />
 
         <activity
@@ -58,11 +40,24 @@
             android:exported="false" />
 
         <activity
-            android:name=".character.CharacterLoadingActivity"
+            android:name=".SettingsActivity"
             android:exported="false" />
 
         <activity
-            android:name=".character.CharacterChatActivity"
+            android:name=".ProfileActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ChangePasswordActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".CircleCropActivity"
+            android:exported="false"
+            android:theme="@style/Theme.CA_Application" />
+
+        <activity
+            android:name=".auth.GoogleWebSignInActivity"
             android:exported="false" />
 
     </application>

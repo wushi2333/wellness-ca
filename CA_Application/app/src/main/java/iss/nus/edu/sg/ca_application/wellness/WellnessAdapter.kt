@@ -4,6 +4,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import iss.nus.edu.sg.ca_application.R
 import iss.nus.edu.sg.ca_application.model.WellnessRecord
@@ -12,12 +14,22 @@ import iss.nus.edu.sg.ca_application.model.WellnessRecord
  * Author: Wang Songyu
  *
  * RecyclerView adapter for displaying wellness records.
+ * Uses ListAdapter with DiffUtil for efficient incremental updates.
  */
 class WellnessAdapter(
-    private var records: List<WellnessRecord>,
     private val onItemClick: (WellnessRecord) -> Unit,
     private val onItemLongClick: (WellnessRecord) -> Unit
-) : RecyclerView.Adapter<WellnessAdapter.WellnessViewHolder>() {
+) : ListAdapter<WellnessRecord, WellnessAdapter.WellnessViewHolder>(DiffCallback) {
+
+    companion object {
+        val DiffCallback = object : DiffUtil.ItemCallback<WellnessRecord>() {
+            override fun areItemsTheSame(oldItem: WellnessRecord, newItem: WellnessRecord): Boolean =
+                oldItem.id == newItem.id
+
+            override fun areContentsTheSame(oldItem: WellnessRecord, newItem: WellnessRecord): Boolean =
+                oldItem == newItem
+        }
+    }
 
     /**
      * Holds references to the views of a single wellness record item.
@@ -35,7 +47,7 @@ class WellnessAdapter(
     }
 
     override fun onBindViewHolder(holder: WellnessViewHolder, position: Int) {
-        val record = records[position]
+        val record = getItem(position)
 
         val context = holder.itemView.context
         holder.tvDate.text = record.recordDate
@@ -51,15 +63,5 @@ class WellnessAdapter(
             onItemLongClick(record)
             true
         }
-    }
-
-    override fun getItemCount(): Int = records.size
-
-    /**
-     * Updates the adapter data and refreshes the RecyclerView.
-     */
-    fun updateData(newRecords: List<WellnessRecord>) {
-        records = newRecords
-        notifyDataSetChanged()
     }
 }

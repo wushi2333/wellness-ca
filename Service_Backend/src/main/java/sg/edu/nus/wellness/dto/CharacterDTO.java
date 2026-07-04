@@ -16,7 +16,7 @@ public class CharacterDTO {
         public String reply;
         public String emotion;
         public Long sessionId;
-        public Map<String, String> intent;
+        public Map<String, Object> intent;  // Object values: LLM may return numbers
         public List<String> tools;
 
         public Resp(String reply, String emotion) {

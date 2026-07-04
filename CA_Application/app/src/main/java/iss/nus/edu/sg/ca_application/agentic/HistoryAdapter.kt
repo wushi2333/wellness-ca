@@ -21,8 +21,15 @@ import java.util.Locale
  * Author: Cai Peilin
  */
 class HistoryAdapter(
-    private val items: List<AgentHistoryItem>
+    private val items: List<AgentHistoryItem>,
+    private val onItemClick: ((AgentHistoryItem, Int, Float) -> Unit)? = null
 ) : RecyclerView.Adapter<HistoryAdapter.VH>() {
+
+    companion object {
+        private const val EVIDENCE_LINE_SPACING = 6f
+        private const val EVIDENCE_LINE_SPACING_MULTIPLIER = 1.0f
+        private const val EVIDENCE_ITEM_MARGIN_DP = 8
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
         val view = LayoutInflater.from(parent.context)
@@ -33,7 +40,7 @@ class HistoryAdapter(
     override fun getItemCount(): Int = items.size
 
     override fun onBindViewHolder(holder: VH, position: Int) {
-        holder.bind(items[position])
+        holder.bind(items[position], position, onItemClick)
     }
 
     class VH(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -44,7 +51,14 @@ class HistoryAdapter(
 
         private var expanded = false
 
-        fun bind(item: AgentHistoryItem) {
+        fun bind(item: AgentHistoryItem, position: Int, onItemClick: ((AgentHistoryItem, Int, Float) -> Unit)?) {
+            itemView.setOnTouchListener { v, event ->
+                if (event.action == android.view.MotionEvent.ACTION_UP) {
+                    onItemClick?.invoke(item, position, event.x)
+                    v.performClick()
+                }
+                true
+            }
             dateText.text = formatDate(item.createdAt)
             contentText.text = item.content
 
@@ -61,14 +75,14 @@ class HistoryAdapter(
                         trace.summary
                     )
                     setTextAppearance(R.style.Body)
-                    setLineSpacing(6f, 1.0f)
+                    setLineSpacing(EVIDENCE_LINE_SPACING, EVIDENCE_LINE_SPACING_MULTIPLIER)
                 }
                 val params = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
                 )
                 if (index > 0) {
-                    params.topMargin = (8 * itemView.resources.displayMetrics.density).toInt()
+                    params.topMargin = (EVIDENCE_ITEM_MARGIN_DP * itemView.resources.displayMetrics.density).toInt()
                 }
                 row.layoutParams = params
                 evidenceContainer.addView(row)
@@ -78,6 +92,9 @@ class HistoryAdapter(
                 expanded = !expanded
                 evidenceContainer.visibility = if (expanded) View.VISIBLE else View.GONE
             }
+
+            itemView.setOnLongClickListener(null)
+            // Toggle evidence
         }
 
         private fun formatDate(iso: String): String {

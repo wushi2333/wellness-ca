@@ -45,23 +45,52 @@ def search(query: str, user_id: int, k: int = 4) -> str:
     return "\n\n".join(docs[0])
 
 
-def upsert_record(record_id: int, user_id: int, text: str, meta: dict) -> None:
+def upsert_record(record_id: int, user_id: int, text: str, meta: dict, prefix: str = "record") -> None:
     """Insert or update a single record in ChromaDB."""
     collection.upsert(
-        ids=[f"record_{record_id}"],
+        ids=[f"{prefix}_{record_id}"],
         documents=[text],
         metadatas=[{**meta, "user_id": user_id, "record_id": record_id}],
     )
 
 
-def delete_record(record_id: int) -> None:
+def delete_record(record_id: int, prefix: str = "record") -> None:
     """Remove a record from ChromaDB by its record_id."""
-    collection.delete(ids=[f"record_{record_id}"])
+    collection.delete(ids=[f"{prefix}_{record_id}"])
 
 
+def textualize_sleep(data: dict) -> str:
+    """Convert a sleep record into a natural-language chunk for RAG indexing."""
+    parts = [f"Date: {data.get('record_date', '')}. Sleep record:"]
+    parts.append(f"Slept {data.get('sleep_hours', 0)} hours")
+    if data.get("sleep_time"):
+        parts.append(f"(bedtime {data['sleep_time']}")
+    if data.get("wake_time"):
+        parts.append(f"woke at {data['wake_time']})")
+    mood = data.get("mood_score", 0)
+    mood_labels = {5: "great 😊", 4: "good 🙂", 3: "okay 😐", 2: "poor 😕", 1: "bad 😟"}
+    if mood and mood in mood_labels:
+        parts.append(f"Morning mood: {mood_labels[mood]} ({mood}/5)")
+    notes = data.get("notes", "")
+    if notes:
+        parts.append(f"Notes: {notes}")
+    return ". ".join(parts) + "."
+
+
+def textualize_exercise(data: dict) -> str:
+    """Convert an exercise record into a natural-language chunk for RAG indexing."""
+    parts = [f"Date: {data.get('record_date', '')}. Exercise record:"]
+    parts.append(f"{data.get('exercise_activity', 'Unknown activity')} for {data.get('exercise_duration', 0)} minutes")
+    notes = data.get("notes", "")
+    if notes:
+        parts.append(f"Notes: {notes}")
+    return ". ".join(parts) + "."
+
+
+# Legacy compat — kept for old callers
 def textualize(sleep_hours: float, exercise_activity: str,
                exercise_duration: int, record_date: str, notes: str) -> str:
-    """Convert a structured wellness record into a natural-language chunk."""
+    """Convert a structured wellness record into a natural-language chunk (old flat format)."""
     activity = exercise_activity if exercise_activity else "No exercise performed"
     dur = exercise_duration if exercise_duration else 0
     nt = notes if notes else "No notes"

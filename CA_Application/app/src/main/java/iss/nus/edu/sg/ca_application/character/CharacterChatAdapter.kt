@@ -12,7 +12,15 @@ import androidx.recyclerview.widget.RecyclerView
 import iss.nus.edu.sg.ca_application.R
 import iss.nus.edu.sg.ca_application.model.CharacterMessage
 
-class CharacterChatAdapter : RecyclerView.Adapter<CharacterChatAdapter.VH>() {
+class CharacterChatAdapter(private val showEmotion: Boolean = true) : RecyclerView.Adapter<CharacterChatAdapter.VH>() {
+
+    companion object {
+        private const val TOOLS_TEXT_SIZE_SP = 11f
+        private const val TOOLS_PADDING_L = 0
+        private const val TOOLS_PADDING_T = 1
+        private const val TOOLS_PADDING_R = 0
+        private const val TOOLS_PADDING_B = 1
+    }
 
     private val items = mutableListOf<CharacterMessage>()
     private var loading = false
@@ -30,11 +38,16 @@ class CharacterChatAdapter : RecyclerView.Adapter<CharacterChatAdapter.VH>() {
         notifyItemInserted(items.size - 1)
     }
 
-    /** Add a complete assistant message (e.g. welcome, no ID, not saved to server). */
+    /** Popup-compatible alias */
+    fun addUserMsg(text: String) = addUserMessage(text)
+
     fun addAssistantMessage(text: String, tools: List<String>?) {
         items.add(CharacterMessage(0, "assistant", text, "", "", tools))
         notifyItemInserted(items.size - 1)
     }
+
+    /** Popup-compatible alias */
+    fun addAssistantReply(reply: String, tools: List<String>? = null) = addAssistantMessage(reply, tools)
 
     fun showLoading() {
         if (!loading) {
@@ -44,6 +57,9 @@ class CharacterChatAdapter : RecyclerView.Adapter<CharacterChatAdapter.VH>() {
         }
     }
 
+    /** Popup-compatible alias */
+    fun addAssistantPlaceholder() = showLoading()
+
     fun updateLoadingReply(reply: String, emotion: String, tools: List<String>? = null) {
         loading = false
         if (items.isNotEmpty()) {
@@ -52,6 +68,11 @@ class CharacterChatAdapter : RecyclerView.Adapter<CharacterChatAdapter.VH>() {
             notifyItemChanged(idx)
         }
     }
+
+    /** Popup-compatible alias with no emotion */
+    fun updateAssistantReply(reply: String, tools: List<String>? = null) = updateLoadingReply(reply, "", tools)
+
+    fun clear() { items.clear(); expandedTools.clear(); loading = false; notifyDataSetChanged() }
 
     override fun getItemViewType(pos: Int) = if (items[pos].role == "user") 0 else 1
 
@@ -77,8 +98,12 @@ class CharacterChatAdapter : RecyclerView.Adapter<CharacterChatAdapter.VH>() {
                 holder.progress?.visibility = View.GONE
                 holder.content?.visibility = View.VISIBLE
                 holder.content?.text = msg.content
-                holder.emotion?.text = emojiFor(msg.emotion)
-                holder.emotion?.visibility = if (msg.emotion.isNotEmpty()) View.VISIBLE else View.GONE
+                if (showEmotion) {
+                    holder.emotion?.text = emojiFor(msg.emotion)
+                    holder.emotion?.visibility = if (msg.emotion.isNotEmpty()) View.VISIBLE else View.GONE
+                } else {
+                    holder.emotion?.visibility = View.GONE
+                }
 
                 // Tools display
                 if (msg.tools != null && msg.tools.isNotEmpty()) {
@@ -104,8 +129,8 @@ class CharacterChatAdapter : RecyclerView.Adapter<CharacterChatAdapter.VH>() {
                                 setTextAppearance(iss.nus.edu.sg.ca_application.R.style.Caption)
                                 setTextColor(holder.itemView.context.resources.getColor(
                                     iss.nus.edu.sg.ca_application.R.color.text_hint, null))
-                                textSize = 11f
-                                setPadding(0, 1, 0, 1)
+                                textSize = TOOLS_TEXT_SIZE_SP
+                                setPadding(TOOLS_PADDING_L, TOOLS_PADDING_T, TOOLS_PADDING_R, TOOLS_PADDING_B)
                                 setTypeface(typeface, Typeface.ITALIC)
                             }
                             holder.toolsList?.addView(tv)

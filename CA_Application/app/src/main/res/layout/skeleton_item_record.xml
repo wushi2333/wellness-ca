@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Author: Xia Zihang. Skeleton placeholder mimicking item_wellness_record -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:layout_marginBottom="2dp"
+    android:background="@color/surface">
+
+    <!-- Title bar -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="16dp"
+        android:background="@color/divider" />
+
+    <!-- Subtitle line 1 -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_marginEnd="80dp"
+        android:layout_height="12dp"
+        android:layout_marginTop="8dp"
+        android:background="@color/divider" />
+
+    <!-- Subtitle line 2 -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_marginEnd="60dp"
+        android:layout_height="12dp"
+        android:layout_marginTop="6dp"
+        android:background="@color/divider" />
+</LinearLayout>
