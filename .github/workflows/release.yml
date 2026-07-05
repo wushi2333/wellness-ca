@@ -26,10 +26,21 @@ jobs:
         run: |
           mkdir -p ~/.android
           echo "$KEYSTORE_BASE64" | base64 -d > ~/.android/debug.keystore
+          echo "Keystore file size: $(wc -c < ~/.android/debug.keystore) bytes"
+          echo "SHA-1 fingerprint:"
+          keytool -list -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey 2>/dev/null | grep -E "SHA1|SHA256" || echo "WARNING: Could not read SHA-1 — secret may be missing or invalid!"
 
       - name: Build debug APK
         working-directory: CA_Application
         run: ./gradlew assembleDebug
+
+      - name: Verify APK signature SHA-1
+        run: |
+          APK="CA_Application/app/build/outputs/apk/debug/app-debug.apk"
+          if [ -f "$APK" ]; then
+            echo "APK signing cert SHA-1:"
+            unzip -p "$APK" META-INF/*.RSA | keytool -printcert 2>/dev/null | grep SHA1 || true
+          fi
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
