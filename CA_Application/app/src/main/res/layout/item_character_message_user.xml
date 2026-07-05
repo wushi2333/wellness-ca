@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="@style/Body"
         android:textColor="@color/bubble_user_text"
-        android:background="@color/bubble_user"
+        android:background="@drawable/bg_bubble_user"
         android:alpha="0.68"
         android:padding="12dp"
         android:maxWidth="280dp"
