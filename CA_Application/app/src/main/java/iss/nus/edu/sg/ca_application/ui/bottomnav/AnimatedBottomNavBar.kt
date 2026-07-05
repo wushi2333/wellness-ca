@@ -1,3 +1,4 @@
+// Author: Wang Songyu, Liu Yu, Xia Zihang
 package iss.nus.edu.sg.ca_application.ui.bottomnav
 
 import android.animation.ValueAnimator
@@ -8,21 +9,11 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.animation.OvershootInterpolator
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import iss.nus.edu.sg.ca_application.R
 
 class AnimatedBottomNavBar @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
-
-    init {
-        ViewCompat.setOnApplyWindowInsetsListener(this) { v, insets ->
-            val imeVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
-            v.visibility = if (imeVisible) View.GONE else View.VISIBLE
-            insets
-        }
-    }
 
     companion object {
         private const val BASE_HEIGHT_DP = 75f
@@ -35,7 +26,7 @@ class AnimatedBottomNavBar @JvmOverloads constructor(
     private var animProgress = 1f
     private var animator: ValueAnimator? = null
 
-    private val barPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.parseColor("#F8FAFC") }
+    private val barPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.parseColor("#1B7B9E") }
     private val bubblePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.parseColor("#1B7B9E") }
     private val shadowPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.argb(25, 0, 0, 0)
