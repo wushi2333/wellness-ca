@@ -39,7 +39,7 @@ jobs:
           APK="CA_Application/app/build/outputs/apk/debug/app-debug.apk"
           if [ -f "$APK" ]; then
             echo "APK signing cert SHA-1:"
-            unzip -p "$APK" META-INF/*.RSA | keytool -printcert 2>/dev/null | grep SHA1 || true
+            keytool -printcert -jarfile "$APK" 2>/dev/null | grep SHA1 || echo "SHA-1 not found"
           fi
 
       - name: Create Release
