@@ -53,8 +53,8 @@ class SleepDetailFragment : Fragment() {
         }
 
         // Week navigation
-        view.findViewById<ImageView>(R.id.btnPrevWeek).setOnClickListener { navigateWeek(view, -1) }
-        view.findViewById<ImageView>(R.id.btnNextWeek).setOnClickListener { navigateWeek(view, +1) }
+        view.findViewById<ImageView>(R.id.btnPrevWeek).setOnClickListener { navigateWeek(view, +1) }
+        view.findViewById<ImageView>(R.id.btnNextWeek).setOnClickListener { navigateWeek(view, -1) }
 
         lastDataFingerprint = "" // reset — view may have been recreated
         loadData(view)

@@ -61,8 +61,8 @@ class ExerciseDetailFragment : Fragment() {
         }
 
         // Week navigation
-        view.findViewById<ImageView>(R.id.btnExPrevWeek).setOnClickListener { navigateWeek(view, -1) }
-        view.findViewById<ImageView>(R.id.btnExNextWeek).setOnClickListener { navigateWeek(view, +1) }
+        view.findViewById<ImageView>(R.id.btnExPrevWeek).setOnClickListener { navigateWeek(view, +1) }
+        view.findViewById<ImageView>(R.id.btnExNextWeek).setOnClickListener { navigateWeek(view, -1) }
 
         // Pie chart toggle: Today / This Week
         val tvToday = view.findViewById<TextView>(R.id.tvPieToggleToday)
