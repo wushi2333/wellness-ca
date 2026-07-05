@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Home tab: calm guidance posture. Avatar + greeting + 3 stat cards + tip. -->
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F8FAFC"
-    android:clipToPadding="false"
-    android:paddingBottom="16dp">
+    android:clipChildren="false"
+    android:clipToPadding="false">
+
+    <!-- Particle effect — subtle floating lines, behind all content -->
+    <iss.nus.edu.sg.ca_application.ui.home.ParticleView
+        android:id="@+id/particleView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="16dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -52,7 +64,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/greeting_good_morning"
                     android:textSize="13sp"
-                    android:textColor="#64748B"
+                    android:textColor="@color/text_secondary"
                     android:fontFamily="@font/segoe_ui" />
 
                 <TextView
@@ -68,13 +80,14 @@
 
             <ImageView
                 android:id="@+id/ivSettings"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
                 android:src="@drawable/ic_settings"
-                android:alpha="0.35"
+                android:alpha="0.45"
                 android:clickable="true"
                 android:focusable="true"
-                android:padding="6dp" />
+                android:padding="4dp"
+                android:background="?attr/selectableItemBackgroundBorderless" />
         </LinearLayout>
 
         <!-- ── Card 1: Sleep ── -->
@@ -104,15 +117,15 @@
                     android:layout_height="wrap_content"
                     android:text="@string/sleep"
                     android:textSize="15sp"
-                    android:textColor="#475569"
+                    android:textColor="@color/card_label"
                     android:fontFamily="@font/segoe_ui"
                     android:textStyle="bold" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="💤"
-                    android:textSize="20sp" />
+                <ImageView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@drawable/ic_sleep"
+                    android:importantForAccessibility="no" />
             </LinearLayout>
 
             <LinearLayout
@@ -133,7 +146,7 @@
                         android:layout_height="wrap_content"
                         android:text="@string/sleep_avg_placeholder"
                         android:textSize="34sp"
-                        android:textColor="#2563EB"
+                        android:textColor="@color/card_sleep_accent"
                         android:fontFamily="@font/segoe_ui"
                         android:textStyle="bold" />
 
@@ -142,7 +155,7 @@
                         android:layout_height="wrap_content"
                         android:text="@string/avg_per_night"
                         android:textSize="12sp"
-                        android:textColor="#94A3B8"
+                        android:textColor="@color/text_hint"
                         android:fontFamily="@font/segoe_ui"
                         android:layout_marginTop="2dp" />
                 </LinearLayout>
@@ -159,7 +172,7 @@
                         android:layout_height="wrap_content"
                         android:text="--"
                         android:textSize="14sp"
-                        android:textColor="#64748B"
+                        android:textColor="@color/text_secondary"
                         android:fontFamily="@font/segoe_ui" />
 
                     <TextView
@@ -167,7 +180,7 @@
                         android:layout_height="wrap_content"
                         android:text="@string/vs_last_7d"
                         android:textSize="12sp"
-                        android:textColor="#94A3B8"
+                        android:textColor="@color/text_hint"
                         android:fontFamily="@font/segoe_ui" />
                 </LinearLayout>
             </LinearLayout>
@@ -211,15 +224,15 @@
                     android:layout_height="wrap_content"
                     android:text="@string/exercise"
                     android:textSize="15sp"
-                    android:textColor="#475569"
+                    android:textColor="@color/card_label"
                     android:fontFamily="@font/segoe_ui"
                     android:textStyle="bold" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🏃"
-                    android:textSize="20sp" />
+                <ImageView
+                    android:layout_width="60dp"
+                    android:layout_height="47dp"
+                    android:src="@drawable/ic_exercise"
+                    android:importantForAccessibility="no" />
             </LinearLayout>
 
             <LinearLayout
@@ -240,7 +253,7 @@
                         android:layout_height="wrap_content"
                         android:text="@string/exercise_avg_placeholder"
                         android:textSize="34sp"
-                        android:textColor="#16A34A"
+                        android:textColor="@color/card_exercise_accent"
                         android:fontFamily="@font/segoe_ui"
                         android:textStyle="bold" />
 
@@ -249,7 +262,7 @@
                         android:layout_height="wrap_content"
                         android:text="@string/avg_per_day"
                         android:textSize="12sp"
-                        android:textColor="#94A3B8"
+                        android:textColor="@color/text_hint"
                         android:fontFamily="@font/segoe_ui"
                         android:layout_marginTop="2dp" />
                 </LinearLayout>
@@ -260,7 +273,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/exercise_days_placeholder"
                     android:textSize="14sp"
-                    android:textColor="#64748B"
+                    android:textColor="@color/text_secondary"
                     android:fontFamily="@font/segoe_ui" />
             </LinearLayout>
 
@@ -302,15 +315,15 @@
                     android:layout_height="wrap_content"
                     android:text="@string/todays_tip"
                     android:textSize="15sp"
-                    android:textColor="#475569"
+                    android:textColor="@color/card_label"
                     android:fontFamily="@font/segoe_ui"
                     android:textStyle="bold" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="💡"
-                    android:textSize="18sp" />
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:src="@drawable/ic_lightbulb"
+                    android:importantForAccessibility="no" />
             </LinearLayout>
 
             <TextView
@@ -319,10 +332,12 @@
                 android:layout_height="wrap_content"
                 android:text="@string/default_tip_text"
                 android:textSize="14sp"
-                android:textColor="#64748B"
+                android:textColor="@color/text_secondary"
                 android:fontFamily="@font/segoe_ui"
                 android:lineSpacingMultiplier="1.3" />
         </LinearLayout>
 
     </LinearLayout>
 </ScrollView>
+
+</FrameLayout>

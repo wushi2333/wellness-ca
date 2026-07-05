@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Default card: subtle warm grey gradient, light bottom → dark top -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
         <shape android:shape="rectangle">
-            <solid android:color="#FFFFFF"/>
+            <gradient android:type="linear" android:angle="90"
+                android:startColor="#FEFEFE"
+                android:endColor="#F9F8FB"/>
             <corners android:radius="20dp"/>
         </shape>
     </item>
     <item>
         <shape android:shape="rectangle">
             <gradient android:type="linear" android:angle="135"
-                android:startColor="#30FFFFFF" android:centerColor="#00FFFFFF"
+                android:startColor="#30FFFFFF"
+                android:centerColor="#00FFFFFF"
                 android:endColor="#08FFFFFF"/>
             <corners android:radius="20dp"/>
         </shape>

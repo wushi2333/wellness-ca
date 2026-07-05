@@ -69,6 +69,7 @@
     <string name="delete_all">删除全部</string>
     <string name="pin_chat">置顶</string>
     <string name="unpin_chat">取消置顶</string>
+    <string name="pinned">已置顶</string>
     <string name="yui_welcome">你好，%1$s！我是 Yui（結衣），你的快乐健康伙伴 🌸\n\n我可以帮你追踪健康状况、分析健康数据，并回答使用本应用的问题。\n\n• 切换到 Agent 模式让我分析你的记录\n• 随时和我聊聊你的一天——我在这里倾听！\n\n今天想做点什么呢？</string>
 
     <!-- Chat -->
@@ -107,6 +108,10 @@
     <string name="view_records">查看记录</string>
     <string name="add_record">添加记录</string>
     <string name="chat">聊天</string>
+    <string name="agent">agent</string>
+    <string name="particles">粒子特效</string>
+    <string name="particles_on">开</string>
+    <string name="particles_off">关</string>
 
     <!-- Network -->
     <string name="email_hint">邮箱（可选）</string>
@@ -150,6 +155,9 @@
     <string name="hint_wake_time">例如 07:00</string>
     <string name="duration_placeholder">时长：--</string>
     <string name="label_morning_mood">晨间心情</string>
+    <string name="mood_good">好</string>
+    <string name="mood_ok">一般</string>
+    <string name="mood_low">差</string>
     <string name="hint_sleep_notes">例如 凌晨3点醒来，感到不安…</string>
     <string name="confirm">确认</string>
 

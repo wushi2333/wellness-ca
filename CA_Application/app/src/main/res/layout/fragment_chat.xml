@@ -61,8 +61,13 @@
                 android:textSize="12sp"
                 android:textColor="#FFFFFF"
                 android:minWidth="0dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:paddingTop="0dp"
+                android:paddingBottom="0dp"
                 android:paddingStart="12dp"
                 android:paddingEnd="12dp"
+                android:gravity="center"
                 android:background="@drawable/bg_btn_chat"
                 android:elevation="0dp" />
 
@@ -76,16 +81,12 @@
                 android:background="@drawable/ic_volume_on"
                 android:elevation="0dp" />
 
-            <Button
+            <ImageButton
                 android:id="@+id/btnSessions"
-                android:layout_width="wrap_content"
+                android:layout_width="36dp"
                 android:layout_height="32dp"
-                android:text="☰"
-                android:textSize="14sp"
-                android:textColor="#1E293B"
-                android:minWidth="0dp"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
+                android:src="@drawable/ic_menu"
+                android:scaleType="center"
                 android:layout_marginStart="4dp"
                 android:background="@drawable/bg_input_field"
                 android:elevation="0dp" />
@@ -157,9 +158,9 @@
             <ImageButton android:id="@+id/btnTrash" android:layout_width="36dp" android:layout_height="36dp"
                 android:src="@drawable/ic_trash" android:background="@android:color/transparent" android:padding="6dp" />
 
-            <Button android:id="@+id/btnNewChat" android:layout_width="wrap_content" android:layout_height="32dp"
-                android:text="@string/new_chat_button" android:textSize="12sp" android:minWidth="0dp"
-                android:paddingStart="10dp" android:paddingEnd="10dp" android:background="@drawable/bg_input_field" android:elevation="0dp" />
+            <ImageButton android:id="@+id/btnNewChat" android:layout_width="36dp" android:layout_height="32dp"
+                android:src="@drawable/ic_plus" android:scaleType="center"
+                android:background="@drawable/bg_input_field" android:elevation="0dp" />
         </LinearLayout>
 
         <!-- Selection actions -->

@@ -68,6 +68,7 @@
     <string name="delete_all">Delete All</string>
     <string name="pin_chat">Pin to Top</string>
     <string name="unpin_chat">Unpin</string>
+    <string name="pinned">Pinned</string>
     <string name="yui_welcome">Hello, %1$s! I\'m Yui (結衣), your cheerful wellness companion 🌸\n\nI can help you track your health, analyze your wellness data, and answer questions about using this app.\n\n• Switch to Agent mode to let me analyze your records\n• Just chat with me about your day — I\'m here to listen!\n\nWhat would you like to do today?</string>
 
     <!-- Chat -->
@@ -106,6 +107,10 @@
     <string name="view_records">View Records</string>
     <string name="add_record">Add Record</string>
     <string name="chat">Chat</string>
+    <string name="agent">Agent</string>
+    <string name="particles">Particle effects</string>
+    <string name="particles_on">On</string>
+    <string name="particles_off">Off</string>
 
     <!-- Network -->
     <string name="email_hint">Email (optional)</string>
@@ -149,6 +154,9 @@
     <string name="hint_wake_time">e.g. 07:00</string>
     <string name="duration_placeholder">Duration: --</string>
     <string name="label_morning_mood">Morning mood</string>
+    <string name="mood_good">Good</string>
+    <string name="mood_ok">OK</string>
+    <string name="mood_low">Low</string>
     <string name="hint_sleep_notes">e.g. woke up at 3am, felt restless...</string>
     <string name="confirm">Confirm</string>
 

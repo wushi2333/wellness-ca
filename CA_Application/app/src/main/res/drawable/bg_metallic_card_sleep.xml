@@ -1,14 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Metallic sleep card: deeper macaron lavender, light bottom → dark top -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
         <shape android:shape="rectangle">
-            <solid android:color="#E8F0FE"/>
+            <gradient android:type="linear" android:angle="90"
+                android:startColor="#F0F4FF"
+                android:centerColor="#E2EAFB"
+                android:endColor="#D2DDF8"/>
             <corners android:radius="20dp"/>
         </shape>
     </item>
     <item>
         <shape android:shape="rectangle">
-            <gradient android:type="linear" android:angle="135" android:startColor="#50FFFFFF" android:centerColor="#00FFFFFF" android:endColor="#10FFFFFF"/>
+            <gradient android:type="linear" android:angle="135"
+                android:startColor="#50FFFFFF"
+                android:centerColor="#00FFFFFF"
+                android:endColor="#10FFFFFF"/>
             <corners android:radius="20dp"/>
         </shape>
     </item>

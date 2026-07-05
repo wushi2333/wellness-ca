@@ -1,14 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Metallic exercise card: deeper macaron mint, light bottom → dark top -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
         <shape android:shape="rectangle">
-            <solid android:color="#E8F8EE"/>
+            <gradient android:type="linear" android:angle="90"
+                android:startColor="#EEF9F3"
+                android:centerColor="#DEF3E7"
+                android:endColor="#C8ECDA"/>
             <corners android:radius="20dp"/>
         </shape>
     </item>
     <item>
         <shape android:shape="rectangle">
-            <gradient android:type="linear" android:angle="135" android:startColor="#50FFFFFF" android:centerColor="#00FFFFFF" android:endColor="#10FFFFFF"/>
+            <gradient android:type="linear" android:angle="135"
+                android:startColor="#50FFFFFF"
+                android:centerColor="#00FFFFFF"
+                android:endColor="#10FFFFFF"/>
             <corners android:radius="20dp"/>
         </shape>
     </item>

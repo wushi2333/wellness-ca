@@ -42,6 +42,7 @@ class HomeFragment : Fragment() {
     private lateinit var ivHomeAvatar: ImageView
     private lateinit var sparklineSleep: SparklineView
     private lateinit var miniBarExercise: MiniBarRowView
+    private lateinit var particleView: ParticleView
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return inflater.inflate(R.layout.fragment_home, container, false)
@@ -59,6 +60,12 @@ class HomeFragment : Fragment() {
         ivHomeAvatar = view.findViewById(R.id.ivHomeAvatar)
         sparklineSleep = view.findViewById(R.id.sparklineSleep)
         miniBarExercise = view.findViewById(R.id.miniBarExercise)
+
+        // Particle effect — extend into status bar
+        particleView = view.findViewById(R.id.particleView)
+        val statusBarH = view.rootWindowInsets?.systemWindowInsetTop ?: 0
+        (particleView.layoutParams as? android.view.ViewGroup.MarginLayoutParams)?.topMargin = -statusBarH
+        applyParticleSetting()
 
         // Handle status bar inset for top bar
         view.findViewById<View>(R.id.homeTopBar).applyTopInset()
@@ -101,6 +108,16 @@ class HomeFragment : Fragment() {
         }
 
         loadData()
+    }
+
+    private fun applyParticleSetting() {
+        if (iss.nus.edu.sg.ca_application.SettingsActivity.isParticlesEnabled(requireContext())) {
+            particleView.visibility = View.VISIBLE
+            particleView.startParticles()
+        } else {
+            particleView.stopParticles()
+            particleView.visibility = View.GONE
+        }
     }
 
     private fun getGreeting(): String {
@@ -195,6 +212,7 @@ class HomeFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         loadUserProfile()
+        if (::particleView.isInitialized) applyParticleSetting()
     }
 
     /** Load avatar and username from server. */

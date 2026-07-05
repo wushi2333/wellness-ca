@@ -39,8 +39,8 @@
             android:focusable="true"
             android:foreground="?attr/selectableItemBackground">
 
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="💤" android:textSize="40sp" />
+            <ImageView android:layout_width="60dp" android:layout_height="60dp"
+                android:src="@drawable/ic_sleep" android:importantForAccessibility="no" />
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
                 android:text="@string/add_sleep" android:textSize="16sp" android:textColor="#475569"
                 android:fontFamily="@font/segoe_ui" android:textStyle="bold" android:layout_marginTop="12dp" />
@@ -65,8 +65,8 @@
             android:focusable="true"
             android:foreground="?attr/selectableItemBackground">
 
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="🏃" android:textSize="40sp" />
+            <ImageView android:layout_width="112dp" android:layout_height="89dp"
+                android:src="@drawable/ic_exercise" android:importantForAccessibility="no" />
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
                 android:text="@string/add_exercise" android:textSize="16sp" android:textColor="#475569"
                 android:fontFamily="@font/segoe_ui" android:textStyle="bold" android:layout_marginTop="12dp" />

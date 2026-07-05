@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Primary — calming teal (wellness / medical feel) -->
-    <color name="primary">#FF1B7B9E</color>
-    <color name="primary_dark">#FF155F7A</color>
-    <color name="primary_light">#FF5BA4BF</color>
+    <!-- Primary — calming macaron teal (wellness / medical feel) -->
+    <color name="primary">#FF45B5D6</color>
+    <color name="primary_dark">#FF2FA8C4</color>
+    <color name="primary_light">#FF80D0E8</color>
     <color name="on_primary">#FFFFFFFF</color>
 
-    <!-- Secondary — fresh green accent -->
-    <color name="secondary">#FF34D399</color>
-    <color name="secondary_dark">#FF059669</color>
+    <!-- Secondary — fresh macaron green accent -->
+    <color name="secondary">#FF64E0B5</color>
+    <color name="secondary_dark">#FF20C090</color>
     <color name="on_secondary">#FF1E293B</color>
 
     <!-- Background & Surface -->
@@ -29,17 +29,22 @@
     <color name="divider">#FFE2E8F0</color>
 
     <!-- Chat bubbles -->
-    <color name="bubble_user">#FF1B7B9E</color>
+    <color name="bubble_user">#FF45B5D6</color>
     <color name="bubble_ai">#FFF1F5F9</color>
     <color name="bubble_user_text">#FFFFFFFF</color>
     <color name="bubble_ai_text">#FF1E293B</color>
 
     <!-- Chart gradients -->
-    <color name="chart_sleep_gradient_start">#FF1B7B9E</color>
+    <color name="chart_sleep_gradient_start">#FF45B5D6</color>
     <color name="chart_sleep_gradient_end">#FF93C5FD</color>
-    <color name="chart_exercise_gradient_start">#FF34C759</color>
+    <color name="chart_exercise_gradient_start">#FF64E0B5</color>
     <color name="chart_exercise_gradient_end">#FF86EFAC</color>
     <color name="chart_target_line">#FFF59E0B</color>
     <color name="chart_sleep_schedule">#FF7C8DFF</color>
     <color name="chart_sleep_sparkline">#FF2563EB</color>
+
+    <!-- Card accents -->
+    <color name="card_label">#FF475569</color>
+    <color name="card_sleep_accent">#FF2563EB</color>
+    <color name="card_exercise_accent">#FF16A34A</color>
 </resources>

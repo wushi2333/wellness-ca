@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -214,7 +215,7 @@ class RecordAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         if (isHeader) {
             val h = holder as SectionHolder
             h.label.text = section.label
-            h.arrow.text = if (collapsed.contains(sectionIdx)) "▶" else "▼"
+            h.arrow.rotation = if (collapsed.contains(sectionIdx)) 0f else 90f
             h.itemView.setOnClickListener {
                 if (collapsed.contains(sectionIdx)) collapsed.remove(sectionIdx)
                 else collapsed.add(sectionIdx)
@@ -226,13 +227,18 @@ class RecordAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             h.date.text = item.date
             h.detail.text = if (item.sleep != null) {
                 val s = item.sleep
-                val moodEmoji = when { s.moodScore >= 4 -> "😊"; s.moodScore >= 3 -> "😐"; s.moodScore > 0 -> "😟"; else -> "" }
+                val moodLabel = when {
+                    s.moodScore >= 4 -> h.itemView.context.getString(R.string.mood_good)
+                    s.moodScore >= 3 -> h.itemView.context.getString(R.string.mood_ok)
+                    s.moodScore > 0 -> h.itemView.context.getString(R.string.mood_low)
+                    else -> ""
+                }
                 if (s.sleepTime.isNotEmpty())
-                    "💤 %.1fh  %s-%s  %s".format(s.sleepHours, s.sleepTime, s.wakeTime, moodEmoji)
+                    "%.1fh  %s-%s  %s".format(s.sleepHours, s.sleepTime, s.wakeTime, moodLabel)
                 else
-                    "💤 %.1fh  %s".format(s.sleepHours, moodEmoji)
+                    "%.1fh  %s".format(s.sleepHours, moodLabel)
             } else if (item.exercise != null) {
-                "🏃 %s  %dmin".format(ExerciseTypeMap.toDisplay(h.itemView.context, item.exercise.exerciseActivity), item.exercise.exerciseDuration)
+                "%s  %dmin".format(ExerciseTypeMap.toDisplay(h.itemView.context, item.exercise.exerciseActivity), item.exercise.exerciseDuration)
             } else ""
             h.btnEdit.setOnClickListener { onEdit?.invoke(item) }
             h.btnDelete.setOnClickListener { onDelete?.invoke(item) }
@@ -255,7 +261,7 @@ class RecordAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     class SectionHolder(v: View) : RecyclerView.ViewHolder(v) {
         val label: TextView = v.findViewById(R.id.tvSectionLabel)
-        val arrow: TextView = v.findViewById(R.id.tvSectionArrow)
+        val arrow: ImageView = v.findViewById(R.id.tvSectionArrow)
     }
 
     class RecordHolder(v: View) : RecyclerView.ViewHolder(v) {

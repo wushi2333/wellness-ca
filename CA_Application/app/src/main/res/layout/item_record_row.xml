@@ -41,25 +41,23 @@
     </LinearLayout>
 
     <!-- Edit -->
-    <TextView
+    <ImageView
         android:id="@+id/btnRecordEdit"
         android:layout_width="36dp"
         android:layout_height="36dp"
-        android:gravity="center"
-        android:text="✏️"
-        android:textSize="16sp"
+        android:src="@drawable/ic_pencil"
+        android:padding="6dp"
         android:clickable="true"
         android:focusable="true"
         android:background="?attr/selectableItemBackgroundBorderless" />
 
     <!-- Delete -->
-    <TextView
+    <ImageView
         android:id="@+id/btnRecordDelete"
         android:layout_width="36dp"
         android:layout_height="36dp"
-        android:gravity="center"
-        android:text="🗑️"
-        android:textSize="16sp"
+        android:src="@drawable/ic_delete"
+        android:padding="6dp"
         android:clickable="true"
         android:focusable="true"
         android:background="?attr/selectableItemBackgroundBorderless"

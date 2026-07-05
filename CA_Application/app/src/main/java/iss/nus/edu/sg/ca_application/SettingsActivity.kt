@@ -26,10 +26,17 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var prefs: SharedPreferences
     private lateinit var btnEnglish: TextView
     private lateinit var btnChinese: TextView
+    private lateinit var tvParticlesStatus: TextView
 
     companion object {
         private const val PREFS_NAME = "settings_prefs"
         private const val KEY_LANGUAGE = "app_language"
+        private const val KEY_PARTICLES = "particles_enabled"
+
+        fun isParticlesEnabled(context: Context): Boolean {
+            return context.getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+                .getBoolean(KEY_PARTICLES, true)
+        }
 
         fun getSavedLocale(context: Context): Locale? {
             val lang = context.getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
@@ -73,6 +80,11 @@ class SettingsActivity : AppCompatActivity() {
 
         btnEnglish.setOnClickListener { setLanguage("en") }
         btnChinese.setOnClickListener { setLanguage("zh") }
+
+        // Particle effect toggle
+        tvParticlesStatus = findViewById(R.id.tvParticlesStatus)
+        findViewById<View>(R.id.rowParticles).setOnClickListener { toggleParticles() }
+        updateParticlesStatus()
 
         // Profile row → ProfileActivity
         findViewById<View>(R.id.rowProfile).setOnClickListener {
@@ -148,6 +160,17 @@ class SettingsActivity : AppCompatActivity() {
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         finish()
+    }
+
+    private fun toggleParticles() {
+        val enabled = prefs.getBoolean(KEY_PARTICLES, true)
+        prefs.edit().putBoolean(KEY_PARTICLES, !enabled).apply()
+        updateParticlesStatus()
+    }
+
+    private fun updateParticlesStatus() {
+        val enabled = prefs.getBoolean(KEY_PARTICLES, true)
+        tvParticlesStatus.text = getString(if (enabled) R.string.particles_on else R.string.particles_off)
     }
 
     private fun performLogout() {

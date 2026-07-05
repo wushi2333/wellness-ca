@@ -194,7 +194,7 @@ class ChatFragment : Fragment() {
     private fun toggleMode() {
         currentMode = if (currentMode == "chat") "agent" else "chat"
         val isAgent = currentMode == "agent"
-        btnMode.text = if (isAgent) "Agent" else "Chat"
+        btnMode.text = if (isAgent) getString(R.string.agent) else getString(R.string.chat)
         btnMode.setBackgroundResource(if (isAgent) R.drawable.bg_btn_agent else R.drawable.bg_btn_chat)
         btnMode.setTextColor(ContextCompat.getColor(requireContext(),
             if (isAgent) R.color.text_primary else R.color.on_primary))
@@ -479,7 +479,7 @@ class ChatFragment : Fragment() {
         override fun onBindViewHolder(h: VH, pos: Int) {
             val sorted = sorted(); if (pos >= sorted.size) return
             val s = sorted[pos]; val pinned = pinnedIds.contains(s.id)
-            h.title.text = s.title; h.meta.text = "${s.mode} · ${s.messageCount} msgs" + if (pinned) " · 📌" else ""
+            h.title.text = s.title; h.meta.text = "${s.mode} · ${s.messageCount} msgs" + if (pinned) " · ${getString(R.string.pinned)}" else ""
             if (selectionMode) {
                 h.cb.visibility = View.VISIBLE
                 h.cb.setOnCheckedChangeListener(null); h.cb.isChecked = selectedIds.contains(s.id)

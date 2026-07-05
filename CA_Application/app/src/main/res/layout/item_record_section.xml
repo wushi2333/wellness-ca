@@ -20,12 +20,12 @@
         android:fontFamily="@font/segoe_ui"
         android:textStyle="bold" />
 
-    <TextView
+    <ImageView
         android:id="@+id/tvSectionArrow"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="▼"
-        android:textSize="12sp"
-        android:textColor="#94A3B8"
-        android:paddingEnd="4dp" />
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:src="@drawable/ic_chevron_right"
+        android:rotation="90"
+        android:paddingEnd="4dp"
+        android:importantForAccessibility="no" />
 </LinearLayout>
