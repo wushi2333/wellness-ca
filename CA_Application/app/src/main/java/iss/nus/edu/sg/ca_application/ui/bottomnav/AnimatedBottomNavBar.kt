@@ -8,12 +8,22 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import android.view.animation.OvershootInterpolator
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.ViewCompat
 import androidx.appcompat.content.res.AppCompatResources
 import iss.nus.edu.sg.ca_application.R
 
 class AnimatedBottomNavBar @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
+
+    init {
+        ViewCompat.setOnApplyWindowInsetsListener(this) { v, insets ->
+            val imeVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
+            v.visibility = if (imeVisible) View.GONE else View.VISIBLE
+            insets
+        }
+    }
 
     companion object {
         private const val BASE_HEIGHT_DP = 75f
