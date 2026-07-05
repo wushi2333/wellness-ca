@@ -33,6 +33,7 @@ import iss.nus.edu.sg.ca_application.network.ApiException
 import iss.nus.edu.sg.ca_application.network.ApiClient
 import iss.nus.edu.sg.ca_application.network.CacheManager
 import iss.nus.edu.sg.ca_application.network.CharacterApi
+import iss.nus.edu.sg.ca_application.util.onClickDebounced
 
 
 class ChatFragment : Fragment() {
@@ -63,6 +64,8 @@ class ChatFragment : Fragment() {
         return if (lang == "zh") "zh-CN" else "en-US"
     }
     private var voiceEnabled = true
+    private var ttsMediaPlayer: android.media.MediaPlayer? = null
+    private var ttsAnimThread: Thread? = null
 
     // ASR permission launcher
     private val requestAudioPermission = registerForActivityResult(
@@ -137,10 +140,13 @@ class ChatFragment : Fragment() {
         Thread { try { CharacterApi.preloadRag(token) } catch (_: Exception) {} }.start()
 
         btnMode.setOnClickListener { toggleMode() }
-        btnVoice.setOnClickListener {
+        btnVoice.onClickDebounced {
             voiceEnabled = !voiceEnabled
             btnVoice.setBackgroundResource(if (voiceEnabled) R.drawable.ic_volume_on else R.drawable.ic_volume_off)
-            if (!voiceEnabled) stopRecording()
+            if (!voiceEnabled) {
+                stopRecording()
+                stopTts()
+            }
         }
         view.findViewById<View>(R.id.btnSessions).setOnClickListener { loadSessions(); drawer.openDrawer(Gravity.END) }
         view.findViewById<View>(R.id.btnNewChat).setOnClickListener { createNewSession() }
@@ -328,16 +334,28 @@ class ChatFragment : Fragment() {
 
     private fun speakResponse(text: String, emotion: String) {
         val model = iss.nus.edu.sg.ca_application.live2d.LAppMinimumLive2DManager.getInstance().getModel(0)
+        stopTts()
         Thread {
             val result = VolcanoTtsService.synthesize(text, emotion, token)
             if (result != null) {
                 activity?.runOnUiThread {
-                    VolcanoTtsService.playMp3(requireContext(), result,
+                    val mp = android.media.MediaPlayer()
+                    ttsMediaPlayer = mp
+                    ttsAnimThread = VolcanoTtsService.playMp3(requireContext(), result, mp,
                         onMouth = { v -> model?.mouthOpenOverride = v },
-                        onComplete = { model?.mouthOpenOverride = 0f })
+                        onComplete = {
+                            model?.mouthOpenOverride = 0f
+                            ttsMediaPlayer = null; ttsAnimThread = null
+                        })
                 }
             }
         }.start()
+    }
+
+    private fun stopTts() {
+        ttsAnimThread?.interrupt(); ttsAnimThread = null
+        try { ttsMediaPlayer?.stop(); ttsMediaPlayer?.release() } catch (_: Exception) {}
+        ttsMediaPlayer = null
     }
 
     private fun pollSessionTitle(sessionId: Long) {
@@ -412,6 +430,7 @@ class ChatFragment : Fragment() {
         titlePollRunnable?.let { handler.removeCallbacks(it) }
         isRecording = false; recorderThread?.interrupt(); recorderThread = null
         audioRecord?.apply { try { stop() } catch (_: Exception) {}; try { release() } catch (_: Exception) {} }; audioRecord = null
+        stopTts()
         live2dView.onDestroy()
     }
 

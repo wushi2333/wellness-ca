@@ -56,19 +56,19 @@ class LoginActivity : AppCompatActivity() {
             if (idToken != null) {
                 handleGoogleSignIn(idToken)
             } else {
-                showSignInError("Google sign-in failed: no auth code")
+                showSignInError(getString(R.string.google_sign_in_no_auth))
             }
         } catch (e: ApiException) {
             if (e.statusCode != 12501) {
                 val detail = when (e.statusCode) {
-                    10 -> "Developer error — check SHA-1 fingerprint and Google Cloud Console config"
-                    12500 -> "Sign-in failed — try again"
+                    10 -> getString(R.string.google_sign_in_developer_error)
+                    12500 -> getString(R.string.google_sign_in_retry)
                     else -> "Code ${e.statusCode}"
                 }
-                showSignInError("Google sign-in failed: $detail")
+                showSignInError(getString(R.string.google_sign_in_failed) + ": $detail")
             }
         } catch (e: Exception) {
-            showSignInError("Google sign-in failed: ${e.message}")
+            showSignInError(getString(R.string.google_sign_in_failed) + ": ${e.message}")
         }
     }
 
@@ -162,7 +162,7 @@ class LoginActivity : AppCompatActivity() {
                     val intent = googleSignInClient?.signInIntent
                     if (intent != null) googleSignInLauncher.launch(intent)
                     else {
-                        tvError.text = "Google Sign-In not available"
+                        tvError.text = getString(R.string.google_sign_in_not_available)
                         tvError.visibility = View.VISIBLE
                     }
                 }
@@ -197,9 +197,9 @@ class LoginActivity : AppCompatActivity() {
 
     private fun showGoogleConflictDialog(idToken: String, existingUsername: String, authCode: String = "") {
         AlertDialog.Builder(this)
-            .setTitle("Account Conflict")
-            .setMessage("This Google email is already registered to \"$existingUsername\".\n\nLog in as $existingUsername?")
-            .setPositiveButton("Yes, login as $existingUsername") { _, _ ->
+            .setTitle(getString(R.string.google_conflict_title))
+            .setMessage(getString(R.string.google_conflict_message, existingUsername, existingUsername))
+            .setPositiveButton(getString(R.string.google_conflict_yes, existingUsername)) { _, _ ->
                 Thread {
                     try {
                         val response = ApiClient.googleLogin(idToken, existingUsername, authCode)
@@ -212,7 +212,7 @@ class LoginActivity : AppCompatActivity() {
                     }
                 }.start()
             }
-            .setNegativeButton("Go Back") { _, _ -> /* user cancels */ }
+            .setNegativeButton(getString(R.string.google_conflict_cancel)) { _, _ -> }
             .setCancelable(true)
             .show()
     }
@@ -232,7 +232,7 @@ class LoginActivity : AppCompatActivity() {
                 }
             } catch (e: Exception) {
                 runOnUiThread {
-                    showSignInError("Google sign-in failed: ${e.message}")
+                    showSignInError(getString(R.string.google_sign_in_failed) + ": ${e.message}")
                 }
             }
         }.start()

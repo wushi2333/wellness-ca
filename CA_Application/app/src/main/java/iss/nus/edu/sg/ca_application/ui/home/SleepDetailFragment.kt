@@ -56,7 +56,13 @@ class SleepDetailFragment : Fragment() {
         view.findViewById<ImageView>(R.id.btnPrevWeek).setOnClickListener { navigateWeek(view, -1) }
         view.findViewById<ImageView>(R.id.btnNextWeek).setOnClickListener { navigateWeek(view, +1) }
 
+        lastDataFingerprint = "" // reset — view may have been recreated
         loadData(view)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        view?.let { loadData(it) }
     }
 
     private fun loadData(view: View) {
@@ -64,9 +70,12 @@ class SleepDetailFragment : Fragment() {
         if (token.isEmpty()) return
         val cacheKey = "records"
 
-        // Show cached data immediately
-        CacheManager.get<Pair<List<DailyWellness>, Boolean>>(cacheKey)?.let { (cached, _) ->
-            if (cached.isNotEmpty()) renderData(view, cached)
+        // Show cached data immediately; fall back to in-memory data if cache miss
+        val cached = CacheManager.get<Pair<List<DailyWellness>, Boolean>>(cacheKey)
+        if (cached != null && cached.first.isNotEmpty()) {
+            renderData(view, cached.first)
+        } else if (allDailies.isNotEmpty()) {
+            renderData(view, allDailies)
         }
 
         Thread {
@@ -83,7 +92,7 @@ class SleepDetailFragment : Fragment() {
     private var lastDataFingerprint = ""
 
     private fun renderData(view: View, dailies: List<DailyWellness>) {
-        val fp = "${dailies.size}_${dailies.firstOrNull()?.recordDate}_${dailies.lastOrNull()?.recordDate}"
+        val fp = dailies.joinToString { "${it.recordDate}:${it.sleep?.sleepHours}:${it.sleep?.moodScore}" }
         if (fp == lastDataFingerprint && allDailies.isNotEmpty()) return
         lastDataFingerprint = fp
         allDailies = dailies
@@ -126,6 +135,7 @@ class SleepDetailFragment : Fragment() {
         }
 
         val chart = view.findViewById<BarChart>(R.id.sleepBarChart)
+        chart.setNoDataText(getString(R.string.no_data_available))
         val dataSet = BarDataSet(entries, "").apply {
             color = Color.parseColor("#1B7B9E")
             valueTextSize = 11f

@@ -118,11 +118,12 @@ class HomeFragment : Fragment() {
         if (token.isEmpty()) return
         val cacheKey = "records"
 
-        // Show cached data immediately
-        CacheManager.get<Pair<List<DailyWellness>, Boolean>>(cacheKey)?.let { (cached, _) ->
-            if (cached.isNotEmpty() && isAdded) {
-                activity?.runOnUiThread { renderHome(cached) }
-            }
+        // Show cached data immediately; fall back to in-memory data if cache miss
+        val cached = CacheManager.get<Pair<List<DailyWellness>, Boolean>>(cacheKey)
+        if (cached != null && cached.first.isNotEmpty()) {
+            if (isAdded) activity?.runOnUiThread { renderHome(cached.first) }
+        } else if (lastHomeDailies.isNotEmpty() && isAdded) {
+            activity?.runOnUiThread { renderHome(lastHomeDailies) }
         }
 
         Thread {
@@ -130,7 +131,7 @@ class HomeFragment : Fragment() {
                 val (dailies, _) = ApiClient.getDailyRecords(token, 0, 90)
                 CacheManager.put(cacheKey, Pair(dailies, true))
                 if (!isAdded) return@Thread
-                val fp = "${dailies.size}_${dailies.firstOrNull()?.recordDate}_${dailies.lastOrNull()?.recordDate}"
+                val fp = dailies.joinToString { "${it.recordDate}:${it.sleep?.sleepHours}:${it.exercises.sumOf { e -> e.exerciseDuration }}" }
                 if (fp != homeDataFingerprint) {
                     activity?.runOnUiThread { renderHome(dailies) }
                 }
@@ -141,10 +142,12 @@ class HomeFragment : Fragment() {
     }
 
     private var homeDataFingerprint = ""
+    private var lastHomeDailies: List<DailyWellness> = emptyList()
 
     private fun renderHome(dailies: List<DailyWellness>) {
         if (!isAdded || dailies.isEmpty()) return
-        homeDataFingerprint = "${dailies.size}_${dailies.firstOrNull()?.recordDate}_${dailies.lastOrNull()?.recordDate}"
+        lastHomeDailies = dailies
+        homeDataFingerprint = dailies.joinToString { "${it.recordDate}:${it.sleep?.sleepHours}:${it.exercises.sumOf { e -> e.exerciseDuration }}" }
         val currentMonday = WeekUtils.currentWeekMonday()
         val prevMonday = currentMonday.minusDays(7)
 

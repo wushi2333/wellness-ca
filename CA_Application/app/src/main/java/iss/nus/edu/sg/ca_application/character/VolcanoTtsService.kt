@@ -39,33 +39,32 @@ object VolcanoTtsService {
         }
     }
 
-    fun playMp3(ctx: Context, result: TtsResult, onMouth: (Float) -> Unit, onComplete: () -> Unit) {
+    fun playMp3(ctx: Context, result: TtsResult, player: MediaPlayer,
+                 onMouth: (Float) -> Unit, onComplete: () -> Unit): Thread {
         val tmp = File.createTempFile("tts", ".mp3", ctx.cacheDir)
         tmp.writeBytes(result.mp3Data)
         val playing = java.util.concurrent.atomic.AtomicBoolean(true)
-        val mp = MediaPlayer().apply {
+        player.apply {
             setDataSource(tmp.absolutePath)
             prepare()
             setOnCompletionListener {
                 playing.set(false)
                 onMouth(0f)
                 onComplete()
-                release()
-                tmp.delete()
             }
             start()
         }
-        // Mouth animation driven by audio playback position
-        Thread {
+        val anim = Thread {
             while (playing.get()) {
                 try {
-                    val pos = mp.currentPosition.toFloat() / 1000f // seconds
-                    // Simulate syllable rhythm: rapid open/close at ~5Hz
+                    val pos = player.currentPosition.toFloat() / 1000f
                     val v = (Math.sin(pos * Math.PI * 5.0) * 0.5 + 0.5).toFloat() * 0.7f
                     onMouth(v)
                     Thread.sleep(40)
                 } catch (_: Exception) { break }
             }
-        }.start()
+        }
+        anim.start()
+        return anim
     }
 }

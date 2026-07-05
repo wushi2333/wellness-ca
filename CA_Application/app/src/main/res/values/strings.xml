@@ -274,6 +274,15 @@
     <string name="delete_account_success">Account deleted</string>
     <string name="delete_account_failed">Failed to delete account</string>
     <string name="google_no_password">Google accounts use Google login, not password</string>
+    <string name="google_sign_in_failed">Google sign-in failed</string>
+    <string name="google_sign_in_no_auth">Google sign-in failed: no auth code</string>
+    <string name="google_sign_in_developer_error">Developer error — check SHA-1 fingerprint and Google Cloud Console config</string>
+    <string name="google_sign_in_retry">Sign-in failed — try again</string>
+    <string name="google_sign_in_not_available">Google Sign-In not available</string>
+    <string name="google_conflict_title">Account Conflict</string>
+    <string name="google_conflict_message">This Google email is already registered to \"%s\".\n\nLog in as %s?</string>
+    <string name="google_conflict_yes">Yes, login as %s</string>
+    <string name="google_conflict_cancel">Go Back</string>
 
     <!-- Common -->
     <string name="save">Save</string>

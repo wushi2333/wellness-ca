@@ -70,7 +70,13 @@ class ExerciseDetailFragment : Fragment() {
         tvToday.setOnClickListener { isPieToday = true; updatePieToggle(view); updatePieChart(view) }
         tvWeek.setOnClickListener { isPieToday = false; updatePieToggle(view); updatePieChart(view) }
 
+        lastDataFingerprint = "" // reset — view may have been recreated
         loadData(view)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        view?.let { loadData(it) }
     }
 
     private fun loadData(view: View) {
@@ -78,9 +84,12 @@ class ExerciseDetailFragment : Fragment() {
         if (token.isEmpty()) return
         val cacheKey = "records"
 
-        // Show cached data immediately
-        CacheManager.get<Pair<List<DailyWellness>, Boolean>>(cacheKey)?.let { (cached, _) ->
-            if (cached.isNotEmpty()) renderData(view, cached)
+        // Show cached data immediately; fall back to in-memory data if cache miss
+        val cached = CacheManager.get<Pair<List<DailyWellness>, Boolean>>(cacheKey)
+        if (cached != null && cached.first.isNotEmpty()) {
+            renderData(view, cached.first)
+        } else if (allDailies.isNotEmpty()) {
+            renderData(view, allDailies)
         }
 
         Thread {
@@ -97,7 +106,7 @@ class ExerciseDetailFragment : Fragment() {
     private var lastDataFingerprint = ""
 
     private fun renderData(view: View, dailies: List<DailyWellness>) {
-        val fp = "${dailies.size}_${dailies.firstOrNull()?.recordDate}_${dailies.lastOrNull()?.recordDate}"
+        val fp = dailies.joinToString { "${it.recordDate}:${it.exercises.joinToString { "${it.exerciseActivity}:${it.exerciseDuration}" }}" }
         if (fp == lastDataFingerprint && allDailies.isNotEmpty()) return
         lastDataFingerprint = fp
         allDailies = dailies

@@ -275,6 +275,15 @@
     <string name="delete_account_success">账号已删除</string>
     <string name="delete_account_failed">删除账号失败</string>
     <string name="google_no_password">Google 账户使用 Google 登录，无需密码</string>
+    <string name="google_sign_in_failed">Google 登录失败</string>
+    <string name="google_sign_in_no_auth">Google 登录失败：未获取到授权码</string>
+    <string name="google_sign_in_developer_error">开发者错误 — 请检查 SHA-1 指纹和 Google Cloud 控制台配置</string>
+    <string name="google_sign_in_retry">登录失败 — 请重试</string>
+    <string name="google_sign_in_not_available">Google 登录不可用</string>
+    <string name="google_conflict_title">账户冲突</string>
+    <string name="google_conflict_message">该 Google 邮箱已注册给 \"%s\"。\n\n以 %s 的身份登录？</string>
+    <string name="google_conflict_yes">是，以 %s 登录</string>
+    <string name="google_conflict_cancel">返回</string>
 
     <!-- Common -->
     <string name="save">保存</string>
