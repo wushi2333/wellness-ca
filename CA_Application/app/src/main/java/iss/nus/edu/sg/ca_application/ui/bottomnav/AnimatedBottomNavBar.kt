@@ -1,4 +1,3 @@
-// Author: Wang Songyu, Liu Yu, Xia Zihang
 package iss.nus.edu.sg.ca_application.ui.bottomnav
 
 import android.animation.ValueAnimator
@@ -9,11 +8,21 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.animation.OvershootInterpolator
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import iss.nus.edu.sg.ca_application.R
 
 class AnimatedBottomNavBar @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
+
+    init {
+        ViewCompat.setOnApplyWindowInsetsListener(this) { v, insets ->
+            val imeVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
+            v.visibility = if (imeVisible) View.GONE else View.VISIBLE
+            insets
+        }
+    }
 
     companion object {
         private const val BASE_HEIGHT_DP = 75f
@@ -26,11 +35,20 @@ class AnimatedBottomNavBar @JvmOverloads constructor(
     private var animProgress = 1f
     private var animator: ValueAnimator? = null
 
-    private val barPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.parseColor("#1B7B9E") }
+    // Bar background — uses page bg colour so it blends seamlessly,
+    // only the wave dip + floating bubble are visually distinct.
+    private val barPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.parseColor("#F8FAFC") }
     private val bubblePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.parseColor("#1B7B9E") }
     private val shadowPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.argb(25, 0, 0, 0)
         setShadowLayer(6f, 0f, 4f, Color.argb(35, 0, 0, 0))
+    }
+
+    // Subtle top-edge line so you can still tell where the bar starts
+    private val edgePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = Color.parseColor("#E8ECF0")
+        strokeWidth = 1f
+        style = Paint.Style.STROKE
     }
 
     private val density = resources.displayMetrics.density
@@ -100,14 +118,15 @@ class AnimatedBottomNavBar @JvmOverloads constructor(
         val h = height.toFloat()
         val segW = w / 3
 
-        val barTop = h * 0.40f
-        val dipDepth = h * 0.50f
+        val barTop = h * 0.50f
+        val dipDepth = h * 0.40f
         val bubbleRadius = h * 0.28f
 
         val oldX = segW * oldSelectedIndex + segW / 2f
         val targetX = segW * selectedIndex + segW / 2f
         val currentWaveX = oldX + (targetX - oldX) * animProgress
 
+        // Bar background — blends with page bg
         val barPath = Path().apply {
             moveTo(0f, barTop)
 
@@ -135,8 +154,11 @@ class AnimatedBottomNavBar @JvmOverloads constructor(
 
         canvas.drawPath(barPath, barPaint)
 
-        val normalY = h * 0.70f
-        val activeY = h * 0.60f
+        // Subtle top edge divider so bar isn't invisible
+        canvas.drawLine(0f, barTop, w, barTop, edgePaint)
+
+        val normalY = h * 0.62f
+        val activeY = h * 0.52f
         val bubbleMinY = h + bubbleRadius
 
         for (i in 0..2) {
