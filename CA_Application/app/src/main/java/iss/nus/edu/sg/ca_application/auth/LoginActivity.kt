@@ -24,6 +24,7 @@ import iss.nus.edu.sg.ca_application.MainActivity
 import iss.nus.edu.sg.ca_application.R
 import iss.nus.edu.sg.ca_application.model.LoginResponse
 import iss.nus.edu.sg.ca_application.network.ApiClient
+import iss.nus.edu.sg.ca_application.util.onClickDebounced
 import org.json.JSONObject
 
 class LoginActivity : AppCompatActivity() {
@@ -58,9 +59,13 @@ class LoginActivity : AppCompatActivity() {
                 showSignInError("Google sign-in failed: no auth code")
             }
         } catch (e: ApiException) {
-            // Status 12501 = SIGN_IN_CANCELLED, not an error
             if (e.statusCode != 12501) {
-                showSignInError("Google sign-in error (${e.statusCode})")
+                val detail = when (e.statusCode) {
+                    10 -> "Developer error — check SHA-1 fingerprint and Google Cloud Console config"
+                    12500 -> "Sign-in failed — try again"
+                    else -> "Code ${e.statusCode}"
+                }
+                showSignInError("Google sign-in failed: $detail")
             }
         } catch (e: Exception) {
             showSignInError("Google sign-in failed: ${e.message}")
@@ -100,7 +105,7 @@ class LoginActivity : AppCompatActivity() {
 
         tvError = findViewById(R.id.tvError)
 
-        btnLogin.setOnClickListener {
+        btnLogin.onClickDebounced {
             tvError.visibility = View.GONE
 
             val username = etUsername.text.toString().trim()
@@ -109,58 +114,58 @@ class LoginActivity : AppCompatActivity() {
             if (username.isEmpty() || password.isEmpty()) {
                 tvError.text = getString(R.string.login_error_empty)
                 tvError.visibility = View.VISIBLE
-                return@setOnClickListener
-            }
+            } else {
+                Thread {
+                    try {
+                        val response: LoginResponse = ApiClient.login(username, password)
 
-            Thread {
-                try {
-                    val response: LoginResponse = ApiClient.login(username, password)
+                        runOnUiThread {
+                            tvError.visibility = View.GONE
 
-                    runOnUiThread {
-                        tvError.visibility = View.GONE
+                            TokenManager.saveToken(this@LoginActivity, response.accessToken, response.tokenType)
+                            TokenManager.saveUsername(this@LoginActivity, response.username)
+                            TokenManager.saveProvider(this@LoginActivity, "LOCAL")
 
-                        TokenManager.saveToken(this@LoginActivity, response.accessToken, response.tokenType)
-                        TokenManager.saveUsername(this@LoginActivity, response.username)
-                        TokenManager.saveProvider(this@LoginActivity, "LOCAL")
-
-                        Toast.makeText(this@LoginActivity, getString(R.string.login_success), Toast.LENGTH_SHORT).show()
-                        startActivity(Intent(this@LoginActivity, MainActivity::class.java))
-                        finish()
-                    }
-                } catch (e: Exception) {
-                    runOnUiThread {
-                        val message = e.message ?: ""
-                        val friendlyMessage = when {
-                            message.contains("Bad credentials", ignoreCase = true) -> getString(R.string.login_error_credentials)
-                            message.contains("Incorrect username or password", ignoreCase = true) -> getString(R.string.login_error_credentials)
-                            message.contains("User not found", ignoreCase = true) -> getString(R.string.login_error_user_not_found)
-                            else -> getString(R.string.login_error_generic)
+                            Toast.makeText(this@LoginActivity, getString(R.string.login_success), Toast.LENGTH_SHORT).show()
+                            startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+                            finish()
                         }
-                        tvError.text = friendlyMessage
-                        tvError.visibility = View.VISIBLE
+                    } catch (e: Exception) {
+                        runOnUiThread {
+                            val message = e.message ?: ""
+                            val friendlyMessage = when {
+                                message.contains("Bad credentials", ignoreCase = true) -> getString(R.string.login_error_credentials)
+                                message.contains("Incorrect username or password", ignoreCase = true) -> getString(R.string.login_error_credentials)
+                                message.contains("User not found", ignoreCase = true) -> getString(R.string.login_error_user_not_found)
+                                else -> getString(R.string.login_error_generic)
+                            }
+                            tvError.text = friendlyMessage
+                            tvError.visibility = View.VISIBLE
+                        }
                     }
-                }
-            }.start()
+                }.start()
+            }
         }
 
-        btnRegister.setOnClickListener {
+        btnRegister.onClickDebounced {
             startActivity(Intent(this, RegisterActivity::class.java))
         }
 
-        btnGoogleSignIn.setOnClickListener {
+        btnGoogleSignIn.onClickDebounced {
             tvError.visibility = View.GONE
-            // Check Google Play Services availability first
             val gpsStatus = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this)
             if (gpsStatus != ConnectionResult.SUCCESS) {
-                // No Google Play Services — fall back to WebView OAuth
                 webSignInLauncher.launch(Intent(this, GoogleWebSignInActivity::class.java))
-                return@setOnClickListener
-            }
-            val intent = googleSignInClient?.signInIntent
-            if (intent != null) googleSignInLauncher.launch(intent)
-            else {
-                tvError.text = "Google Sign-In not available"
-                tvError.visibility = View.VISIBLE
+            } else {
+                // Clear cached Google state before launching sign-in
+                googleSignInClient?.signOut()?.addOnCompleteListener {
+                    val intent = googleSignInClient?.signInIntent
+                    if (intent != null) googleSignInLauncher.launch(intent)
+                    else {
+                        tvError.text = "Google Sign-In not available"
+                        tvError.visibility = View.VISIBLE
+                    }
+                }
             }
         }
     }
@@ -179,7 +184,11 @@ class LoginActivity : AppCompatActivity() {
                 }
             } catch (e: Exception) {
                 runOnUiThread {
-                    tvError.text = "Google sign-in failed: ${e.message}"
+                    val detail = when (e) {
+                        is iss.nus.edu.sg.ca_application.network.ApiException -> "[HTTP ${e.code}] ${e.message}"
+                        else -> "[${e.javaClass.simpleName}] ${e.message}"
+                    }
+                    tvError.text = "Google sign-in failed\n$detail"
                     tvError.visibility = View.VISIBLE
                 }
             }

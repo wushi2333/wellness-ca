@@ -11,10 +11,13 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import iss.nus.edu.sg.ca_application.auth.LoginActivity
 import iss.nus.edu.sg.ca_application.auth.TokenManager
 import iss.nus.edu.sg.ca_application.network.ApiErrorHandler
 import iss.nus.edu.sg.ca_application.network.ApiException
+import iss.nus.edu.sg.ca_application.network.CacheManager
 import iss.nus.edu.sg.ca_application.network.ProfileApi
 import java.util.Locale
 
@@ -148,6 +151,12 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun performLogout() {
+        // Sign out from Google to clear cached credentials
+        try {
+            val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).build()
+            GoogleSignIn.getClient(this, gso).signOut()
+        } catch (_: Exception) {}
+        CacheManager.clear()
         TokenManager.clearToken(this)
         Toast.makeText(this, R.string.logout_success, Toast.LENGTH_SHORT).show()
         val intent = Intent(this, LoginActivity::class.java)

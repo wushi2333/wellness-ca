@@ -279,4 +279,13 @@
     <!-- Common -->
     <string name="save">保存</string>
     <string name="back">返回</string>
+    <string name="no_data_available">暂无数据</string>
+    <string name="btn_update">更新</string>
+    <string name="sleep_saved">睡眠记录已保存</string>
+    <string name="sleep_updated">睡眠记录已更新</string>
+    <string name="exercise_saved">运动记录已保存</string>
+    <string name="exercise_updated">运动记录已更新</string>
+    <string name="validation_time_required">请填写就寝和起床时间</string>
+    <string name="validation_time_format">时间格式需为 HH:MM（例如 23:00、07:30）</string>
+    <string name="duration_fmt">时长: %.1f 小时</string>
 </resources>

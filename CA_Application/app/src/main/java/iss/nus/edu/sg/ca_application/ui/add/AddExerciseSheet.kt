@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.*
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import iss.nus.edu.sg.ca_application.R
@@ -12,6 +13,8 @@ import iss.nus.edu.sg.ca_application.auth.TokenManager
 import iss.nus.edu.sg.ca_application.network.ApiClient
 import iss.nus.edu.sg.ca_application.network.ApiErrorHandler
 import iss.nus.edu.sg.ca_application.network.ApiException
+import iss.nus.edu.sg.ca_application.network.CacheManager
+import iss.nus.edu.sg.ca_application.util.onClickDebounced
 import iss.nus.edu.sg.ca_application.util.ExerciseTypeMap
 
 class AddExerciseSheet : BottomSheetDialogFragment() {
@@ -40,6 +43,11 @@ class AddExerciseSheet : BottomSheetDialogFragment() {
         return inflater.inflate(R.layout.sheet_add_exercise, container, false)
     }
 
+    override fun onStart() {
+        super.onStart()
+        dialog?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val isEdit = editRecordId > 0
@@ -61,7 +69,7 @@ class AddExerciseSheet : BottomSheetDialogFragment() {
             val types = resources.getStringArray(R.array.exercise_types)
             val idx = types.indexOfFirst { it.equals(prefillActivity, ignoreCase = true) || it == prefillActivity }
             if (idx >= 0) spinner.setSelection(idx)
-            btnSave.text = "Update"
+            btnSave.text = getString(R.string.btn_update)
         } else {
             etDate.setText(java.time.LocalDate.now().toString())
         }
@@ -69,13 +77,13 @@ class AddExerciseSheet : BottomSheetDialogFragment() {
         etDate.isFocusable = false
         etDate.isClickable = true
 
-        view.findViewById<Button>(R.id.btnSaveEx).setOnClickListener {
-            if (isSaving) return@setOnClickListener
+        view.findViewById<Button>(R.id.btnSaveEx).onClickDebounced {
+            if (!isSaving) {
             isSaving = true
             val dateStr = etDate.text.toString().trim()
             Thread {
                 val token = TokenManager.getToken(requireContext())
-                val act = ExerciseTypeMap.toKey(spinner.selectedItem.toString())
+                val act = ExerciseTypeMap.toKey(requireContext(), spinner.selectedItem.toString())
                 val duration = etDuration.text.toString().toIntOrNull() ?: 0
                 val dateStr2 = if (dateStr.isNotEmpty() && dateStr.matches(Regex("\\d{4}-\\d{2}-\\d{2}"))) dateStr else java.time.LocalDate.now().toString()
                 try {
@@ -89,7 +97,8 @@ class AddExerciseSheet : BottomSheetDialogFragment() {
                     isSaving = false
                     activity?.runOnUiThread {
                         parentFragmentManager.setFragmentResult("record_updated", Bundle())
-                        Toast.makeText(requireContext(), if (isEdit) "Exercise updated" else "Exercise record saved", Toast.LENGTH_SHORT).show()
+                        CacheManager.invalidate("records")
+                        Toast.makeText(requireContext(), if (isEdit) getString(R.string.exercise_updated) else getString(R.string.exercise_saved), Toast.LENGTH_SHORT).show()
                         dismiss()
                     }
                 } catch (e: ApiException) {
@@ -104,6 +113,7 @@ class AddExerciseSheet : BottomSheetDialogFragment() {
                     }
                 }
             }.start()
+            }
         }
     }
 

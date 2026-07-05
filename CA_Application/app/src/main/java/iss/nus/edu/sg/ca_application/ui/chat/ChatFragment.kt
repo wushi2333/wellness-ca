@@ -1,7 +1,9 @@
 // Author: Xia Zihang
 package iss.nus.edu.sg.ca_application.ui.chat
 
+import android.Manifest
 import android.app.AlertDialog
+import android.content.pm.PackageManager
 import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
@@ -11,6 +13,7 @@ import android.os.Looper
 import android.util.Base64
 import android.view.*
 import android.widget.*
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -19,6 +22,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import iss.nus.edu.sg.ca_application.R
+import iss.nus.edu.sg.ca_application.applyTopInset
 import iss.nus.edu.sg.ca_application.auth.TokenManager
 import iss.nus.edu.sg.ca_application.character.CharacterChatAdapter
 import iss.nus.edu.sg.ca_application.character.VolcanoTtsService
@@ -27,8 +31,9 @@ import iss.nus.edu.sg.ca_application.model.CharacterMessage
 import iss.nus.edu.sg.ca_application.model.CharacterSession
 import iss.nus.edu.sg.ca_application.network.ApiException
 import iss.nus.edu.sg.ca_application.network.ApiClient
+import iss.nus.edu.sg.ca_application.network.CacheManager
 import iss.nus.edu.sg.ca_application.network.CharacterApi
-import java.util.Locale
+
 
 class ChatFragment : Fragment() {
 
@@ -52,8 +57,17 @@ class ChatFragment : Fragment() {
     private lateinit var sessionRecycler: RecyclerView
     private val sessionAdapter = SessionAdapter()
     private val handler = Handler(Looper.getMainLooper())
-    private val asrLanguage: String get() = if (Locale.getDefault().language == "zh") "zh-CN" else "en-US"
+    private val asrLanguage: String get() {
+        val appLocale = iss.nus.edu.sg.ca_application.SettingsActivity.getSavedLocale(requireContext())
+        val lang = appLocale?.language ?: java.util.Locale.getDefault().language
+        return if (lang == "zh") "zh-CN" else "en-US"
+    }
     private var voiceEnabled = true
+
+    // ASR permission launcher
+    private val requestAudioPermission = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted -> if (granted) startRecording() else toast("Microphone permission required") }
 
     // ASR
     private var audioRecord: AudioRecord? = null
@@ -80,11 +94,14 @@ class ChatFragment : Fragment() {
         recycler.layoutManager = LinearLayoutManager(requireContext()).apply { stackFromEnd = true }
         recycler.adapter = adapter
 
-        // Keep chat visible above any keyboard (fixes third-party IME like Sogou)
-        ViewCompat.setOnApplyWindowInsetsListener(view) { _, insets ->
-            val imeHeight = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
-            recycler.setPadding(recycler.paddingLeft, recycler.paddingTop, recycler.paddingRight, imeHeight)
-            recycler.scrollToPosition(adapter.lastIndex)
+        // Sidebar header must sit below status bar
+        view.findViewById<LinearLayout>(R.id.sidebarHeader).applyTopInset()
+
+        // Scroll to latest when keyboard opens and shrinks the RecyclerView
+        ViewCompat.setOnApplyWindowInsetsListener(recycler) { v, insets ->
+            if (insets.isVisible(WindowInsetsCompat.Type.ime()) && adapter.itemCount > 0) {
+                v.post { recycler.scrollToPosition(adapter.lastIndex) }
+            }
             insets
         }
 
@@ -99,8 +116,13 @@ class ChatFragment : Fragment() {
         micBtn.setOnTouchListener { _, event ->
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
-                    micBtn.setColorFilter(android.graphics.Color.parseColor("#22C55E"))
-                    startRecording()
+                    if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.RECORD_AUDIO)
+                        != PackageManager.PERMISSION_GRANTED) {
+                        requestAudioPermission.launch(Manifest.permission.RECORD_AUDIO)
+                    } else {
+                        micBtn.setColorFilter(android.graphics.Color.parseColor("#22C55E"))
+                        startRecording()
+                    }
                     true
                 }
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
@@ -235,7 +257,9 @@ class ChatFragment : Fragment() {
         if (bufSize == AudioRecord.ERROR || bufSize == AudioRecord.ERROR_BAD_VALUE) { toast("Mic unavailable"); return }
         try { audioRecord = AudioRecord(MediaRecorder.AudioSource.MIC, rate, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, bufSize * 2) }
         catch (e: Exception) { toast("Mic unavailable"); return }
-        if (audioRecord?.state != AudioRecord.STATE_INITIALIZED) { audioRecord?.release(); audioRecord = null; return }
+        if (audioRecord?.state != AudioRecord.STATE_INITIALIZED) {
+            toast("Mic init failed"); audioRecord?.release(); audioRecord = null; return
+        }
         audioRecord?.startRecording(); isRecording = true; recordedChunks.clear(); toast("🎤 Recording…")
         recorderThread = Thread {
             val buf = ByteArray(bufSize)
@@ -264,7 +288,11 @@ class ChatFragment : Fragment() {
                 val text = CharacterApi.asr(token, b64, asrLanguage)
                 activity?.runOnUiThread {
                     etMessage.hint = "Chat with Yui…"
-                    if (!text.isNullOrBlank()) { etMessage.setText(text.trim()); etMessage.setSelection(etMessage.text.length) } else toast("Didn't catch that")
+                    if (!text.isNullOrBlank()) {
+                        etMessage.setText(text.trim()); etMessage.setSelection(etMessage.text.length)
+                    } else {
+                        toast("Didn't catch that ($asrLanguage)")
+                    }
                 }
             } catch (_: Exception) { activity?.runOnUiThread { etMessage.hint = "Chat with Yui…"; toast("ASR failed") } }
         }.start()
@@ -362,6 +390,7 @@ class ChatFragment : Fragment() {
                         intent["notes"]?.toString() ?: "Created via agent")
                 }
                 activity?.runOnUiThread {
+                    CacheManager.invalidate("records")
                     Toast.makeText(requireContext(), "Record saved via agent ✨", Toast.LENGTH_SHORT).show()
                     (activity as? iss.nus.edu.sg.ca_application.MainActivity)?.homeFragment?.loadData()
                 }

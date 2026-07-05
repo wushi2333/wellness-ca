@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import iss.nus.edu.sg.ca_application.R
+import iss.nus.edu.sg.ca_application.applyTopInset
 import iss.nus.edu.sg.ca_application.agentic.HistoryAdapter
 import iss.nus.edu.sg.ca_application.auth.TokenManager
 import iss.nus.edu.sg.ca_application.model.AgentHistoryItem
@@ -41,6 +42,7 @@ class RecommendationsFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val root = inflater.inflate(R.layout.fragment_recommendations, container, false)
 
+        root.findViewById<View>(R.id.topBar).applyTopInset()
         root.findViewById<ImageView>(R.id.btnRecsBack).setOnClickListener {
             (activity as? iss.nus.edu.sg.ca_application.MainActivity)?.hideHomeDetail()
         }

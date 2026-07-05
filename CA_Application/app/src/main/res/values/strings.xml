@@ -278,4 +278,13 @@
     <!-- Common -->
     <string name="save">Save</string>
     <string name="back">Back</string>
+    <string name="no_data_available">No data available</string>
+    <string name="btn_update">Update</string>
+    <string name="sleep_saved">Sleep record saved</string>
+    <string name="sleep_updated">Sleep updated</string>
+    <string name="exercise_saved">Exercise record saved</string>
+    <string name="exercise_updated">Exercise updated</string>
+    <string name="validation_time_required">Bedtime and wake time are required</string>
+    <string name="validation_time_format">Time must be in HH:MM format (e.g. 23:00, 07:30)</string>
+    <string name="duration_fmt">Duration: %.1f hours</string>
 </resources>

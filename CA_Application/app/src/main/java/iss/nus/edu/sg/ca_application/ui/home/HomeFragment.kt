@@ -13,6 +13,7 @@ import android.graphics.BitmapFactory
 import android.graphics.Outline
 import iss.nus.edu.sg.ca_application.R
 import iss.nus.edu.sg.ca_application.applyTopInset
+import iss.nus.edu.sg.ca_application.model.DailyWellness
 import iss.nus.edu.sg.ca_application.ProfileActivity
 import iss.nus.edu.sg.ca_application.SettingsActivity
 import iss.nus.edu.sg.ca_application.auth.TokenManager
@@ -20,6 +21,7 @@ import iss.nus.edu.sg.ca_application.network.ApiClient
 import iss.nus.edu.sg.ca_application.network.ApiErrorHandler
 import iss.nus.edu.sg.ca_application.network.ApiException
 import iss.nus.edu.sg.ca_application.network.BASE_URL
+import iss.nus.edu.sg.ca_application.network.CacheManager
 import iss.nus.edu.sg.ca_application.network.ProfileApi
 import iss.nus.edu.sg.ca_application.ui.chart.MiniBarRowView
 import iss.nus.edu.sg.ca_application.ui.chart.SparklineView
@@ -114,14 +116,37 @@ class HomeFragment : Fragment() {
         val ctx = context ?: return
         val token = TokenManager.getToken(ctx)
         if (token.isEmpty()) return
+        val cacheKey = "records"
+
+        // Show cached data immediately
+        CacheManager.get<Pair<List<DailyWellness>, Boolean>>(cacheKey)?.let { (cached, _) ->
+            if (cached.isNotEmpty() && isAdded) {
+                activity?.runOnUiThread { renderHome(cached) }
+            }
+        }
+
         Thread {
             try {
-                val (dailies, _) = ApiClient.getDailyRecords(token, 0, 50)
+                val (dailies, _) = ApiClient.getDailyRecords(token, 0, 90)
+                CacheManager.put(cacheKey, Pair(dailies, true))
                 if (!isAdded) return@Thread
-                activity?.runOnUiThread {
-                    if (!isAdded || dailies.isEmpty()) return@runOnUiThread
-                    val currentMonday = WeekUtils.currentWeekMonday()
-                    val prevMonday = currentMonday.minusDays(7)
+                val fp = "${dailies.size}_${dailies.firstOrNull()?.recordDate}_${dailies.lastOrNull()?.recordDate}"
+                if (fp != homeDataFingerprint) {
+                    activity?.runOnUiThread { renderHome(dailies) }
+                }
+            } catch (e: ApiException) {
+                if (isAdded) activity?.runOnUiThread { activity?.let { ApiErrorHandler.handle(it, e) } }
+            } catch (_: Exception) {}
+        }.start()
+    }
+
+    private var homeDataFingerprint = ""
+
+    private fun renderHome(dailies: List<DailyWellness>) {
+        if (!isAdded || dailies.isEmpty()) return
+        homeDataFingerprint = "${dailies.size}_${dailies.firstOrNull()?.recordDate}_${dailies.lastOrNull()?.recordDate}"
+        val currentMonday = WeekUtils.currentWeekMonday()
+        val prevMonday = currentMonday.minusDays(7)
 
                     // Build week arrays (Mon–Sun) from DailyWellness
                     val thisWeekSleep = WeekUtils.buildWeekArray(currentMonday, dailies) { d ->
@@ -162,11 +187,6 @@ class HomeFragment : Fragment() {
                         getString(R.string.tip_breathe)
                     )
                     tvLatestTip.text = tips[(java.util.Calendar.getInstance().get(java.util.Calendar.DAY_OF_YEAR) % tips.size)]
-                }
-            } catch (e: ApiException) {
-                if (isAdded) activity?.runOnUiThread { activity?.let { ApiErrorHandler.handle(it, e) } }
-            } catch (_: Exception) {}
-        }.start()
     }
 
     override fun onResume() {

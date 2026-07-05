@@ -229,14 +229,22 @@ public class UserService {
         }
 
         // 2. Delete character messages (for each session, then sessions themselves)
-        java.util.List<CharacterSession> sessions = characterSessionRepo.findByUserIdOrderByUpdatedAtDesc(userId);
-        for (CharacterSession s : sessions) {
-            characterMessageRepo.deleteAllBySessionId(s.id);
+        try {
+            java.util.List<CharacterSession> sessions = characterSessionRepo.findByUserIdOrderByUpdatedAtDesc(userId);
+            for (CharacterSession s : sessions) {
+                characterMessageRepo.deleteAllBySessionId(s.id);
+            }
+            characterSessionRepo.deleteAllByUserId(userId);
+        } catch (Exception e) {
+            log.error("Failed to delete character data for user {}: {}", userId, e.getMessage(), e);
         }
-        characterSessionRepo.deleteAllByUserId(userId);
 
         // 3. Delete wellness records (cascades to sleep_records + exercise_records + RAG)
-        wellnessService.deleteAllByUserId(userId);
+        try {
+            wellnessService.deleteAllByUserId(userId);
+        } catch (Exception e) {
+            log.error("Failed to delete wellness data for user {}: {}", userId, e.getMessage(), e);
+        }
 
         // 4. Delete chat history
         chatHistoryRepo.deleteAllByUserId(userId);

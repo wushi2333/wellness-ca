@@ -22,25 +22,25 @@ object CacheManager {
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun <T> get(key: String): T? {
+    fun <T> get(key: String): T? = synchronized(cache) {
         val entry = cache[key] ?: return null
         if (entry.isExpired()) {
             cache.remove(key)
             return null
         }
-        return entry.data as? T
+        entry.data as? T
     }
 
-    fun <T> put(key: String, data: T) {
+    fun <T> put(key: String, data: T) = synchronized(cache) {
         @Suppress("UNCHECKED_CAST")
         cache[key] = CacheEntry(data as Any)
     }
 
-    fun invalidate(keyPrefix: String) {
+    fun invalidate(keyPrefix: String) = synchronized(cache) {
         cache.keys.removeAll { it.startsWith(keyPrefix) }
     }
 
-    fun clear() {
+    fun clear() = synchronized(cache) {
         cache.clear()
     }
 }

@@ -11,11 +11,13 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import iss.nus.edu.sg.ca_application.R
+import iss.nus.edu.sg.ca_application.applyTopInset
 import iss.nus.edu.sg.ca_application.auth.TokenManager
 import iss.nus.edu.sg.ca_application.model.DailyWellness
 import iss.nus.edu.sg.ca_application.network.ApiClient
 import iss.nus.edu.sg.ca_application.network.ApiErrorHandler
 import iss.nus.edu.sg.ca_application.network.ApiException
+import iss.nus.edu.sg.ca_application.network.CacheManager
 import iss.nus.edu.sg.ca_application.ui.add.AddExerciseSheet
 import iss.nus.edu.sg.ca_application.ui.add.AddSleepSheet
 import iss.nus.edu.sg.ca_application.ui.chart.WeekUtils
@@ -44,6 +46,7 @@ class RecordManageFragment : Fragment() {
         view.findViewById<TextView>(R.id.tvManageTitle).text = getString(
             if (type == TYPE_SLEEP) R.string.manage_sleep_title else R.string.manage_exercise_title)
 
+        view.findViewById<View>(R.id.topBar).applyTopInset()
         view.findViewById<View>(R.id.btnManageBack).setOnClickListener {
             parentFragmentManager.popBackStack()
         }
@@ -130,6 +133,7 @@ class RecordManageFragment : Fragment() {
                     ApiClient.deleteExerciseRecord(token, item.exercise.id)
                 }
                 activity?.runOnUiThread {
+                    CacheManager.invalidate("records")
                     Toast.makeText(requireContext(), getString(R.string.toast_deleted), Toast.LENGTH_SHORT).show()
                     loadData()
                 }

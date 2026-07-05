@@ -24,10 +24,12 @@ import com.github.mikephil.charting.formatter.PercentFormatter
 import android.app.AlertDialog
 import android.widget.Toast
 import iss.nus.edu.sg.ca_application.R
+import iss.nus.edu.sg.ca_application.applyTopInset
 import iss.nus.edu.sg.ca_application.auth.TokenManager
 import iss.nus.edu.sg.ca_application.model.DailyWellness
 import iss.nus.edu.sg.ca_application.network.ApiClient
 import iss.nus.edu.sg.ca_application.network.ApiException
+import iss.nus.edu.sg.ca_application.network.CacheManager
 import iss.nus.edu.sg.ca_application.ui.chart.RoundedBarChartRenderer
 import iss.nus.edu.sg.ca_application.ui.chart.WeekUtils
 import iss.nus.edu.sg.ca_application.util.ExerciseTypeMap
@@ -48,6 +50,7 @@ class ExerciseDetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        view.findViewById<View>(R.id.topBar).applyTopInset()
         view.findViewById<View>(R.id.btnExBack).setOnClickListener {
             (activity as? iss.nus.edu.sg.ca_application.MainActivity)?.hideHomeDetail()
         }
@@ -70,31 +73,38 @@ class ExerciseDetailFragment : Fragment() {
         loadData(view)
     }
 
-    override fun onResume() {
-        super.onResume()
-        view?.let { loadData(it) }
-    }
-
     private fun loadData(view: View) {
         val token = TokenManager.getToken(requireContext())
         if (token.isEmpty()) return
+        val cacheKey = "records"
+
+        // Show cached data immediately
+        CacheManager.get<Pair<List<DailyWellness>, Boolean>>(cacheKey)?.let { (cached, _) ->
+            if (cached.isNotEmpty()) renderData(view, cached)
+        }
+
         Thread {
             try {
                 val (dailies, _) = ApiClient.getDailyRecords(token, 0, 90)
-                allDailies = dailies
-                availableWeeks = WeekUtils.availableWeeks(dailies)
-
-                val currentMonday = WeekUtils.currentWeekMonday()
-                val defaultIdx = if (availableWeeks.contains(currentMonday))
-                    availableWeeks.indexOf(currentMonday)
-                else
-                    0
-
-                activity?.runOnUiThread { showWeek(view, defaultIdx) }
+                CacheManager.put(cacheKey, Pair(dailies, true))
+                if (isAdded) activity?.runOnUiThread { renderData(view, dailies) }
             } catch (e: ApiException) {
-                activity?.runOnUiThread { iss.nus.edu.sg.ca_application.network.ApiErrorHandler.handle(requireActivity(), e) }
+                if (isAdded) activity?.runOnUiThread { iss.nus.edu.sg.ca_application.network.ApiErrorHandler.handle(requireActivity(), e) }
             } catch (_: Exception) {}
         }.start()
+    }
+
+    private var lastDataFingerprint = ""
+
+    private fun renderData(view: View, dailies: List<DailyWellness>) {
+        val fp = "${dailies.size}_${dailies.firstOrNull()?.recordDate}_${dailies.lastOrNull()?.recordDate}"
+        if (fp == lastDataFingerprint && allDailies.isNotEmpty()) return
+        lastDataFingerprint = fp
+        allDailies = dailies
+        availableWeeks = WeekUtils.availableWeeks(dailies)
+        val currentMonday = WeekUtils.currentWeekMonday()
+        val idx = if (availableWeeks.contains(currentMonday)) availableWeeks.indexOf(currentMonday) else 0
+        showWeek(view, idx)
     }
 
     private fun navigateWeek(view: View, delta: Int) {
@@ -144,6 +154,7 @@ class ExerciseDetailFragment : Fragment() {
         }
 
         val chart = view.findViewById<BarChart>(R.id.exerciseBarChart)
+        chart.setNoDataText(getString(R.string.no_data_available))
         val dataSet = BarDataSet(entries, "").apply {
             color = Color.parseColor("#34C759")
             valueTextSize = 11f
@@ -242,6 +253,7 @@ class ExerciseDetailFragment : Fragment() {
 
     private fun updatePieChart(view: View) {
         val pieChart = view.findViewById<PieChart>(R.id.activityPieChart)
+        pieChart.setNoDataText(getString(R.string.no_data_available))
         val activityMap: Map<String, Int> = if (isPieToday) {
             // Today's exercises only
             val today = java.time.LocalDate.now().toString()

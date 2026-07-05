@@ -101,14 +101,22 @@ public class AuthService {
                 if (idToken == null) throw new IllegalArgumentException("No id_token in exchange response");
             }
 
-            // Route 2: verify idToken directly (web/desktop, or from authCode exchange above)
+            // Route 2: verify idToken directly
             if (idToken == null || idToken.isBlank()) {
-                throw new IllegalArgumentException("No authCode or idToken provided");
+                throw new IllegalArgumentException("No authCode or idToken provided (idToken is null or blank)");
             }
+            log.info("Google login — idToken prefix: {}..., length: {}", idToken.substring(0, Math.min(20, idToken.length())), idToken.length());
 
-            ResponseEntity<Map> resp = http.getForEntity(
-                "https://oauth2.googleapis.com/tokeninfo?id_token=" + idToken, Map.class);
+            // Try v3 endpoint first (more lenient), fall back to v1
+            String tokenInfoUrl = "https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=" + idToken;
+            ResponseEntity<Map> resp = http.getForEntity(tokenInfoUrl, Map.class);
             if (resp.getBody() == null || resp.getBody().containsKey("error")) {
+                log.warn("v3 tokeninfo failed: {} — trying v1", resp.getBody());
+                resp = http.getForEntity(
+                    "https://oauth2.googleapis.com/tokeninfo?id_token=" + idToken, Map.class);
+            }
+            if (resp.getBody() == null || resp.getBody().containsKey("error")) {
+                log.warn("Both tokeninfo endpoints failed. v3={}", resp.getBody());
                 throw new IllegalArgumentException("Invalid Google ID token");
             }
             email = (String) resp.getBody().get("email");
@@ -123,15 +131,16 @@ public class AuthService {
         // Check: email already bound to existing account?
         User existingByEmail = users.findByEmail(email.toLowerCase()).orElse(null);
         if (existingByEmail != null) {
-            return Map.of("conflict", true,
-                "existingUsername", existingByEmail.getUsername(),
-                "email", email);
+            // If username matches, this is the same user — proceed to Google ID check
+            if (username.isEmpty() || !existingByEmail.getUsername().equals(username)) {
+                return Map.of("conflict", true,
+                    "existingUsername", existingByEmail.getUsername(),
+                    "email", email);
+            }
         }
 
         // Check: Google ID already registered?
-        User existingByGoogle = users.findAll().stream()
-            .filter(u -> "GOOGLE".equals(u.getProvider()) && googleId.equals(u.getProviderId()))
-            .findFirst().orElse(null);
+        User existingByGoogle = users.findByProviderAndProviderId("GOOGLE", googleId).orElse(null);
         if (existingByGoogle != null) {
             // Existing Google user: just log them in
             return Map.of("conflict", false,

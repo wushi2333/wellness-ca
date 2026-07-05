@@ -7,10 +7,12 @@
 
     <!-- Main content -->
     <LinearLayout
+        android:id="@+id/chatContentLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:background="#F8FAFC">
+        android:background="#F8FAFC"
+        android:fitsSystemWindows="true">
 
         <!-- Live2D area -->
         <FrameLayout
@@ -66,16 +68,12 @@
 
             <Button
                 android:id="@+id/btnToggleVoice"
-                android:layout_width="wrap_content"
+                android:layout_width="32dp"
                 android:layout_height="32dp"
-                android:text="🔊"
-                android:textSize="12sp"
-                android:textColor="#1E293B"
                 android:minWidth="0dp"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
+                android:padding="6dp"
                 android:layout_marginStart="4dp"
-                android:background="@drawable/bg_input_field"
+                android:background="@drawable/ic_volume_on"
                 android:elevation="0dp" />
 
             <Button
@@ -140,12 +138,16 @@
         android:background="#FFFFFF">
 
         <LinearLayout
+            android:id="@+id/sidebarHeader"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
+            android:layout_height="wrap_content"
+            android:minHeight="56dp"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingStart="16dp"
             android:paddingEnd="8dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp"
             android:background="#F8FAFC">
 
             <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"

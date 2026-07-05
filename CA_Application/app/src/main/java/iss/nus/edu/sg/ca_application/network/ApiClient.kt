@@ -619,25 +619,49 @@ object ApiClient {
     fun googleLogin(idToken: String, username: String, authCode: String = "", redirectUri: String = ""): JSONObject {
         var connection: HttpURLConnection? = null
         try {
-            connection = createConnection("/auth/google", "POST", "")
+            // Step 1: create connection
+            try { connection = createConnection("/auth/google", "POST", "") }
+            catch (e: Exception) { throw ApiException(0, "createConn: ${e.javaClass.simpleName}: ${e.message}") }
+
+            connection!!.readTimeout = 30_000
+
             val jsonBody = JSONObject().apply {
                 if (idToken.isNotEmpty()) put("idToken", idToken)
                 if (authCode.isNotEmpty()) put("authCode", authCode)
                 if (redirectUri.isNotEmpty()) put("redirectUri", redirectUri)
                 put("username", username)
             }
-            connection.outputStream.use { os ->
-                val writer = OutputStreamWriter(os, "UTF-8")
-                writer.write(jsonBody.toString())
-                writer.flush()
+
+            // Step 2: write request body
+            try {
+                connection!!.outputStream.use { os ->
+                    OutputStreamWriter(os, "UTF-8").use { w -> w.write(jsonBody.toString()); w.flush() }
+                }
+            } catch (e: Exception) { throw ApiException(0, "writeBody: ${e.javaClass.simpleName}: ${e.message}") }
+
+            // Step 3: read response code
+            val responseCode: Int = try { connection!!.responseCode }
+                catch (e: Exception) { throw ApiException(0, "responseCode: ${e.javaClass.simpleName}: ${e.message}") }
+
+            // Step 4: read response body (409 uses errorStream, not inputStream)
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                try {
+                    return JSONObject(connection!!.inputStream.bufferedReader().use { it.readText() })
+                } catch (e: Exception) { throw ApiException(0, "readBody: ${e.javaClass.simpleName}: ${e.message}") }
             }
-            val responseCode = connection.responseCode
-            if (responseCode == HttpURLConnection.HTTP_OK || responseCode == 409) {
-                return JSONObject(connection.inputStream.bufferedReader().use { it.readText() })
-            } else {
-                val errorBody = connection.errorStream?.bufferedReader()?.use { it.readText() } ?: "No error details"
-                throw ApiException(responseCode, errorBody)
+            if (responseCode == 409) {
+                try {
+                    return JSONObject(connection!!.errorStream?.bufferedReader()?.use { it.readText() } ?: "{}")
+                } catch (e: Exception) { throw ApiException(0, "read409: ${e.javaClass.simpleName}: ${e.message}") }
             }
+            val errorBody = try { connection!!.errorStream?.bufferedReader()?.use { it.readText() } ?: "" }
+                catch (e: Exception) { "" }
+            throw ApiException(responseCode, errorBody)
+        } catch (e: ApiException) {
+            throw e
+        } catch (e: Exception) {
+            android.util.Log.e("ApiClient", "Google login error", e)
+            throw ApiException(0, "${e.javaClass.simpleName}: ${e.message}")
         } finally {
             connection?.disconnect()
         }
