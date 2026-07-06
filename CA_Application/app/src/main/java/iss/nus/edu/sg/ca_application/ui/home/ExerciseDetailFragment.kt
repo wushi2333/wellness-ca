@@ -41,7 +41,7 @@ class ExerciseDetailFragment : Fragment() {
     private var allDailies: List<DailyWellness> = emptyList()
     private var availableWeeks: List<java.time.LocalDate> = emptyList()
     private var currentWeekIdx = 0
-    private var isPieToday = true  // true = Today, false = This Week
+    private var isPieToday: Boolean? = true  // true = Today, false = This Week, null = neither (week nav triggered)
     private var weekActivityMap: Map<String, Int> = emptyMap()  // cached for week toggle
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -64,11 +64,11 @@ class ExerciseDetailFragment : Fragment() {
         view.findViewById<ImageView>(R.id.btnExPrevWeek).setOnClickListener { navigateWeek(view, +1) }
         view.findViewById<ImageView>(R.id.btnExNextWeek).setOnClickListener { navigateWeek(view, -1) }
 
-        // Pie chart toggle: Today / This Week
+        // Pie chart toggle: Today / This Week — always jump to current week first
         val tvToday = view.findViewById<TextView>(R.id.tvPieToggleToday)
         val tvWeek = view.findViewById<TextView>(R.id.tvPieToggleWeek)
-        tvToday.setOnClickListener { isPieToday = true; updatePieToggle(view); updatePieChart(view) }
-        tvWeek.setOnClickListener { isPieToday = false; updatePieToggle(view); updatePieChart(view) }
+        tvToday.setOnClickListener { selectPieMode(view, true) }
+        tvWeek.setOnClickListener { selectPieMode(view, false) }
 
         lastDataFingerprint = "" // reset — view may have been recreated
         loadData(view)
@@ -119,8 +119,42 @@ class ExerciseDetailFragment : Fragment() {
     private fun navigateWeek(view: View, delta: Int) {
         val newIdx = currentWeekIdx + delta
         if (newIdx in availableWeeks.indices) {
+            val currentMonday = WeekUtils.currentWeekMonday()
+            val thisWeekIdx = if (availableWeeks.contains(currentMonday)) availableWeeks.indexOf(currentMonday) else -1
+            isPieToday = if (newIdx == thisWeekIdx) false else null
             showWeek(view, newIdx)
         }
+    }
+
+    /** Build exercise activity → total minutes map for the given Monday's week. */
+    private fun buildActivityMap(monday: java.time.LocalDate): Map<String, Int> {
+        val map = mutableMapOf<String, Int>()
+
+        val sdf = android.icu.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US)
+        val mondayDate = try { sdf.parse(monday.toString()) } catch (_: Exception) { null } ?: return map
+
+        val cal = android.icu.util.Calendar.getInstance().apply {
+            time = mondayDate
+            add(android.icu.util.Calendar.DAY_OF_YEAR, 6)
+        }
+        val sundayTime = cal.timeInMillis
+        val mondayTime = mondayDate.time
+
+        for (d in allDailies) {
+            try {
+                val currentRecordDate = sdf.parse(d.recordDate)
+                if (currentRecordDate != null) {
+                    val recordTime = currentRecordDate.time
+                    if (recordTime in mondayTime..sundayTime) {
+                        for (e in d.exercises) {
+                            val displayName = ExerciseTypeMap.toDisplay(requireContext(), e.exerciseActivity)
+                            map[displayName] = (map[displayName] ?: 0) + e.exerciseDuration
+                        }
+                    }
+                }
+            } catch (_: Exception) {}
+        }
+        return map
     }
 
     private fun showWeek(view: View, weekIdx: Int) {
@@ -144,18 +178,7 @@ class ExerciseDetailFragment : Fragment() {
             d?.exercises?.sumOf { it.exerciseDuration } ?: 0
         }
         // Activity breakdown: iterate exercises within this week
-        val activityMap = mutableMapOf<String, Int>()
-        for (d in allDailies) {
-            try {
-                val date = java.time.LocalDate.parse(d.recordDate)
-                if (date >= monday && date <= monday.plusDays(6)) {
-                    for (e in d.exercises) {
-                        val displayName = ExerciseTypeMap.toDisplay(requireContext(), e.exerciseActivity)
-                        activityMap[displayName] = (activityMap[displayName] ?: 0) + e.exerciseDuration
-                    }
-                }
-            } catch (_: Exception) {}
-        }
+        val activityMap = buildActivityMap(monday)
 
         // ---- Bar chart entries ----
         val entries = exValues.mapIndexed { i, v ->
@@ -244,28 +267,51 @@ class ExerciseDetailFragment : Fragment() {
         updatePieChart(view)
     }
 
+    /** Jump to current week if needed, then apply Today/This Week mode. */
+    private fun selectPieMode(view: View, today: Boolean) {
+        isPieToday = today
+        val currentMonday = WeekUtils.currentWeekMonday()
+        val thisWeekIdx = if (availableWeeks.contains(currentMonday)) availableWeeks.indexOf(currentMonday) else -1
+        if (thisWeekIdx >= 0 && currentWeekIdx != thisWeekIdx) {
+            showWeek(view, thisWeekIdx)
+        } else {
+            updatePieToggle(view)
+            updatePieChart(view)
+        }
+    }
+
     private fun updatePieToggle(view: View) {
         val tvToday = view.findViewById<TextView>(R.id.tvPieToggleToday)
         val tvWeek = view.findViewById<TextView>(R.id.tvPieToggleWeek)
-        if (isPieToday) {
-            tvToday.setTextColor(android.graphics.Color.WHITE)
-            tvToday.setBackgroundResource(iss.nus.edu.sg.ca_application.R.drawable.bg_btn_primary)
-            tvWeek.setTextColor(android.graphics.Color.parseColor("#64748B"))
-            tvWeek.setBackgroundResource(iss.nus.edu.sg.ca_application.R.drawable.bg_input_field)
-        } else {
-            tvWeek.setTextColor(android.graphics.Color.WHITE)
-            tvWeek.setBackgroundResource(iss.nus.edu.sg.ca_application.R.drawable.bg_btn_primary)
-            tvToday.setTextColor(android.graphics.Color.parseColor("#64748B"))
-            tvToday.setBackgroundResource(iss.nus.edu.sg.ca_application.R.drawable.bg_input_field)
+        val inactiveTextColor = android.graphics.Color.parseColor("#64748B")
+        when (isPieToday) {
+            true -> {
+                tvToday.setTextColor(android.graphics.Color.WHITE)
+                tvToday.setBackgroundResource(iss.nus.edu.sg.ca_application.R.drawable.bg_btn_primary)
+                tvWeek.setTextColor(inactiveTextColor)
+                tvWeek.setBackgroundResource(iss.nus.edu.sg.ca_application.R.drawable.bg_input_field)
+            }
+            false -> {
+                tvWeek.setTextColor(android.graphics.Color.WHITE)
+                tvWeek.setBackgroundResource(iss.nus.edu.sg.ca_application.R.drawable.bg_btn_primary)
+                tvToday.setTextColor(inactiveTextColor)
+                tvToday.setBackgroundResource(iss.nus.edu.sg.ca_application.R.drawable.bg_input_field)
+            }
+            null -> {
+                tvToday.setTextColor(inactiveTextColor)
+                tvToday.setBackgroundResource(iss.nus.edu.sg.ca_application.R.drawable.bg_input_field)
+                tvWeek.setTextColor(inactiveTextColor)
+                tvWeek.setBackgroundResource(iss.nus.edu.sg.ca_application.R.drawable.bg_input_field)
+            }
         }
     }
 
     private fun updatePieChart(view: View) {
         val pieChart = view.findViewById<PieChart>(R.id.activityPieChart)
         pieChart.setNoDataText(getString(R.string.no_data_available))
-        val activityMap: Map<String, Int> = if (isPieToday) {
+        val activityMap: Map<String, Int> = if (isPieToday == true) {
             // Today's exercises only
-            val today = java.time.LocalDate.now().toString()
+            val today = android.icu.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(java.util.Date())
             val todayDaily = allDailies.firstOrNull { it.recordDate == today }
             if (todayDaily != null) {
                 todayDaily.exercises.groupBy { ExerciseTypeMap.toDisplay(requireContext(), it.exerciseActivity) }
