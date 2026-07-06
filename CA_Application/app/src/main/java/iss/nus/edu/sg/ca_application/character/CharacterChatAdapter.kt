@@ -126,6 +126,7 @@ class CharacterChatAdapter(private val showEmotion: Boolean = true) : RecyclerVi
                         for (tool in msg.tools) {
                             val tv = TextView(holder.itemView.context).apply {
                                 text = tool
+                                maxLines = 1
                                 setTextAppearance(iss.nus.edu.sg.ca_application.R.style.Caption)
                                 setTextColor(holder.itemView.context.resources.getColor(
                                     iss.nus.edu.sg.ca_application.R.color.text_hint, null))
