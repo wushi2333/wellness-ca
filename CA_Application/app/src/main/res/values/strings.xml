@@ -3,18 +3,28 @@
 
     <!-- Auth -->
     <string name="login">Login</string>
+    <string name="login_subtitle">Sign in to continue</string>
+    <string name="login_no_account">Don\'t have an account? </string>
+    <string name="other_login_methods">Other login methods</string>
     <string name="logout">Logout</string>
     <string name="username">Username</string>
     <string name="username_or_email">Username or Email</string>
     <string name="password">Password</string>
     <string name="register">Register</string>
     <string name="register_title">Create Account</string>
-    <string name="login_error_empty">Please enter username and password</string>
+    <string name="register_subtitle">Join us to start your wellness journey</string>
+    <string name="register_has_account">Already have an account? </string>
+    <string name="login_error_empty">Please fill in this field</string>
+    <string name="register_error_empty_username">Please enter a username</string>
+    <string name="password_too_weak">Password must be at least 8 characters</string>
+    <string name="password_need_digit_letter">Password must contain at least one digit and one letter</string>
+    <string name="error_username_exists">Username already exists</string>
+    <string name="error_email_exists">This email is already registered</string>
+    <string name="invalid_email">Please enter a valid email address</string>
     <string name="login_error_credentials">Incorrect username or password</string>
     <string name="login_error_user_not_found">User does not exist</string>
     <string name="login_error_generic">Login failed, please try again</string>
     <string name="login_success">Login Successful</string>
-    <string name="register_error_empty">Please enter username and password</string>
     <string name="register_success">Register Successful</string>
 
     <!-- Wellness -->
@@ -114,7 +124,6 @@
 
     <!-- Network -->
     <string name="email_hint">Email (optional)</string>
-    <string name="invalid_email">Please enter a valid email address</string>
     <string name="network_error">Network error. Please try again.</string>
     <string name="session_expired">Session expired. Please login again.</string>
 
@@ -290,6 +299,8 @@
     <string name="google_conflict_title">Account Conflict</string>
     <string name="google_conflict_message">This Google email is already registered to \"%s\".\n\nLog in as %s?</string>
     <string name="google_conflict_yes">Yes, login as %s</string>
+    <string name="google_new_user_message">Create a new account with this Google email?</string>
+    <string name="google_new_user_confirm">Create Account</string>
     <string name="google_conflict_cancel">Go Back</string>
 
     <!-- Common -->

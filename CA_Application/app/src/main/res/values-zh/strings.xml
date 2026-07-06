@@ -4,18 +4,28 @@
 
     <!-- Auth -->
     <string name="login">登录</string>
+    <string name="login_subtitle">登录以继续</string>
+    <string name="login_no_account">还没有账号？</string>
+    <string name="other_login_methods">其他登录方式</string>
     <string name="logout">登出</string>
     <string name="username">用户名</string>
     <string name="username_or_email">用户名或邮箱</string>
     <string name="password">密码</string>
     <string name="register">注册</string>
     <string name="register_title">创建账号</string>
-    <string name="login_error_empty">请输入用户名和密码</string>
+    <string name="register_subtitle">加入我们，开启健康之旅</string>
+    <string name="register_has_account">已有账号？</string>
+    <string name="login_error_empty">请填写此项</string>
+    <string name="register_error_empty_username">请输入用户名</string>
+    <string name="password_too_weak">密码至少需要 8 个字符</string>
+    <string name="password_need_digit_letter">密码需要包含至少一个数字和一个字母</string>
+    <string name="error_username_exists">用户名已存在</string>
+    <string name="error_email_exists">此邮箱已被注册</string>
+    <string name="invalid_email">请输入有效的邮箱地址</string>
     <string name="login_error_credentials">用户名或密码错误</string>
     <string name="login_error_user_not_found">用户不存在</string>
     <string name="login_error_generic">登录失败，请重试</string>
     <string name="login_success">登录成功</string>
-    <string name="register_error_empty">请输入用户名和密码</string>
     <string name="register_success">注册成功</string>
 
     <!-- Wellness -->
@@ -115,7 +125,6 @@
 
     <!-- Network -->
     <string name="email_hint">邮箱（可选）</string>
-    <string name="invalid_email">请输入有效的邮箱地址</string>
     <string name="network_error">网络错误，请重试</string>
     <string name="session_expired">会话已过期，请重新登录</string>
 
@@ -291,6 +300,8 @@
     <string name="google_conflict_title">账户冲突</string>
     <string name="google_conflict_message">该 Google 邮箱已注册给 \"%s\"。\n\n以 %s 的身份登录？</string>
     <string name="google_conflict_yes">是，以 %s 登录</string>
+    <string name="google_new_user_message">使用此 Google 邮箱创建新账号？</string>
+    <string name="google_new_user_confirm">创建账号</string>
     <string name="google_conflict_cancel">返回</string>
 
     <!-- Common -->

@@ -157,31 +157,47 @@ public class AuthService {
                 "email", email);
         }
 
-        // Create new Google user — generate username from email if not provided
-        username = username.trim();
-        if (username.isEmpty() || username.length() < 3) {
-            username = email.substring(0, email.indexOf('@')).replaceAll("[^a-zA-Z0-9_]", "_");
-            if (username.length() < 3) username = "user_" + username;
-        }
-        // If generated username is taken, append numbers
-        String base = username;
+        // New Google user — generate suggested username from email
+        String suggested = email.substring(0, email.indexOf('@')).replaceAll("[^a-zA-Z0-9_]", "_");
+        if (suggested.length() < 3) suggested = "user_" + suggested;
+        // Ensure suggested username is unique
+        String base = suggested;
         int suffix = 1;
-        while (users.findByUsername(username).isPresent()) {
-            username = base + suffix;
+        while (users.findByUsername(suggested).isPresent()) {
+            suggested = base + suffix;
             suffix++;
         }
 
-        User u = new User(username, "");
-        u.setEmail(email.toLowerCase());
-        u.setProvider("GOOGLE");
-        u.setProviderId(googleId);
-        u = users.save(u);
+        // If client provided a username, this is a confirmation — create the account
+        username = username.trim();
+        if (!username.isEmpty() && username.length() >= 3) {
+            // Use client-provided username if available, otherwise fall back to suggested
+            String finalName = username;
+            if (!finalName.equals(suggested)) {
+                // Ensure client-provided username is unique
+                String b2 = finalName;
+                int s2 = 1;
+                while (users.findByUsername(finalName).isPresent()) {
+                    finalName = b2 + s2;
+                    s2++;
+                }
+            }
+            User u = new User(finalName, "");
+            u.setEmail(email.toLowerCase());
+            u.setProvider("GOOGLE");
+            u.setProviderId(googleId);
+            u = users.save(u);
+            return Map.of("conflict", false,
+                "accessToken", jwt.createToken(u.getId().toString()),
+                "tokenType", "bearer",
+                "userId", u.getId(),
+                "username", u.getUsername(),
+                "email", email);
+        }
 
-        return Map.of("conflict", false,
-            "accessToken", jwt.createToken(u.getId().toString()),
-            "tokenType", "bearer",
-            "userId", u.getId(),
-            "username", u.getUsername(),
-            "email", email);
+        // New user not yet confirmed — return hint so client can show confirmation dialog
+        return Map.of("newUser", true,
+            "email", email,
+            "suggestedUsername", suggested);
     }
 }

@@ -1,57 +1,200 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Author: Liu Yu. Register screen. Flow: RegisterActivity → (success) → finish() → back to LoginActivity -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Author: Liu Yu -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical"
-    android:padding="24dp"
-    android:background="@color/background">
+    android:fillViewport="true"
+    android:background="@color/background"
+    android:clipToPadding="false"
+    android:clipChildren="false">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/register_title"
-        android:textAppearance="@style/Heading2"
-        android:layout_marginBottom="30dp" />
-
-    <EditText
-        android:id="@+id/etUsername"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/username"
-        android:textAppearance="@style/Body"
-        android:textColor="@color/text_primary"
-        android:textColorHint="@color/text_hint"
-        android:inputType="textPersonName" />
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:paddingStart="28dp"
+        android:paddingEnd="28dp"
+        android:paddingTop="48dp"
+        android:paddingBottom="32dp"
+        android:clipToPadding="false"
+        android:clipChildren="false">
 
-    <EditText
-        android:id="@+id/etEmail"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        android:hint="@string/email_hint"
-        android:textAppearance="@style/Body"
-        android:textColor="@color/text_primary"
-        android:textColorHint="@color/text_hint"
-        android:inputType="textEmailAddress" />
+        <!-- Language toggle -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp">
 
-    <EditText
-        android:id="@+id/etPassword"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        android:hint="@string/password"
-        android:textAppearance="@style/Body"
-        android:textColor="@color/text_primary"
-        android:textColorHint="@color/text_hint"
-        android:inputType="textPassword" />
+            <TextView
+                android:id="@+id/btnLangToggle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:padding="4dp"
+                android:text="EN"
+                android:textSize="14sp"
+                android:textColor="@color/outline"
+                android:textStyle="bold"
+                android:clickable="true"
+                android:focusable="true" />
+        </FrameLayout>
 
-    <Button
-        android:id="@+id/btnRegister"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="25dp"
-        android:text="@string/register" />
+        <!-- Header -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/register_title"
+            android:textAppearance="@style/Heading1"
+            android:textColor="@color/text_primary"
+            android:layout_marginBottom="4dp" />
 
-</LinearLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/register_subtitle"
+            android:textAppearance="@style/Body"
+            android:textColor="@color/text_secondary"
+            android:layout_marginBottom="36dp" />
+
+        <!-- Register form card -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="6dp"
+            app:cardBackgroundColor="#FFFFFF"
+            app:strokeWidth="0dp"
+            android:layout_marginBottom="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <EditText
+                    android:id="@+id/etUsername"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:hint="@string/username"
+                    android:background="@drawable/bg_input_field"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:gravity="center_vertical"
+                    android:textAppearance="@style/Body"
+                    android:textColor="@color/text_primary"
+                    android:textColorHint="@color/text_hint"
+                    android:inputType="textPersonName"
+                    android:importantForAutofill="yes" />
+
+                <TextView
+                    android:id="@+id/tvUsernameError"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/Caption"
+                    android:textColor="@color/error"
+                    android:paddingStart="16dp"
+                    android:paddingTop="4dp"
+                    android:visibility="gone" />
+
+                <EditText
+                    android:id="@+id/etEmail"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="12dp"
+                    android:hint="@string/email_hint"
+                    android:background="@drawable/bg_input_field"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:gravity="center_vertical"
+                    android:textAppearance="@style/Body"
+                    android:textColor="@color/text_primary"
+                    android:textColorHint="@color/text_hint"
+                    android:inputType="textEmailAddress"
+                    android:importantForAutofill="yes" />
+
+                <TextView
+                    android:id="@+id/tvEmailError"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/Caption"
+                    android:textColor="@color/error"
+                    android:paddingStart="16dp"
+                    android:paddingTop="4dp"
+                    android:visibility="gone" />
+
+                <EditText
+                    android:id="@+id/etPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="12dp"
+                    android:hint="@string/password"
+                    android:background="@drawable/bg_input_field"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:gravity="center_vertical"
+                    android:textAppearance="@style/Body"
+                    android:textColor="@color/text_primary"
+                    android:textColorHint="@color/text_hint"
+                    android:inputType="textPassword"
+                    android:importantForAutofill="yes" />
+
+                <TextView
+                    android:id="@+id/tvPasswordError"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/Caption"
+                    android:textColor="@color/error"
+                    android:paddingStart="16dp"
+                    android:paddingTop="4dp"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/btnRegister"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="20dp"
+                    android:gravity="center"
+                    android:text="@string/register"
+                    android:textAppearance="@style/ButtonText"
+                    android:textColor="@color/on_primary"
+                    android:background="@drawable/bg_btn_primary"
+                    android:clickable="true"
+                    android:focusable="true" />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Back to login link -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="18dp"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/register_has_account"
+                android:textSize="14sp"
+                android:textColor="@color/outline"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/btnGoLogin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/login"
+                android:textAppearance="@style/Body"
+                android:textColor="@color/primary"
+                android:fontWeight="700"
+                android:clickable="true"
+                android:focusable="true"
+                android:paddingStart="4dp" />
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

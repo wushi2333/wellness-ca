@@ -48,6 +48,16 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
 
+        fun saveLocale(context: Context, lang: String) {
+            context.getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+                .edit().putString(KEY_LANGUAGE, lang).apply()
+        }
+
+        fun getCurrentLanguage(context: Context): String {
+            return context.getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+                .getString(KEY_LANGUAGE, null) ?: "en"
+        }
+
         fun wrapContextForLocale(base: Context): Context {
             val locale = getSavedLocale(base) ?: return base
             val config = Configuration(base.resources.configuration)
