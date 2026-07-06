@@ -70,7 +70,7 @@ class ChatFragment : Fragment() {
     // ASR permission launcher
     private val requestAudioPermission = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
-    ) { granted -> if (granted) startRecording() else toast("Microphone permission required") }
+    ) { granted -> if (granted) @Suppress("MissingPermission") startRecording() else toast("Microphone permission required") }
 
     // ASR
     private var audioRecord: AudioRecord? = null
@@ -148,7 +148,7 @@ class ChatFragment : Fragment() {
                 stopTts()
             }
         }
-        view.findViewById<View>(R.id.btnSessions).setOnClickListener { loadSessions(); drawer.openDrawer(Gravity.END) }
+        view.findViewById<View>(R.id.btnSessions).setOnClickListener { loadSessions(); drawer.openDrawer(androidx.core.view.GravityCompat.END) }
         view.findViewById<View>(R.id.btnNewChat).setOnClickListener { createNewSession() }
         view.findViewById<View>(R.id.btnTrash).setOnClickListener { sessionAdapter.toggleSelectionMode() }
         view.findViewById<View>(R.id.btnDeleteSelected).setOnClickListener {
@@ -220,12 +220,12 @@ class ChatFragment : Fragment() {
     }
 
     private fun createNewSession() {
-        if (adapter.lastIndex < 0) { drawer.closeDrawer(Gravity.END); return }
+        if (adapter.lastIndex < 0) { drawer.closeDrawer(androidx.core.view.GravityCompat.END); return }
         currentSessionId = null
         tvSessionTitle.text = "New Chat"
         adapter.setMessages(emptyList())
         etMessage.hint = "Chat with Yui…"
-        drawer.closeDrawer(Gravity.END)
+        drawer.closeDrawer(androidx.core.view.GravityCompat.END)
     }
 
     private fun switchToSession(sessionId: Long, title: String) {
@@ -255,7 +255,7 @@ class ChatFragment : Fragment() {
     }
 
     // ── ASR ────────────────────────────────────────────────────────
-
+    @androidx.annotation.RequiresPermission(android.Manifest.permission.RECORD_AUDIO)
     private fun startRecording() {
         if (isRecording) return
         val rate = 16000
@@ -275,6 +275,7 @@ class ChatFragment : Fragment() {
     }
 
     private fun stopRecording() {
+        if (!isRecording) return
         isRecording = false; recorderThread?.join(RECORDER_JOIN_TIMEOUT_MS); recorderThread = null
         try { audioRecord?.stop(); audioRecord?.release() } catch (_: Exception) {}; audioRecord = null
         val pcm: ByteArray
@@ -389,7 +390,7 @@ class ChatFragment : Fragment() {
 
     private fun createRecordFromIntent(intent: Map<String, Any?>) {
         val recordType = intent["recordType"]?.toString() ?: return
-        val date = intent["recordDate"]?.toString() ?: java.time.LocalDate.now().toString()
+        val date = intent["recordDate"]?.toString() ?: android.icu.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(java.util.Date())
         Thread {
             try {
                 if (recordType == "sleep") {
@@ -488,7 +489,7 @@ class ChatFragment : Fragment() {
                 h.itemView.setOnLongClickListener(null)
             } else {
                 h.cb.visibility = View.GONE
-                h.itemView.setOnClickListener { switchToSession(s.id, s.title); drawer.closeDrawer(Gravity.END) }
+                h.itemView.setOnClickListener { switchToSession(s.id, s.title); drawer.closeDrawer(androidx.core.view.GravityCompat.END) }
                 h.itemView.setOnLongClickListener {
                     AlertDialog.Builder(requireContext()).setTitle(s.title)
                         .setItems(arrayOf(if (pinned) "Unpin" else "Pin to Top", "Delete", "Cancel")) { _, which ->
