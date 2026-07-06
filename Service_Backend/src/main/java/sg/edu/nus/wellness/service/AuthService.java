@@ -171,18 +171,20 @@ public class AuthService {
         // If client provided a username, this is a confirmation — create the account
         username = username.trim();
         if (!username.isEmpty() && username.length() >= 3) {
-            // Use client-provided username if available, otherwise fall back to suggested
-            String finalName = username;
-            if (!finalName.equals(suggested)) {
-                // Ensure client-provided username is unique
-                String b2 = finalName;
+            if (users.findByUsername(username).isPresent()) {
+                // Username already taken — regenerate suggestion and ask again
+                String alt = base;
                 int s2 = 1;
-                while (users.findByUsername(finalName).isPresent()) {
-                    finalName = b2 + s2;
+                while (users.findByUsername(alt).isPresent()) {
+                    alt = base + s2;
                     s2++;
                 }
+                return Map.of("newUser", true,
+                    "email", email,
+                    "suggestedUsername", alt,
+                    "error", "username_taken");
             }
-            User u = new User(finalName, "");
+            User u = new User(username, "");
             u.setEmail(email.toLowerCase());
             u.setProvider("GOOGLE");
             u.setProviderId(googleId);

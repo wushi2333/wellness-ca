@@ -85,6 +85,16 @@
                     android:textColorHint="@color/text_hint"
                     android:inputType="textPersonName"
                     android:maxLength="30" />
+
+                <TextView
+                    android:id="@+id/tvDialogUsernameError"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/Caption"
+                    android:textColor="@color/error"
+                    android:paddingStart="16dp"
+                    android:paddingTop="4dp"
+                    android:visibility="gone" />
             </LinearLayout>
 
             <!-- Buttons -->

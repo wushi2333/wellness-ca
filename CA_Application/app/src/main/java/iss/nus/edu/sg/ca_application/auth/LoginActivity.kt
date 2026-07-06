@@ -276,8 +276,15 @@ class LoginActivity : AppCompatActivity() {
         view.findViewById<TextView>(R.id.tvDialogMessage).text = getString(R.string.google_new_user_message)
         view.findViewById<View>(R.id.layoutUsernameInput).visibility = View.VISIBLE
         val etUsername = view.findViewById<EditText>(R.id.etDialogUsername)
+        val tvUsernameError = view.findViewById<TextView>(R.id.tvDialogUsernameError)
         etUsername.setText(suggestedUsername)
         view.findViewById<TextView>(R.id.btnDialogConfirm).text = getString(R.string.google_new_user_confirm)
+
+        // Clear error on focus
+        etUsername.setOnFocusChangeListener { _, _ ->
+            etUsername.setBackgroundResource(R.drawable.bg_input_field)
+            tvUsernameError.visibility = View.GONE
+        }
 
         val dialog = AlertDialog.Builder(this).setView(view).setCancelable(true).create()
         view.findViewById<TextView>(R.id.btnDialogCancel).setOnClickListener { dialog.dismiss() }
@@ -287,14 +294,29 @@ class LoginActivity : AppCompatActivity() {
                 Toast.makeText(this, R.string.login_error_empty, Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            dialog.dismiss()
+            view.findViewById<TextView>(R.id.btnDialogConfirm).isEnabled = false
             Thread {
                 try {
                     val resp = if (authCode.isNotEmpty()) ApiClient.googleLogin("", chosen, authCode)
                                else ApiClient.googleLogin(idToken, chosen)
-                    runOnUiThread { finishGoogleLogin(resp) }
+                    runOnUiThread {
+                        if (resp.optBoolean("newUser", false) && "username_taken" == resp.optString("error", "")) {
+                            // Username taken — show error inline, keep dialog open
+                            etUsername.setBackgroundResource(R.drawable.bg_input_field_error)
+                            tvUsernameError.text = getString(R.string.error_username_exists)
+                            tvUsernameError.visibility = View.VISIBLE
+                            etUsername.setText(resp.optString("suggestedUsername", chosen))
+                            view.findViewById<TextView>(R.id.btnDialogConfirm).isEnabled = true
+                        } else {
+                            dialog.dismiss()
+                            finishGoogleLogin(resp)
+                        }
+                    }
                 } catch (e: Exception) {
-                    runOnUiThread { tvError.text = "Failed: ${e.message}"; tvError.visibility = View.VISIBLE }
+                    runOnUiThread {
+                        view.findViewById<TextView>(R.id.btnDialogConfirm).isEnabled = true
+                        tvError.text = "Failed: ${e.message}"; tvError.visibility = View.VISIBLE
+                    }
                 }
             }.start()
         }
