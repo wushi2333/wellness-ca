@@ -131,12 +131,18 @@ public class AuthService {
         // Check: email already bound to existing account?
         User existingByEmail = users.findByEmail(email.toLowerCase()).orElse(null);
         if (existingByEmail != null) {
-            // If username matches, this is the same user — proceed to Google ID check
             if (username.isEmpty() || !existingByEmail.getUsername().equals(username)) {
                 return Map.of("conflict", true,
                     "existingUsername", existingByEmail.getUsername(),
                     "email", email);
             }
+            // Same person: just log them in without changing provider
+            return Map.of("conflict", false,
+                "accessToken", jwt.createToken(existingByEmail.getId().toString()),
+                "tokenType", "bearer",
+                "userId", existingByEmail.getId(),
+                "username", existingByEmail.getUsername(),
+                "email", email);
         }
 
         // Check: Google ID already registered?
