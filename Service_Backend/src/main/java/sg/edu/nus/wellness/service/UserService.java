@@ -1,9 +1,10 @@
-// Author: Xia Zihang
+// Author: Xia Zihang, Yutong Luo
 package sg.edu.nus.wellness.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +36,7 @@ public class UserService {
     private final CharacterSessionRepo characterSessionRepo;
     private final CharacterMessageRepo characterMessageRepo;
     private final CharacterUserProfileRepo characterUserProfileRepo;
+    private final JdbcTemplate jdbcTemplate;
     private final PasswordEncoder encoder;
 
     @Value("${app.upload.dir}")
@@ -43,7 +45,8 @@ public class UserService {
     public UserService(UserRepo userRepo, UserProfileRepo profileRepo, WellnessService wellnessService,
                        ChatHistoryRepo chatHistoryRepo, RecRepo recRepo,
                        CharacterSessionRepo characterSessionRepo, CharacterMessageRepo characterMessageRepo,
-                       CharacterUserProfileRepo characterUserProfileRepo, PasswordEncoder encoder) {
+                       CharacterUserProfileRepo characterUserProfileRepo,
+                       JdbcTemplate jdbcTemplate, PasswordEncoder encoder) {
         this.userRepo = userRepo;
         this.profileRepo = profileRepo;
         this.wellnessService = wellnessService;
@@ -52,6 +55,7 @@ public class UserService {
         this.characterSessionRepo = characterSessionRepo;
         this.characterMessageRepo = characterMessageRepo;
         this.characterUserProfileRepo = characterUserProfileRepo;
+        this.jdbcTemplate = jdbcTemplate;
         this.encoder = encoder;
     }
 
@@ -251,6 +255,7 @@ public class UserService {
 
         // 5. Delete recommendations
         recRepo.deleteAllByUserId(userId);
+        deleteAgentSidecarRecommendations(userId);
 
         // 6. Delete character user profile
         characterUserProfileRepo.findById(userId).ifPresent(p -> characterUserProfileRepo.delete(p));
@@ -262,6 +267,15 @@ public class UserService {
         userRepo.deleteById(userId);
 
         log.info("Account deleted for userId={}", userId);
+    }
+
+    private void deleteAgentSidecarRecommendations(Long userId) {
+        try {
+            int deleted = jdbcTemplate.update("DELETE FROM agent_recommendations WHERE user_id = ?", userId);
+            log.info("Deleted {} agent sidecar recommendations for userId={}", deleted, userId);
+        } catch (Exception e) {
+            log.warn("Could not delete agent sidecar recommendations for userId={}: {}", userId, e.getMessage());
+        }
     }
 
     /** Custom runtime exception for 409 email conflict. */

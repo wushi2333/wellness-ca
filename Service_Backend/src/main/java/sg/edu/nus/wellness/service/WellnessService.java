@@ -290,6 +290,84 @@ public class WellnessService {
         }
     }
 
+    /**
+     * Old Android compatibility.
+     *
+     * Earlier clients treated /records/{id} as a flat record endpoint. After the
+     * split model, that id may be a daily id, a sleep id, or an exercise id.
+     */
+    public void updateCompat(Long userId, Long id, WellnessRequest req) {
+        if (hasSleepData(req) && dailyRepo.findFirstByUserIdAndSleepRecordId(userId, id).isPresent()) {
+            SleepRecordRequest sr = toSleepRequest(req);
+            updateSleep(userId, id, sr);
+            return;
+        }
+
+        if (hasExerciseData(req) && isOwnedExercise(userId, id)) {
+            ExerciseRecordRequest er = toExerciseRequest(req);
+            updateExercise(userId, id, er);
+            return;
+        }
+
+        Optional<WellnessRecord> daily = dailyRepo.findByIdAndUserId(id, userId);
+        if (daily.isPresent()) {
+            update(userId, id, req);
+            return;
+        }
+
+        throw new NotFoundException("Record not found");
+    }
+
+    public void deleteCompat(Long userId, Long id) {
+        if (dailyRepo.findFirstByUserIdAndSleepRecordId(userId, id).isPresent()) {
+            deleteSleep(userId, id);
+            return;
+        }
+        if (isOwnedExercise(userId, id)) {
+            deleteExercise(userId, id);
+            return;
+        }
+        if (dailyRepo.findByIdAndUserId(id, userId).isPresent()) {
+            delete(userId, id);
+            return;
+        }
+        throw new NotFoundException("Record not found");
+    }
+
+    private boolean hasSleepData(WellnessRequest req) {
+        return req.sleepHours != null && req.sleepHours > 0;
+    }
+
+    private boolean hasExerciseData(WellnessRequest req) {
+        return req.exerciseDuration != null && req.exerciseDuration > 0;
+    }
+
+    private boolean isOwnedExercise(Long userId, Long exerciseId) {
+        return exerciseRepo.findById(exerciseId)
+                .map(exercise -> dailyRepo.findByIdAndUserId(exercise.getDailyRecordId(), userId).isPresent())
+                .orElse(false);
+    }
+
+    private SleepRecordRequest toSleepRequest(WellnessRequest req) {
+        SleepRecordRequest sr = new SleepRecordRequest();
+        sr.sleepHours = req.sleepHours;
+        sr.sleepTime = req.sleepTime;
+        sr.wakeTime = req.wakeTime;
+        sr.moodScore = req.moodScore;
+        sr.recordDate = req.recordDate;
+        sr.notes = req.notes;
+        return sr;
+    }
+
+    private ExerciseRecordRequest toExerciseRequest(WellnessRequest req) {
+        ExerciseRecordRequest er = new ExerciseRecordRequest();
+        er.exerciseActivity = req.exerciseActivity;
+        er.exerciseDuration = req.exerciseDuration;
+        er.recordDate = req.recordDate;
+        er.notes = req.notes;
+        return er;
+    }
+
     /** Old-style delete — removes the entire daily record and linked data. */
     @CacheEvict(value = "records", key = "#userId")
     public void delete(Long userId, Long id) {

@@ -64,8 +64,17 @@ public class WellnessController {
     /** Backward-compat: old DELETE /records/{id} deletes the daily record. */
     @DeleteMapping("/records/{id}")
     public ResponseEntity<?> deleteCompat(@PathVariable Long id, HttpServletRequest req) {
-        ws.delete(userExt.userId(req), id);
+        ws.deleteCompat(userExt.userId(req), id);
         return ResponseEntity.ok(Map.of("message", "Deleted"));
+    }
+
+    /** Backward-compat: old PUT /records/{id} updates daily, sleep, or exercise records. */
+    @PutMapping("/records/{id}")
+    public ResponseEntity<?> updateCompat(@PathVariable Long id,
+                                          @Valid @RequestBody WellnessRequest r,
+                                          HttpServletRequest req) {
+        ws.updateCompat(userExt.userId(req), id, r);
+        return ResponseEntity.ok(Map.of("message", "Updated"));
     }
 
     // ── sleep CRUD ──────────────────────────────────────────────────────

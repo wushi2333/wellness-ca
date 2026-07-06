@@ -1,4 +1,4 @@
-// Author: Cai Peilin
+// Author: Cai Peilin, Yutong Luo
 package sg.edu.nus.wellness.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
@@ -41,7 +41,8 @@ public class AgentController {
                 String evidenceJson = "[]";
                 try { evidenceJson = new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(evidence); } catch (Exception ignored) {}
                 Integer iterations = (Integer) body.getOrDefault("iterations", 1);
-                recRepo.save(new sg.edu.nus.wellness.model.Recommendation(userId, content, evidenceJson, iterations));
+                var saved = recRepo.save(new sg.edu.nus.wellness.model.Recommendation(userId, content, evidenceJson, iterations));
+                body.put("saved_id", saved.getId());
             }
             return ResponseEntity.ok(resp.getBody());
         } catch (Exception e) {
