@@ -1,0 +1,89 @@
+<!-- Author: Guo Jiali -->
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Record Your Wellness - Profile</title>
+    <link rel="stylesheet" th:href="@{/web/css/style.css}">
+</head>
+<body>
+<header class="topbar">
+    <a class="brand" th:href="@{/web/dashboard}"><span class="brand-mark small">W</span><span>Record Your Wellness</span></a>
+    <nav class="nav">
+        <a th:href="@{/web/dashboard}">Dashboard</a>
+        <a th:href="@{/web/records}">Records</a>
+        <a th:href="@{/web/chat}">Chat</a>
+        <a th:href="@{/web/insights}">Insights</a>
+        <a th:href="@{/web/settings}" class="active">Settings</a>
+    </nav>
+    <form th:action="@{/web/logout}" method="post"><button class="icon-button" type="submit">Logout</button></form>
+</header>
+
+<main class="page">
+    <div class="detail-topbar">
+        <a class="back-link" th:href="@{/web/settings}">Back</a>
+        <h1>Profile</h1>
+        <span></span>
+    </div>
+
+    <div class="alert success" th:if="${success}" th:text="${success}"></div>
+    <div class="alert error" th:if="${error}" th:text="${error}"></div>
+
+    <section class="profile-grid">
+        <article class="profile-card">
+            <div class="profile-avatar">
+                <img th:if="${profile.avatarUrl}" th:src="${profile.avatarUrl}" alt="">
+                <span th:unless="${profile.avatarUrl}" th:text="${profile.username != null && !profile.username.isBlank() ? #strings.substring(profile.username,0,1).toUpperCase() : 'U'}">U</span>
+            </div>
+            <h2 th:text="${profile.nickname != null && !profile.nickname.isBlank() ? profile.nickname : profile.username}">User</h2>
+            <p class="muted" th:text="${profile.email != null ? profile.email : 'No email bound'}">email</p>
+            <p class="provider-pill" th:text="${profile.provider != null ? profile.provider : 'LOCAL'}">LOCAL</p>
+            <form class="form-stack" th:action="@{/web/profile/avatar}" method="post" enctype="multipart/form-data">
+                <label for="avatar">Avatar</label>
+                <input id="avatar" name="file" type="file" accept="image/jpeg,image/png,image/webp" required>
+                <button class="button secondary" type="submit">Upload Avatar</button>
+            </form>
+        </article>
+
+        <div class="profile-forms">
+            <form class="panel form-stack" th:action="@{/web/profile/metrics}" method="post">
+                <h2>Health Profile</h2>
+                <label for="nickname">Nickname</label>
+                <input id="nickname" name="nickname" type="text" th:value="${profile.nickname}" placeholder="Nickname">
+                <div class="field-grid three">
+                    <div>
+                        <label for="heightCm">Height (cm)</label>
+                        <input id="heightCm" name="heightCm" type="number" min="1" max="260" th:value="${profile.heightCm}">
+                    </div>
+                    <div>
+                        <label for="weightKg">Weight (kg)</label>
+                        <input id="weightKg" name="weightKg" type="number" min="1" max="500" step="0.1" th:value="${profile.weightKg}">
+                    </div>
+                    <div>
+                        <label for="age">Age</label>
+                        <input id="age" name="age" type="number" min="1" max="130" th:value="${profile.age}">
+                    </div>
+                </div>
+                <button class="button primary" type="submit">Save Profile</button>
+            </form>
+
+            <form class="panel form-stack" th:action="@{/web/profile/username}" method="post">
+                <h2>Username</h2>
+                <label for="usernameNew">Username</label>
+                <input id="usernameNew" name="username" type="text" th:value="${profile.username}" required>
+                <button class="button secondary" type="submit">Change Username</button>
+            </form>
+
+            <form class="panel form-stack" th:action="@{/web/profile/email}" method="post">
+                <h2>Email</h2>
+                <label for="emailNew">Email</label>
+                <input id="emailNew" name="email" type="email" th:value="${profile.email}" th:disabled="${isGoogleUser}" required>
+                <p class="help-text" th:if="${isGoogleUser}">Google accounts cannot change email.</p>
+                <button class="button secondary" type="submit" th:disabled="${isGoogleUser}">Bind Email</button>
+            </form>
+        </div>
+    </section>
+</main>
+</body>
+</html>

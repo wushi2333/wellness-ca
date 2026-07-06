@@ -1,0 +1,39 @@
+<!-- Author: Guo Jiali -->
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Record Your Wellness - New Record</title>
+    <link rel="stylesheet" th:href="@{/web/css/style.css}">
+</head>
+<body>
+<header class="topbar">
+    <a class="brand" th:href="@{/web/dashboard}"><span class="brand-mark small">W</span><span>Record Your Wellness</span></a>
+    <nav class="nav">
+        <a th:href="@{/web/dashboard}">Dashboard</a>
+        <a th:href="@{/web/records}" class="active">Records</a>
+        <a th:href="@{/web/chat}">Chat</a>
+        <a th:href="@{/web/insights}">Insights</a>
+        <a th:href="@{/web/settings}">Settings</a>
+    </nav>
+    <form th:action="@{/web/logout}" method="post"><button class="icon-button" type="submit">Logout</button></form>
+</header>
+
+<main class="page add-choice-page">
+    <h1>New Record</h1>
+    <section class="add-choice-grid">
+        <a class="add-choice-card sleep-card" th:href="@{/web/records/sleep/new}">
+            <span class="choice-icon">Sleep</span>
+            <strong>Add Sleep</strong>
+            <small>Bedtime · Wake time · Mood</small>
+        </a>
+        <a class="add-choice-card exercise-card" th:href="@{/web/records/exercise/new}">
+            <span class="choice-icon wide">Exercise</span>
+            <strong>Add Exercise</strong>
+            <small>Type · Duration · Notes</small>
+        </a>
+    </section>
+</main>
+</body>
+</html>

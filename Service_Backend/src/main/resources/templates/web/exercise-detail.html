@@ -1,0 +1,76 @@
+<!-- Author: Guo Jiali -->
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Record Your Wellness - Exercise Detail</title>
+    <link rel="stylesheet" th:href="@{/web/css/style.css}">
+    <script defer th:src="@{/web/js/app.js}"></script>
+</head>
+<body>
+<header class="topbar">
+    <a class="brand" th:href="@{/web/dashboard}"><span class="brand-mark small">W</span><span>Record Your Wellness</span></a>
+    <nav class="nav">
+        <a th:href="@{/web/dashboard}">Dashboard</a>
+        <a th:href="@{/web/records}" class="active">Records</a>
+        <a th:href="@{/web/chat}">Chat</a>
+        <a th:href="@{/web/insights}">Insights</a>
+        <a th:href="@{/web/settings}">Settings</a>
+    </nav>
+    <form th:action="@{/web/logout}" method="post"><button class="icon-button" type="submit">Logout</button></form>
+</header>
+
+<main class="page">
+    <div class="detail-topbar">
+        <a class="back-link" th:href="@{/web/dashboard}">Back</a>
+        <h1>Exercise</h1>
+        <a class="button secondary compact" th:href="@{/web/records/manage/exercise}">Edit</a>
+    </div>
+
+    <div class="alert success" th:if="${success}" th:text="${success}"></div>
+
+    <section class="stats-row two">
+        <article class="stat-card">
+            <strong class="green" th:text="${#numbers.formatDecimal(detail.avgExercise,1,0)}">--</strong>
+            <span>Avg min/day</span>
+        </article>
+        <article class="stat-card">
+            <strong th:text="${detail.activeDays}">--</strong>
+            <span>Active days</span>
+        </article>
+    </section>
+
+    <div class="week-nav">
+        <a th:href="@{/web/exercise-detail(week=${prevWeek})}">Prev</a>
+        <strong th:text="${detail.weekLabel}">Week</strong>
+        <a th:href="@{/web/exercise-detail(week=${nextWeek})}">Next</a>
+    </div>
+
+    <section class="chart-panel">
+        <div class="section-header">
+            <h2>Exercise Minutes</h2>
+            <span>30 min target</span>
+        </div>
+        <div class="bar-chart" th:attr="data-series=${#strings.listJoin(detail.exerciseSeries, ',')},data-labels=${#strings.listJoin(detail.dayLabels, ',')},data-max='90',data-target='30',data-kind='exercise'"></div>
+    </section>
+
+    <section class="chart-panel">
+        <div class="section-header">
+            <h2>Activity Breakdown</h2>
+            <span>This Week</span>
+        </div>
+        <p class="empty-state" th:if="${#maps.isEmpty(detail.exerciseBreakdown)}">No activity data</p>
+        <div class="breakdown-list" th:if="${!#maps.isEmpty(detail.exerciseBreakdown)}">
+            <div class="breakdown-row" th:each="entry : ${detail.exerciseBreakdown}">
+                <span th:text="${entry.key}">Running</span>
+                <div class="breakdown-track">
+                    <i th:style="'width:' + ${entry.value > 120 ? 100 : entry.value * 100 / 120} + '%'"></i>
+                </div>
+                <strong th:text="${entry.value} + ' min'">30 min</strong>
+            </div>
+        </div>
+    </section>
+</main>
+</body>
+</html>

@@ -4,37 +4,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wellness AI - Login</title>
+    <title>Record Your Wellness - Login</title>
     <link rel="stylesheet" th:href="@{/web/css/style.css}">
 </head>
 <body class="auth-page">
 <main class="auth-shell">
-    <section class="auth-panel" aria-labelledby="loginTitle">
-        <p class="eyebrow">Wellness AI</p>
-        <h1 id="loginTitle">Login</h1>
+    <section class="auth-panel">
+        <div class="auth-brand">
+            <span class="brand-mark">W</span>
+            <div>
+                <p class="eyebrow">Record Your Wellness</p>
+                <h1>Login</h1>
+            </div>
+        </div>
 
+        <p class="muted">Sign in to continue</p>
         <div class="alert success" th:if="${success}" th:text="${success}"></div>
         <div class="alert error" th:if="${error}" th:text="${error}"></div>
 
         <form class="form-stack" th:action="@{/web/login}" method="post">
-            <label for="username">Username</label>
-            <input id="username"
-                   name="username"
-                   type="text"
-                   autocomplete="username"
-                   th:value="${usernameInput}"
-                   required>
+            <label for="username">Username or Email</label>
+            <input id="username" name="username" type="text" autocomplete="username"
+                   th:value="${usernameInput}" required>
 
             <label for="password">Password</label>
-            <input id="password"
-                   name="password"
-                   type="password"
-                   autocomplete="current-password"
-                   required>
+            <input id="password" name="password" type="password" autocomplete="current-password" required>
 
             <button class="button primary" type="submit">Login</button>
-            <a class="button secondary" th:href="@{/web/register}">Register</a>
         </form>
+
+        <p class="auth-switch">Don't have an account?
+            <a th:href="@{/web/register}">Register</a>
+        </p>
     </section>
 </main>
 </body>

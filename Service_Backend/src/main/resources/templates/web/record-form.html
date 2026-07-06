@@ -3,71 +3,16 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${editMode} ? 'Wellness AI - Edit Record' : 'Wellness AI - Add Record'">Wellness AI - Record</title>
+    <meta http-equiv="refresh" content="0; url=/web/records/new">
+    <title>Record Your Wellness - New Record</title>
     <link rel="stylesheet" th:href="@{/web/css/style.css}">
 </head>
 <body>
-<header class="topbar">
-    <a class="brand" th:href="@{/web/dashboard}">Wellness AI</a>
-    <nav class="nav">
-        <a th:href="@{/web/records}" class="active">Records</a>
-        <a th:href="@{/web/chat}">Chat</a>
-        <a th:href="@{/web/insights}">Insights</a>
-    </nav>
-    <form th:action="@{/web/logout}" method="post">
-        <button class="link-button" type="submit">Logout</button>
-    </form>
-</header>
-
 <main class="page narrow">
-    <div class="page-header">
-        <div>
-            <p class="eyebrow">Wellness</p>
-            <h1 th:text="${editMode} ? 'Edit Record' : 'Add Record'">Add Record</h1>
-        </div>
-    </div>
-
-    <div class="alert error" th:if="${error}" th:text="${error}"></div>
-
-    <form class="form-stack" th:action="${formAction}" th:object="${record}" method="post">
-        <label for="sleepHours">Sleep Hours</label>
-        <input id="sleepHours" th:field="*{sleepHours}" type="number" min="0" max="24" step="0.1" placeholder="e.g. 7.5" required>
-        <div class="field-error" th:if="${#fields.hasErrors('sleepHours')}" th:errors="*{sleepHours}"></div>
-
-        <label for="exerciseActivity">Exercise Activity</label>
-        <input id="exerciseActivity" th:field="*{exerciseActivity}" type="text" maxlength="100" placeholder="e.g. Running, Yoga" required>
-        <div class="field-error" th:if="${#fields.hasErrors('exerciseActivity')}" th:errors="*{exerciseActivity}"></div>
-
-        <label for="exerciseDuration">Duration (mins)</label>
-        <input id="exerciseDuration" th:field="*{exerciseDuration}" type="number" min="0" max="1440" placeholder="e.g. 30" required>
-        <div class="field-error" th:if="${#fields.hasErrors('exerciseDuration')}" th:errors="*{exerciseDuration}"></div>
-
-        <label for="moodScore">Mood Score</label>
-        <select id="moodScore" th:field="*{moodScore}">
-            <option value="">Not set</option>
-            <option value="1">1 - Very low</option>
-            <option value="2">2 - Low</option>
-            <option value="3">3 - Neutral</option>
-            <option value="4">4 - Good</option>
-            <option value="5">5 - Great</option>
-        </select>
-        <div class="field-error" th:if="${#fields.hasErrors('moodScore')}" th:errors="*{moodScore}"></div>
-
-        <label for="recordDate">Date</label>
-        <input id="recordDate" th:field="*{recordDate}" type="date" required>
-        <div class="field-error" th:if="${#fields.hasErrors('recordDate')}" th:errors="*{recordDate}"></div>
-
-        <label for="notes">Notes</label>
-        <textarea id="notes" th:field="*{notes}" rows="4" maxlength="1000" placeholder="Optional notes"></textarea>
-        <div class="field-error" th:if="${#fields.hasErrors('notes')}" th:errors="*{notes}"></div>
-
-        <div class="form-actions">
-            <button class="button primary" type="submit" th:text="${editMode} ? 'Update Record' : 'Save Record'">Save Record</button>
-            <a class="button secondary" th:if="${editMode}" th:href="@{/web/records/{id}(id=${recordId})}">Cancel</a>
-            <a class="button secondary" th:if="${!editMode}" th:href="@{/web/records}">Cancel</a>
-        </div>
-    </form>
+    <section class="panel">
+        <p class="muted">Choose a sleep or exercise record.</p>
+        <a class="button primary" th:href="@{/web/records/new}">New Record</a>
+    </section>
 </main>
 </body>
 </html>

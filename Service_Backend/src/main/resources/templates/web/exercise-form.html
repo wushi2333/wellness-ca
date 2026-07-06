@@ -1,0 +1,60 @@
+<!-- Author: Guo Jiali -->
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Record Your Wellness - Exercise</title>
+    <link rel="stylesheet" th:href="@{/web/css/style.css}">
+</head>
+<body>
+<header class="topbar">
+    <a class="brand" th:href="@{/web/dashboard}"><span class="brand-mark small">W</span><span>Record Your Wellness</span></a>
+    <nav class="nav">
+        <a th:href="@{/web/dashboard}">Dashboard</a>
+        <a th:href="@{/web/records}" class="active">Records</a>
+        <a th:href="@{/web/chat}">Chat</a>
+        <a th:href="@{/web/insights}">Insights</a>
+        <a th:href="@{/web/settings}">Settings</a>
+    </nav>
+    <form th:action="@{/web/logout}" method="post"><button class="icon-button" type="submit">Logout</button></form>
+</header>
+
+<main class="page narrow">
+    <div class="page-header">
+        <div>
+            <p class="eyebrow" th:text="${editMode} ? 'Edit Exercise' : 'Add Exercise'">Add Exercise</p>
+            <h1>Exercise</h1>
+        </div>
+        <a class="button secondary compact" th:href="@{/web/records}">Back</a>
+    </div>
+
+    <div class="alert error" th:if="${error}" th:text="${error}"></div>
+
+    <form class="panel form-stack" th:action="@{${formAction}}" th:object="${exercise}" method="post">
+        <label for="recordDate">Date</label>
+        <input id="recordDate" th:field="*{recordDate}" type="date" required>
+        <p class="field-error" th:if="${#fields.hasErrors('recordDate')}" th:errors="*{recordDate}"></p>
+
+        <label for="exerciseActivity">Type</label>
+        <select id="exerciseActivity" th:field="*{exerciseActivity}" required>
+            <option th:each="type : ${exerciseTypes}" th:value="${type}" th:text="${type}">Running</option>
+        </select>
+        <p class="field-error" th:if="${#fields.hasErrors('exerciseActivity')}" th:errors="*{exerciseActivity}"></p>
+
+        <label for="exerciseDuration">Duration (minutes)</label>
+        <input id="exerciseDuration" th:field="*{exerciseDuration}" type="number" min="1" max="1440" step="1" required>
+        <p class="field-error" th:if="${#fields.hasErrors('exerciseDuration')}" th:errors="*{exerciseDuration}"></p>
+
+        <label for="notes">Notes</label>
+        <textarea id="notes" th:field="*{notes}" rows="4" placeholder="How did it feel? Intensity, location..."></textarea>
+        <p class="field-error" th:if="${#fields.hasErrors('notes')}" th:errors="*{notes}"></p>
+
+        <div class="form-actions">
+            <button class="button primary" type="submit" th:text="${editMode} ? 'Update Record' : 'Confirm'">Confirm</button>
+            <a class="button secondary" th:href="@{/web/records}">Cancel</a>
+        </div>
+    </form>
+</main>
+</body>
+</html>

@@ -4,48 +4,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wellness AI - Chat</title>
+    <title>Record Your Wellness - Chat</title>
     <link rel="stylesheet" th:href="@{/web/css/style.css}">
     <script defer th:src="@{/web/js/app.js}"></script>
 </head>
-<body>
+<body class="chat-body">
 <header class="topbar">
-    <a class="brand" th:href="@{/web/dashboard}">Wellness AI</a>
+    <a class="brand" th:href="@{/web/dashboard}"><span class="brand-mark small">W</span><span>Record Your Wellness</span></a>
     <nav class="nav">
+        <a th:href="@{/web/dashboard}">Dashboard</a>
         <a th:href="@{/web/records}">Records</a>
         <a th:href="@{/web/chat}" class="active">Chat</a>
         <a th:href="@{/web/insights}">Insights</a>
+        <a th:href="@{/web/settings}">Settings</a>
     </nav>
-    <form th:action="@{/web/logout}" method="post">
-        <button class="link-button" type="submit">Logout</button>
-    </form>
+    <form th:action="@{/web/logout}" method="post"><button class="icon-button" type="submit">Logout</button></form>
 </header>
 
-<main class="page chat-page">
-    <div class="page-header">
-        <div>
-            <p class="eyebrow">AI Wellness Assistant</p>
-            <h1>Chat</h1>
+<main class="chat-shell">
+    <section class="chat-main">
+        <div class="character-stage">
+            <div class="yui-avatar" th:classappend="${chatMode == 'agent'} ? 'agent' : ''">
+                <span>Yui</span>
+            </div>
+            <div>
+                <p class="eyebrow">AI Wellness Assistant</p>
+                <h1>Chat with Yui</h1>
+                <p class="muted" th:text="${ragReady} ? 'Wellness memory is ready.' : 'Wellness memory is loading.'">Ready</p>
+            </div>
         </div>
-        <form th:action="@{/web/chat/clear}" method="post">
-            <button class="button secondary compact" type="submit">Clear</button>
+
+        <div class="chat-toolbar">
+            <strong th:text="${currentSessionId == null} ? 'New Chat' : 'Session #' + ${currentSessionId}">New Chat</strong>
+            <form th:action="@{/web/chat/mode}" method="post" class="mode-toggle">
+                <button type="submit" name="mode" value="chat" th:classappend="${chatMode == 'chat'} ? 'active'">Chat</button>
+                <button type="submit" name="mode" value="agent" th:classappend="${chatMode == 'agent'} ? 'active'">Agent</button>
+            </form>
+        </div>
+
+        <div class="alert success" th:if="${success}" th:text="${success}"></div>
+        <div class="alert error" th:if="${error}" th:text="${error}"></div>
+        <div class="alert info" th:if="${intentTarget}" th:text="'Yui suggested opening: ' + ${intentTarget}"></div>
+
+        <section class="chat-window" id="chatWindow" aria-live="polite">
+            <div class="empty-chat" th:if="${#lists.isEmpty(messages)}">
+                <strong>Hello, <span th:text="${username}">User</span>!</strong>
+                <p>Switch to Agent mode to let Yui analyze your records, or stay in Chat mode for normal conversation.</p>
+            </div>
+            <article th:each="message : ${messages}"
+                     th:class="${message.role == 'user'} ? 'chat-bubble user' : 'chat-bubble ai'">
+                <p th:text="${message.content}">Message</p>
+                <div class="message-meta" th:if="${message.role != 'user'}">
+                    <span th:if="${message.emotion != null && !message.emotion.isBlank()}" th:text="${message.emotion}">happy</span>
+                    <span th:if="${!#lists.isEmpty(message.tools)}" th:text="'Tools: ' + ${#strings.listJoin(message.tools, ', ')}">Tools</span>
+                </div>
+            </article>
+        </section>
+
+        <form class="chat-form" th:action="@{/web/chat}" method="post" data-loading-form>
+            <input type="hidden" name="mode" th:value="${chatMode}">
+            <input name="message" type="text" placeholder="Chat with Yui..." autocomplete="off" required>
+            <button class="send-button" type="submit" title="Send">Send</button>
         </form>
-    </div>
-
-    <div class="alert error" th:if="${error}" th:text="${error}"></div>
-
-    <section class="chat-window" id="chatWindow" aria-live="polite">
-        <p class="empty-state" th:if="${#lists.isEmpty(messages)}">Ask the assistant about your wellness records.</p>
-        <div th:each="message : ${messages}"
-             th:class="${message.role == 'user'} ? 'chat-bubble user' : 'chat-bubble ai'">
-            <span th:text="${message.content}">Message</span>
-        </div>
     </section>
 
-    <form class="chat-form" th:action="@{/web/chat}" method="post" data-loading-form>
-        <input name="message" type="text" placeholder="Type a message..." autocomplete="off" required>
-        <button class="button primary compact" type="submit">Send</button>
-    </form>
+    <aside class="session-rail">
+        <div class="rail-header">
+            <strong>History</strong>
+            <form th:action="@{/web/chat/new}" method="post">
+                <button class="button secondary small" type="submit">New</button>
+            </form>
+        </div>
+        <p class="empty-state" th:if="${#lists.isEmpty(sessions)}">No chat history yet.</p>
+        <div class="session-list" th:if="${!#lists.isEmpty(sessions)}">
+            <article class="session-item" th:each="item : ${sessions}" th:classappend="${item.active} ? 'active'">
+                <form th:action="@{/web/chat/sessions/{id}(id=${item.id})}" method="post">
+                    <button type="submit">
+                        <strong th:text="${item.title == null || item.title.isBlank()} ? 'New Chat' : ${item.title}">New Chat</strong>
+                        <span th:text="${item.mode} + ' · ' + ${item.messageCount} + ' messages'">chat</span>
+                    </button>
+                </form>
+                <form th:action="@{/web/chat/sessions/{id}/delete(id=${item.id})}" method="post"
+                      data-confirm="Delete this chat?">
+                    <button class="delete-text" type="submit">Delete</button>
+                </form>
+            </article>
+        </div>
+    </aside>
 </main>
 </body>
 </html>

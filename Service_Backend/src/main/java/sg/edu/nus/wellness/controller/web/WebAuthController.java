@@ -65,24 +65,40 @@ public class WebAuthController {
 
     @PostMapping("/web/register")
     public String register(@RequestParam String username,
+                           @RequestParam(required = false) String email,
                            @RequestParam String password,
                            RedirectAttributes redirectAttributes) {
         String cleanUsername = username == null ? "" : username.trim();
+        String cleanEmail = email == null ? "" : email.trim();
         String cleanPassword = password == null ? "" : password.trim();
 
-        if (cleanUsername.length() < 3 || cleanPassword.length() < 6) {
-            redirectAttributes.addFlashAttribute("error", "Username must be at least 3 characters and password at least 6 characters.");
+        if (cleanUsername.length() < 3) {
+            redirectAttributes.addFlashAttribute("error", "Username must be at least 3 characters.");
             redirectAttributes.addFlashAttribute("usernameInput", cleanUsername);
+            redirectAttributes.addFlashAttribute("emailInput", cleanEmail);
+            return "redirect:/web/register";
+        }
+        if (!cleanEmail.isEmpty() && !cleanEmail.matches("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$")) {
+            redirectAttributes.addFlashAttribute("error", "Please enter a valid email address.");
+            redirectAttributes.addFlashAttribute("usernameInput", cleanUsername);
+            redirectAttributes.addFlashAttribute("emailInput", cleanEmail);
+            return "redirect:/web/register";
+        }
+        if (cleanPassword.length() < 8 || !cleanPassword.matches(".*[A-Za-z].*") || !cleanPassword.matches(".*\\d.*")) {
+            redirectAttributes.addFlashAttribute("error", "Password must be at least 8 characters and include a letter and a digit.");
+            redirectAttributes.addFlashAttribute("usernameInput", cleanUsername);
+            redirectAttributes.addFlashAttribute("emailInput", cleanEmail);
             return "redirect:/web/register";
         }
 
         try {
-            authService.register(cleanUsername, cleanPassword, null);
+            authService.register(cleanUsername, cleanPassword, cleanEmail.isEmpty() ? null : cleanEmail);
             redirectAttributes.addFlashAttribute("success", "Register successful. Please log in.");
             return "redirect:/web/login";
         } catch (RuntimeException ex) {
             redirectAttributes.addFlashAttribute("error", ex.getMessage());
             redirectAttributes.addFlashAttribute("usernameInput", cleanUsername);
+            redirectAttributes.addFlashAttribute("emailInput", cleanEmail);
             return "redirect:/web/register";
         }
     }

@@ -4,21 +4,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wellness AI - Records</title>
+    <title>Record Your Wellness - Records</title>
     <link rel="stylesheet" th:href="@{/web/css/style.css}">
     <script defer th:src="@{/web/js/app.js}"></script>
 </head>
 <body>
 <header class="topbar">
-    <a class="brand" th:href="@{/web/dashboard}">Wellness AI</a>
+    <a class="brand" th:href="@{/web/dashboard}"><span class="brand-mark small">W</span><span>Record Your Wellness</span></a>
     <nav class="nav">
+        <a th:href="@{/web/dashboard}">Dashboard</a>
         <a th:href="@{/web/records}" class="active">Records</a>
         <a th:href="@{/web/chat}">Chat</a>
         <a th:href="@{/web/insights}">Insights</a>
+        <a th:href="@{/web/settings}">Settings</a>
     </nav>
-    <form th:action="@{/web/logout}" method="post">
-        <button class="link-button" type="submit">Logout</button>
-    </form>
+    <form th:action="@{/web/logout}" method="post"><button class="icon-button" type="submit">Logout</button></form>
 </header>
 
 <main class="page">
@@ -33,24 +33,74 @@
     <div class="alert success" th:if="${success}" th:text="${success}"></div>
     <div class="alert error" th:if="${error}" th:text="${error}"></div>
 
-    <p class="empty-state" th:if="${#lists.isEmpty(records)}">No wellness records yet</p>
-
-    <section class="record-list" th:if="${!#lists.isEmpty(records)}">
-        <article class="record-row" th:each="record : ${records}">
-            <a class="record-main" th:href="@{/web/records/{id}(id=${record.id})}">
-                <strong th:text="${record.recordDate}">2026-07-02</strong>
-                <span th:text="|Sleep: ${record.sleepHours} hrs|">Sleep: 7.5 hrs</span>
-                <span th:text="|Exercise: ${record.exerciseActivity} (${record.exerciseDuration} mins)|">Exercise</span>
-                <span th:if="${record.moodScore != null}" th:text="|Mood: ${record.moodScore}/5|">Mood</span>
-            </a>
-            <div class="row-actions">
-                <a class="button secondary small" th:href="@{/web/records/{id}/edit(id=${record.id})}">Edit</a>
-                <form th:action="@{/web/records/{id}/delete(id=${record.id})}" method="post" data-confirm="Delete this record?">
-                    <button class="button danger small" type="submit">Delete</button>
-                </form>
+    <section class="records-overview">
+        <article class="record-summary sleep-summary">
+            <div>
+                <p class="eyebrow">Sleep</p>
+                <h2>Sleep Records</h2>
             </div>
+            <a class="button secondary compact" th:href="@{/web/records/manage/sleep}">Manage</a>
+        </article>
+        <article class="record-summary exercise-summary">
+            <div>
+                <p class="eyebrow">Exercise</p>
+                <h2>Exercise Records</h2>
+            </div>
+            <a class="button secondary compact" th:href="@{/web/records/manage/exercise}">Manage</a>
         </article>
     </section>
+
+    <div class="two-column">
+        <section>
+            <div class="section-header">
+                <h2>Recent Sleep</h2>
+                <a th:href="@{/web/sleep-detail}">Detail</a>
+            </div>
+            <p class="empty-state" th:if="${#lists.isEmpty(sleepSections)}">No sleep records yet.</p>
+            <div class="section-list" th:each="section : ${sleepSections}" th:if="${!#lists.isEmpty(sleepSections)}">
+                <p class="date-label" th:text="${section.label}">Week</p>
+                <article class="record-row" th:each="item : ${section.items}">
+                    <div class="record-main">
+                        <strong th:text="${item.date}">2026-07-02</strong>
+                        <span th:text="${item.primary}">7.5h</span>
+                        <span th:text="${item.secondary}">23:00 - 07:00</span>
+                    </div>
+                    <div class="row-actions">
+                        <a class="button secondary small" th:href="@{/web/records/sleep/{id}/edit(id=${item.id})}">Edit</a>
+                        <form th:action="@{/web/records/sleep/{id}/delete(id=${item.id})}" method="post"
+                              th:attr="data-confirm='Delete sleep record from ' + ${item.date} + '?'">
+                            <button class="button danger small" type="submit">Delete</button>
+                        </form>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <section>
+            <div class="section-header">
+                <h2>Recent Exercise</h2>
+                <a th:href="@{/web/exercise-detail}">Detail</a>
+            </div>
+            <p class="empty-state" th:if="${#lists.isEmpty(exerciseSections)}">No exercise records yet.</p>
+            <div class="section-list" th:each="section : ${exerciseSections}" th:if="${!#lists.isEmpty(exerciseSections)}">
+                <p class="date-label" th:text="${section.label}">Week</p>
+                <article class="record-row" th:each="item : ${section.items}">
+                    <div class="record-main">
+                        <strong th:text="${item.date}">2026-07-02</strong>
+                        <span th:text="${item.primary}">Running</span>
+                        <span th:text="${item.secondary}">30 min</span>
+                    </div>
+                    <div class="row-actions">
+                        <a class="button secondary small" th:href="@{/web/records/exercise/{id}/edit(id=${item.id})}">Edit</a>
+                        <form th:action="@{/web/records/exercise/{id}/delete(id=${item.id})}" method="post"
+                              th:attr="data-confirm='Delete ' + ${item.primary} + ' record from ' + ${item.date} + '?'">
+                            <button class="button danger small" type="submit">Delete</button>
+                        </form>
+                    </div>
+                </article>
+            </div>
+        </section>
+    </div>
 </main>
 </body>
 </html>
