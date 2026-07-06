@@ -5,12 +5,14 @@ import jakarta.servlet.http.*;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
+import sg.edu.nus.wellness.repository.UserRepo;
 import java.io.IOException;
 import java.util.List;
 
 public class JwtAuthFilter extends OncePerRequestFilter {
     private final JwtTokenProvider jwt;
-    public JwtAuthFilter(JwtTokenProvider j) { jwt=j; }
+    private final UserRepo users;
+    public JwtAuthFilter(JwtTokenProvider j, UserRepo users) { this.jwt = j; this.users = users; }
 
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
@@ -26,6 +28,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
         try {
             Long userId = Long.parseLong(jwt.validateAndGetUserId(header.substring(7)));
+            if (!users.existsById(userId)) {
+                throw new IllegalArgumentException("User no longer exists");
+            }
             req.setAttribute("userId", userId);
             SecurityContextHolder.getContext().setAuthentication(
                     new UsernamePasswordAuthenticationToken(userId, null, List.of()));

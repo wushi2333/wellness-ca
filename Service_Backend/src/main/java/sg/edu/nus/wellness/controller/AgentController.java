@@ -51,12 +51,12 @@ public class AgentController {
 
     @DeleteMapping("/agent/recommend/{id}")
     public ResponseEntity<?> deleteRec(@PathVariable Long id, HttpServletRequest req) {
-        try {
-            recRepo.deleteById(id);
-            return ResponseEntity.ok(Map.of("message","Deleted"));
-        } catch (Exception e) {
-            return ResponseEntity.status(404).body(Map.of("detail","Not found"));
-        }
+        Long userId = (Long) req.getAttribute("userId");
+        if (userId == null) return ResponseEntity.status(401).body(Map.of("detail","Unauthorized"));
+        var rec = recRepo.findByIdAndUserId(id, userId);
+        if (rec.isEmpty()) return ResponseEntity.status(404).body(Map.of("detail","Not found"));
+        recRepo.delete(rec.get());
+        return ResponseEntity.ok(Map.of("message","Deleted"));
     }
 
     @GetMapping("/agent/recommend/history")

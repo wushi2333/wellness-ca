@@ -9,7 +9,7 @@ public class AuthRequest {
     public String username;
 
     @NotBlank
-    @Size(min = 6, max = 128)
+    @Size(min = 8, max = 128)
     public String password;
 
     public String email;

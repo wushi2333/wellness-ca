@@ -13,6 +13,7 @@ public interface WellnessRepo extends JpaRepository<WellnessRecord,Long> {
     Page<WellnessRecord> findByUserIdOrderByRecordDateDesc(Long uid, Pageable pageable);
     List<WellnessRecord> findTop7ByUserIdOrderByRecordDateDesc(Long uid);
     Optional<WellnessRecord> findByIdAndUserId(Long id, Long uid);
+    Optional<WellnessRecord> findFirstByUserIdAndSleepRecordId(Long userId, Long sleepRecordId);
     Optional<WellnessRecord> findFirstByUserIdAndRecordDateOrderByIdAsc(Long userId, LocalDate recordDate);
     void deleteAllByUserId(Long userId);
 }

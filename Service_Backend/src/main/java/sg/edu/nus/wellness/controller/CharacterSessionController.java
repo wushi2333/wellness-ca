@@ -15,9 +15,11 @@ import java.util.*;
 public class CharacterSessionController {
 
     private final CharacterMemoryService memory;
+    private final RequestUserExtractor userExt;
 
-    public CharacterSessionController(CharacterMemoryService memory) {
+    public CharacterSessionController(CharacterMemoryService memory, RequestUserExtractor userExt) {
         this.memory = memory;
+        this.userExt = userExt;
     }
 
     @GetMapping("/character/sessions")
@@ -40,15 +42,15 @@ public class CharacterSessionController {
     }
 
     @DeleteMapping("/character/sessions/{id}")
-    public ResponseEntity<?> deleteSession(@PathVariable Long id) {
-        memory.deleteSession(id);
+    public ResponseEntity<?> deleteSession(@PathVariable Long id, HttpServletRequest req) {
+        memory.deleteSession(userExt.userId(req), id);
         return ResponseEntity.ok(Map.of("status", "deleted"));
     }
 
     @GetMapping("/character/sessions/{id}/messages")
-    public ResponseEntity<List<Map<String, Object>>> getMessages(@PathVariable Long id) {
+    public ResponseEntity<List<Map<String, Object>>> getMessages(@PathVariable Long id, HttpServletRequest req) {
         List<Map<String, Object>> result = new ArrayList<>();
-        for (CharacterMessage m : memory.getMessages(id)) {
+        for (CharacterMessage m : memory.getMessages(userExt.userId(req), id)) {
             Map<String, Object> msg = new java.util.LinkedHashMap<>();
             msg.put("id", m.id);
             msg.put("role", m.role);

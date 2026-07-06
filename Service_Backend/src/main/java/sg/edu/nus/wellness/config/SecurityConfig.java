@@ -1,5 +1,6 @@
 // Author: Xia Zihang, Yutong Luo
 package sg.edu.nus.wellness.config;
+import sg.edu.nus.wellness.repository.UserRepo;
 import sg.edu.nus.wellness.security.*;
 import org.springframework.context.annotation.*;
 import org.springframework.http.HttpMethod;
@@ -16,8 +17,8 @@ import org.springframework.security.web.access.intercept.AuthorizationFilter;
 public class SecurityConfig {
 
     @Bean
-    public JwtAuthFilter jwtAuthFilter(JwtTokenProvider jwt) {
-        return new JwtAuthFilter(jwt);
+    public JwtAuthFilter jwtAuthFilter(JwtTokenProvider jwt, UserRepo users) {
+        return new JwtAuthFilter(jwt, users);
     }
 
     @Bean

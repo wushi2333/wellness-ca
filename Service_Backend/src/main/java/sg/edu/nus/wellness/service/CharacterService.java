@@ -60,6 +60,8 @@ public class CharacterService {
         // Create or reuse session
         if (sessionId == null) {
             sessionId = memory.createSession(userId, mode).id;
+        } else {
+            memory.requireOwnedSession(userId, sessionId);
         }
 
         // Save user message

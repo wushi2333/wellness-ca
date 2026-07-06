@@ -8,6 +8,7 @@ import org.springframework.http.*;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import sg.edu.nus.wellness.exception.NotFoundException;
 import sg.edu.nus.wellness.model.*;
 import sg.edu.nus.wellness.repository.*;
 import org.slf4j.Logger;
@@ -54,7 +55,13 @@ public class CharacterMemoryService {
         return sessionRepo.save(s);
     }
 
-    public void deleteSession(Long sessionId) {
+    public CharacterSession requireOwnedSession(Long userId, Long sessionId) {
+        return sessionRepo.findByIdAndUserId(sessionId, userId)
+                .orElseThrow(() -> new NotFoundException("Session not found"));
+    }
+
+    public void deleteSession(Long userId, Long sessionId) {
+        requireOwnedSession(userId, sessionId);
         List<CharacterMessage> msgs = messageRepo.findBySessionIdOrderByCreatedAtAsc(sessionId);
         messageRepo.deleteAll(msgs);
         sessionRepo.deleteById(sessionId);
@@ -62,7 +69,8 @@ public class CharacterMemoryService {
 
     // ---- Messages ----------------------------------------------------------
 
-    public List<CharacterMessage> getMessages(Long sessionId) {
+    public List<CharacterMessage> getMessages(Long userId, Long sessionId) {
+        requireOwnedSession(userId, sessionId);
         return messageRepo.findBySessionIdOrderByCreatedAtAsc(sessionId);
     }
 

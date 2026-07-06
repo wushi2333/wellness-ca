@@ -44,6 +44,7 @@ public class WellnessService {
 
     // ── sleep CRUD ──────────────────────────────────────────────────────
 
+    @CacheEvict(value = "records", key = "#userId")
     public Long createSleep(Long userId, SleepRecordRequest req) {
         LocalDate date = LocalDate.parse(req.recordDate);
         WellnessRecord daily = getOrCreateDaily(userId, date);
@@ -68,7 +69,9 @@ public class WellnessService {
         return s.getId();
     }
 
+    @CacheEvict(value = "records", key = "#userId")
     public void updateSleep(Long userId, Long sleepId, SleepRecordRequest req) {
+        WellnessRecord daily = findOwnedDailyBySleepId(userId, sleepId);
         SleepRecord s = sleepRepo.findById(sleepId)
                 .orElseThrow(() -> new NotFoundException("Sleep record not found"));
         applySleep(s, req);
@@ -76,22 +79,18 @@ public class WellnessService {
         ragClient.syncSleep(s.getId(), userId, s.getSleepHours(),
                 s.getSleepTime(), s.getWakeTime(),
                 s.getMoodScore() != null ? s.getMoodScore() : 0,
-                "", s.getNotes());
-        log.info("Sleep updated id={}", sleepId);
+                daily.getRecordDate().toString(), s.getNotes());
+        log.info("Sleep updated id={} for user={}", sleepId, userId);
     }
 
     @CacheEvict(value = "records", key = "#userId")
     public void deleteSleep(Long userId, Long sleepId) {
-        // Unlink from daily record
-        dailyRepo.findAll().forEach(d -> {
-            if (sleepId.equals(d.getSleepRecordId())) {
-                d.setSleepRecordId(null);
-                dailyRepo.save(d);
-            }
-        });
+        WellnessRecord daily = findOwnedDailyBySleepId(userId, sleepId);
+        daily.setSleepRecordId(null);
+        dailyRepo.save(daily);
         sleepRepo.deleteById(sleepId);
         ragClient.deleteSleep(sleepId);
-        log.info("Sleep deleted id={}", sleepId);
+        log.info("Sleep deleted id={} for user={}", sleepId, userId);
     }
 
     private void applySleep(SleepRecord s, SleepRecordRequest req) {
@@ -104,6 +103,7 @@ public class WellnessService {
 
     // ── exercise CRUD ───────────────────────────────────────────────────
 
+    @CacheEvict(value = "records", key = "#userId")
     public Long createExercise(Long userId, ExerciseRecordRequest req) {
         LocalDate date = LocalDate.parse(req.recordDate);
         WellnessRecord daily = getOrCreateDaily(userId, date);
@@ -119,27 +119,45 @@ public class WellnessService {
         return e.getId();
     }
 
+    @CacheEvict(value = "records", key = "#userId")
     public void updateExercise(Long userId, Long exerciseId, ExerciseRecordRequest req) {
-        ExerciseRecord e = exerciseRepo.findById(exerciseId)
-                .orElseThrow(() -> new NotFoundException("Exercise record not found"));
+        ExerciseRecord e = findOwnedExercise(userId, exerciseId);
         applyExercise(e, req);
         exerciseRepo.save(e);
         ragClient.syncExercise(e.getId(), userId, e.getExerciseActivity(),
                 e.getExerciseDuration(), "", e.getNotes());
-        log.info("Exercise updated id={}", exerciseId);
+        log.info("Exercise updated id={} for user={}", exerciseId, userId);
     }
 
     @CacheEvict(value = "records", key = "#userId")
     public void deleteExercise(Long userId, Long exerciseId) {
+        findOwnedExercise(userId, exerciseId);
         exerciseRepo.deleteById(exerciseId);
         ragClient.deleteExercise(exerciseId);
-        log.info("Exercise deleted id={}", exerciseId);
+        log.info("Exercise deleted id={} for user={}", exerciseId, userId);
     }
 
     private void applyExercise(ExerciseRecord e, ExerciseRecordRequest req) {
         e.setExerciseActivity(req.exerciseActivity);
         e.setExerciseDuration(req.exerciseDuration);
         if (req.notes != null && !req.notes.isEmpty()) e.setNotes(req.notes);
+    }
+
+    private WellnessRecord findOwnedDaily(Long userId, Long dailyRecordId) {
+        return dailyRepo.findByIdAndUserId(dailyRecordId, userId)
+                .orElseThrow(() -> new NotFoundException("Record not found"));
+    }
+
+    private WellnessRecord findOwnedDailyBySleepId(Long userId, Long sleepId) {
+        return dailyRepo.findFirstByUserIdAndSleepRecordId(userId, sleepId)
+                .orElseThrow(() -> new NotFoundException("Sleep record not found"));
+    }
+
+    private ExerciseRecord findOwnedExercise(Long userId, Long exerciseId) {
+        ExerciseRecord exercise = exerciseRepo.findById(exerciseId)
+                .orElseThrow(() -> new NotFoundException("Exercise record not found"));
+        findOwnedDaily(userId, exercise.getDailyRecordId());
+        return exercise;
     }
 
     // ── aggregated daily query ─────────────────────────────────────────
@@ -249,8 +267,7 @@ public class WellnessService {
 
     /** Old-style update by daily record ID. */
     public void update(Long userId, Long id, WellnessRequest req) {
-        WellnessRecord d = dailyRepo.findById(id)
-                .orElseThrow(() -> new NotFoundException("Record not found"));
+        WellnessRecord d = findOwnedDaily(userId, id);
         if (req.sleepHours != null && req.sleepHours > 0 && d.getSleepRecordId() != null) {
             SleepRecordRequest sr = new SleepRecordRequest();
             sr.sleepHours = req.sleepHours;
@@ -276,8 +293,7 @@ public class WellnessService {
     /** Old-style delete — removes the entire daily record and linked data. */
     @CacheEvict(value = "records", key = "#userId")
     public void delete(Long userId, Long id) {
-        WellnessRecord d = dailyRepo.findById(id)
-                .orElseThrow(() -> new NotFoundException("Record not found"));
+        WellnessRecord d = findOwnedDaily(userId, id);
         if (d.getSleepRecordId() != null) sleepRepo.deleteById(d.getSleepRecordId());
         exerciseRepo.deleteAllByDailyRecordId(d.getId());
         dailyRepo.delete(d);
