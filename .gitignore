@@ -23,7 +23,16 @@ Service_Backend/target/
 __pycache__/
 *.py[cod]
 
+# .NET
+.vs/
+bin/
+obj/
+*.user
+
 # OS
 Thumbs.db
 /tmp
 CLAUDE.md
+
+# Claude local config
+.claude/
