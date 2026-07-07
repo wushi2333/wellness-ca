@@ -173,7 +173,10 @@ class LoginActivity : AppCompatActivity() {
         }
 
         btnRegister.onClickDebounced {
-            startActivity(Intent(this, RegisterActivity::class.java))
+            val intent = Intent(this, RegisterActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            }
+            startActivity(intent)
         }
 
         btnGoogleSignIn.onClickDebounced {

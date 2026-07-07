@@ -56,7 +56,10 @@ class RegisterActivity : AppCompatActivity() {
         etPassword.setOnFocusChangeListener { _, _ -> clearFieldError(etPassword, tvPasswordError) }
 
         btnGoLogin.setOnClickListener {
-            startActivity(Intent(this, LoginActivity::class.java))
+            val intent = Intent(this, LoginActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            }
+            startActivity(intent)
             finish()
         }
 

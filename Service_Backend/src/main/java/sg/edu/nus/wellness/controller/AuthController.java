@@ -1,6 +1,7 @@
 // Author: Xia Zihang, Yutong Luo
 package sg.edu.nus.wellness.controller;
 import sg.edu.nus.wellness.dto.AuthRequest;
+import sg.edu.nus.wellness.dto.LoginRequest;
 import sg.edu.nus.wellness.dto.ChangePasswordRequest;
 import sg.edu.nus.wellness.dto.EmailRequest;
 import sg.edu.nus.wellness.service.AuthService;
@@ -29,7 +30,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody AuthRequest req) {
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest req) {
         return ResponseEntity.ok(auth.login(req.username, req.password));
     }
 

@@ -19,6 +19,9 @@ public class AuthService {
     private final UserRepo users; private final JwtTokenProvider jwt; private final PasswordEncoder encoder;
     private final RestTemplate http;
 
+    @org.springframework.beans.factory.annotation.Value("${app.google.client.secret:}")
+    private String googleClientSecret;
+
     public AuthService(UserRepo u, JwtTokenProvider j, PasswordEncoder e, RestTemplate rt) { users=u; jwt=j; encoder=e; http=rt; }
 
     public Long register(String username, String password, String email) {
@@ -79,10 +82,12 @@ public class AuthService {
             // Route 1: authCode → exchange for tokens (Android Chrome Tabs / Web)
             if (authCode != null && !authCode.isBlank()) {
                 String clientId = "375016829980-l1gpslqj0cltlc5aqf2f403c52oepeg7.apps.googleusercontent.com";
+                String clientSecret = googleClientSecret != null ? googleClientSecret : "";
                 String uri = (redirectUri != null && !redirectUri.isBlank())
                     ? redirectUri : "http://localhost/oauth2callback";
                 String tokenBody = "code=" + authCode +
                     "&client_id=" + clientId +
+                    "&client_secret=" + clientSecret +
                     "&redirect_uri=" + uri +
                     "&grant_type=authorization_code";
 
@@ -134,7 +139,8 @@ public class AuthService {
             if (username.isEmpty() || !existingByEmail.getUsername().equals(username)) {
                 return Map.of("conflict", true,
                     "existingUsername", existingByEmail.getUsername(),
-                    "email", email);
+                    "email", email,
+                    "idToken", idToken);
             }
             // Same person: just log them in without changing provider
             return Map.of("conflict", false,
@@ -182,7 +188,8 @@ public class AuthService {
                 return Map.of("newUser", true,
                     "email", email,
                     "suggestedUsername", alt,
-                    "error", "username_taken");
+                    "error", "username_taken",
+                    "idToken", idToken);
             }
             User u = new User(username, "");
             u.setEmail(email.toLowerCase());
@@ -200,6 +207,7 @@ public class AuthService {
         // New user not yet confirmed — return hint so client can show confirmation dialog
         return Map.of("newUser", true,
             "email", email,
-            "suggestedUsername", suggested);
+            "suggestedUsername", suggested,
+            "idToken", idToken);
     }
 }

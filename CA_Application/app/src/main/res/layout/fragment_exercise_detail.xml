@@ -1,239 +1,247 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Exercise detail: top bar + stat cards + rounded bar chart + activity breakdown donut -->
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Exercise detail: fixed top bar + scrollable content -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background"
-    android:clipToPadding="false">
+    android:orientation="vertical"
+    android:background="@color/background">
 
+    <!-- Top bar (fixed, does not scroll) -->
     <LinearLayout
+        android:id="@+id/topBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:minHeight="56dp"
+        android:gravity="center_vertical"
+        android:paddingStart="8dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
+        android:background="@color/surface"
+        android:elevation="2dp">
 
-        <!-- Top bar -->
-        <LinearLayout
-            android:id="@+id/topBar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="56dp"
-            android:gravity="center_vertical"
-            android:paddingStart="8dp"
-            android:paddingEnd="16dp"
-            android:paddingTop="12dp"
-            android:paddingBottom="12dp"
-            android:background="@color/surface"
-            android:elevation="2dp">
+        <ImageView
+            android:id="@+id/btnExBack"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_back"/>
 
-            <ImageView
-                android:id="@+id/btnExBack"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_back"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:text="@string/exercise"
-                android:textAppearance="@style/Heading3"/>
-
-            <Button
-                android:id="@+id/btnExEdit"
-                android:layout_width="wrap_content"
-                android:layout_height="36dp"
-                android:text="@string/edit"
-                style="@style/Widget.Material3.Button.TextButton"/>
-        </LinearLayout>
-
-        <!-- Stat cards row -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="16dp">
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:background="@drawable/bg_metallic_card"
-                android:padding="16dp"
-                android:layout_marginEnd="8dp">
-
-                <TextView
-                    android:id="@+id/tvDetailExAvg"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="--"
-                    android:textAppearance="@style/Heading1"
-                    android:textColor="#34C759"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/detail_avg_min_per_day"
-                    android:textAppearance="@style/Caption"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:background="@drawable/bg_metallic_card"
-                android:padding="16dp"
-                android:layout_marginStart="8dp">
-
-                <TextView
-                    android:id="@+id/tvDetailExActive"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="--"
-                    android:textAppearance="@style/Heading1"
-                    android:textColor="@color/primary"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/detail_active_days"
-                    android:textAppearance="@style/Caption"/>
-            </LinearLayout>
-        </LinearLayout>
-
-        <!-- Week navigation -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:paddingTop="4dp"
-            android:paddingBottom="4dp">
-
-            <ImageView
-                android:id="@+id/btnExPrevWeek"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:src="@drawable/ic_back"
-                android:padding="6dp"
-                android:alpha="0.25"
-                android:clickable="true"
-                android:focusable="true" />
-
-            <TextView
-                android:id="@+id/tvExWeekLabel"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="--"
-                android:textSize="14sp"
-                android:textColor="#1E293B"
-                android:fontFamily="@font/segoe_ui"
-                android:textStyle="bold" />
-
-            <ImageView
-                android:id="@+id/btnExNextWeek"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:src="@drawable/ic_back"
-                android:rotation="180"
-                android:padding="6dp"
-                android:alpha="0.25"
-                android:clickable="true"
-                android:focusable="true" />
-        </LinearLayout>
-
-        <!-- Section label -->
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="@string/chart_exercise_minutes_title"
-            android:textSize="13sp"
-            android:textColor="#64748B"
-            android:fontFamily="@font/segoe_ui"
-            android:textStyle="bold"
-            android:paddingStart="20dp"
-            android:paddingTop="4dp"
-            android:paddingBottom="4dp" />
+            android:layout_marginStart="12dp"
+            android:text="@string/exercise"
+            android:textAppearance="@style/Heading3"/>
 
-        <!-- Rounded gradient bar chart -->
-        <com.github.mikephil.charting.charts.BarChart
-            android:id="@+id/exerciseBarChart"
-            android:layout_width="match_parent"
-            android:layout_height="260dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="4dp"/>
+        <Button
+            android:id="@+id/btnExEdit"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:text="@string/edit"
+            style="@style/Widget.Material3.Button.TextButton"/>
+    </LinearLayout>
 
-        <!-- Activity breakdown header with Today/Week toggle -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@color/background"
+        android:clipToPadding="false">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingStart="20dp"
-            android:paddingEnd="16dp"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp">
+            android:orientation="vertical">
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_weight="1"
+            <!-- Stat cards row -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/chart_activity_breakdown"
+                android:orientation="horizontal"
+                android:padding="16dp">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:background="@drawable/bg_metallic_card"
+                    android:padding="16dp"
+                    android:layout_marginEnd="8dp">
+
+                    <TextView
+                        android:id="@+id/tvDetailExAvg"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="--"
+                        android:textAppearance="@style/Heading1"
+                        android:textColor="#34C759"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/detail_avg_min_per_day"
+                        android:textAppearance="@style/Caption"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:background="@drawable/bg_metallic_card"
+                    android:padding="16dp"
+                    android:layout_marginStart="8dp">
+
+                    <TextView
+                        android:id="@+id/tvDetailExActive"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="--"
+                        android:textAppearance="@style/Heading1"
+                        android:textColor="@color/primary"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/detail_active_days"
+                        android:textAppearance="@style/Caption"/>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Week navigation -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp">
+
+                <ImageView
+                    android:id="@+id/btnExPrevWeek"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/ic_back"
+                    android:padding="6dp"
+                    android:alpha="0.25"
+                    android:clickable="true"
+                    android:focusable="true" />
+
+                <TextView
+                    android:id="@+id/tvExWeekLabel"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="--"
+                    android:textSize="14sp"
+                    android:textColor="#1E293B"
+                    android:fontFamily="@font/segoe_ui"
+                    android:textStyle="bold" />
+
+                <ImageView
+                    android:id="@+id/btnExNextWeek"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/ic_back"
+                    android:rotation="180"
+                    android:padding="6dp"
+                    android:alpha="0.25"
+                    android:clickable="true"
+                    android:focusable="true" />
+            </LinearLayout>
+
+            <!-- Section label -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/chart_exercise_minutes_title"
                 android:textSize="13sp"
                 android:textColor="#64748B"
                 android:fontFamily="@font/segoe_ui"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/tvPieToggleToday"
-                android:layout_width="wrap_content"
-                android:layout_height="28dp"
-                android:gravity="center"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
-                android:text="@string/pie_toggle_today"
-                android:textSize="12sp"
-                android:textColor="#FFFFFF"
-                android:fontFamily="@font/segoe_ui"
                 android:textStyle="bold"
-                android:background="@drawable/bg_btn_primary"
-                android:clickable="true"
-                android:focusable="true" />
+                android:paddingStart="20dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp" />
 
-            <TextView
-                android:id="@+id/tvPieToggleWeek"
-                android:layout_width="wrap_content"
-                android:layout_height="28dp"
-                android:gravity="center"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
-                android:text="@string/pie_toggle_week"
-                android:textSize="12sp"
-                android:textColor="#64748B"
-                android:fontFamily="@font/segoe_ui"
-                android:background="@drawable/bg_input_field"
-                android:layout_marginStart="4dp"
-                android:clickable="true"
-                android:focusable="true" />
+            <!-- Rounded gradient bar chart -->
+            <com.github.mikephil.charting.charts.BarChart
+                android:id="@+id/exerciseBarChart"
+                android:layout_width="match_parent"
+                android:layout_height="260dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="4dp"/>
+
+            <!-- Activity breakdown header with Today/Week toggle -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="20dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="@string/chart_activity_breakdown"
+                    android:textSize="13sp"
+                    android:textColor="#64748B"
+                    android:fontFamily="@font/segoe_ui"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvPieToggleToday"
+                    android:layout_width="wrap_content"
+                    android:layout_height="28dp"
+                    android:gravity="center"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:text="@string/pie_toggle_today"
+                    android:textSize="12sp"
+                    android:textColor="#FFFFFF"
+                    android:fontFamily="@font/segoe_ui"
+                    android:textStyle="bold"
+                    android:background="@drawable/bg_btn_primary"
+                    android:clickable="true"
+                    android:focusable="true" />
+
+                <TextView
+                    android:id="@+id/tvPieToggleWeek"
+                    android:layout_width="wrap_content"
+                    android:layout_height="28dp"
+                    android:gravity="center"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:text="@string/pie_toggle_week"
+                    android:textSize="12sp"
+                    android:textColor="#64748B"
+                    android:fontFamily="@font/segoe_ui"
+                    android:background="@drawable/bg_input_field"
+                    android:layout_marginStart="4dp"
+                    android:clickable="true"
+                    android:focusable="true" />
+            </LinearLayout>
+
+            <!-- Activity type breakdown donut chart -->
+            <com.github.mikephil.charting.charts.PieChart
+                android:id="@+id/activityPieChart"
+                android:layout_width="match_parent"
+                android:layout_height="240dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="24dp"/>
+
         </LinearLayout>
-
-        <!-- Activity type breakdown donut chart -->
-        <com.github.mikephil.charting.charts.PieChart
-            android:id="@+id/activityPieChart"
-            android:layout_width="match_parent"
-            android:layout_height="240dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="24dp"/>
-
-    </LinearLayout>
-</ScrollView>
+    </ScrollView>
+</LinearLayout>
