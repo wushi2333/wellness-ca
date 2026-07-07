@@ -104,7 +104,7 @@ Runtime env vars (set in the `wellness-backend.service` unit): `DB_HOST`, `DB_PO
 
 ### Web UI
 
-Open `https://152.42.181.66:8443/web/login` in a browser (accept the self-signed cert
+Open `(https://152-42-181-66.nip.io/web/login)` in a browser (accept the self-signed cert
 warning once). The Python sidecars must be running for agent chat and recommendations:
 
 ```bash
