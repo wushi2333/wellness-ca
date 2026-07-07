@@ -62,7 +62,11 @@ jobs:
       - name: Package EXE as zip
         run: |
           cd RecordYourWellnessApp/publish
-          zip -j ../../RecordYourWellnessApp-win-x64.zip RecordYourWellnessApp.exe
+          ls -la
+          BIN=$(find . -maxdepth 1 -type f -name "RecordYourWellnessApp*" ! -name "*.pdb" | head -1)
+          if [ -z "$BIN" ]; then echo "No binary found!"; find . -type f; exit 1; fi
+          echo "Packaging: $BIN"
+          zip -j ../../RecordYourWellnessApp-win-x64.zip "$BIN"
 
       # ======================== Release ========================
       - name: Create Release
