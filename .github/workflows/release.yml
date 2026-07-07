@@ -56,7 +56,7 @@ jobs:
       - name: Build WinForm release EXE (self-contained single-file)
         working-directory: RecordYourWellnessApp
         run: |
-          dotnet publish -c Release -p:PublishProfile=win-x64 -o publish
+          dotnet publish -c Release -p:PublishProfile=win-x64 -p:EnableWindowsTargeting=true -o publish
           ls -la publish/
 
       - name: Package EXE as zip
