@@ -1,3 +1,4 @@
+// Author: Xia Zihang
 using Microsoft.Extensions.DependencyInjection;
 using static RecordYourWellnessApp.Views.LoginForm;
 using RecordYourWellnessApp.Services;

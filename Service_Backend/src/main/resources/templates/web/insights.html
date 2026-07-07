@@ -1,71 +1,70 @@
-<!-- Author: Guo Jiali -->
+<!-- Author: Guo Jiali, Xia Zihang -->
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wellness AI - Insights</title>
+    <title>Record Your Wellness - Insights</title>
     <link rel="stylesheet" th:href="@{/web/css/style.css}">
     <script defer th:src="@{/web/js/app.js}"></script>
 </head>
 <body>
-<header class="topbar">
-    <a class="brand" th:href="@{/web/dashboard}">Wellness AI</a>
-    <nav class="nav">
-        <a th:href="@{/web/records}">Records</a>
-        <a th:href="@{/web/chat}">Chat</a>
-        <a th:href="@{/web/insights}" class="active">Insights</a>
-    </nav>
-    <form th:action="@{/web/logout}" method="post">
-        <button class="link-button" type="submit">Logout</button>
-    </form>
-</header>
+<header th:replace="web/fragments/chrome :: topbar(${activePage})"></header>
 
-<main class="page narrow">
+<main class="page">
     <div class="page-header">
         <div>
-            <p class="eyebrow">Wellness Insights</p>
-            <h1>Get a personalized recommendation</h1>
+            <p class="eyebrow" th:text="#{insights.title}">Wellness Insights</p>
+            <h1 th:text="#{insights.main_title}">Get a personalized recommendation</h1>
         </div>
+        <a class="button secondary compact" th:href="@{/web/insights/history}" th:text="#{insights.history}">View History</a>
     </div>
 
     <div class="alert error" th:if="${error}" th:text="${error}"></div>
 
-    <section class="insight-panel" th:if="${state == 'idle'}">
-        <p class="muted">Based on your recent wellness data.</p>
-        <form th:action="@{/web/insights/generate}" method="post" data-loading-form data-loading-target="insightLoading">
-            <button class="button primary" type="submit">Generate Recommendation</button>
-        </form>
-        <a class="button secondary" th:href="@{/web/insights/history}">View History</a>
-    </section>
-
-    <section class="loading-panel" id="insightLoading" hidden>
-        <strong>Generating recommendation...</strong>
-        <ol>
-            <li>Loading your wellness records</li>
-            <li>Analyzing sleep pattern</li>
-            <li>Analyzing exercise pattern</li>
-            <li>Generating recommendation</li>
-        </ol>
-    </section>
-
-    <section class="insight-result" th:if="${state == 'result'}">
-        <p class="eyebrow">Today's Recommendation</p>
-        <p class="recommendation-text" th:text="${recommendation}">Recommendation</p>
-
-        <details class="evidence-box">
-            <summary>How AI arrived at this</summary>
-            <ol>
-                <li th:each="item : ${evidence}" th:text="${item['summary']}">Evidence</li>
-            </ol>
-            <p class="muted" th:if="${iterations != null}" th:text="|Iterations: ${iterations}|">Iterations</p>
-        </details>
-
-        <div class="form-actions">
+    <section class="insight-layout">
+        <article class="insight-panel">
+            <p class="muted" th:text="#{insights.subtitle}">Based on your recent wellness data.</p>
             <form th:action="@{/web/insights/generate}" method="post" data-loading-form data-loading-target="insightLoading">
-                <button class="button primary" type="submit">Generate Again</button>
+                <button class="button primary" type="submit"
+                        th:text="${state == 'result'} ? #{insights.again} : #{insights.generate}">Generate Recommendation</button>
             </form>
-            <a class="button secondary" th:href="@{/web/insights/history}">View History</a>
+
+            <div class="loading-panel" id="insightLoading" hidden>
+                <strong th:text="#{insights.generate}">Generating recommendation...</strong>
+                <ol>
+                    <li th:text="#{insights.subtitle}">Loading your wellness records</li>
+                    <li th:text="#{insights.subtitle}">Analyzing sleep pattern</li>
+                    <li th:text="#{insights.subtitle}">Analyzing exercise pattern</li>
+                    <li th:text="#{insights.generate}">Generating recommendation</li>
+                </ol>
+            </div>
+        </article>
+
+        <article class="insight-result" th:if="${state == 'result'}">
+            <p class="eyebrow" th:text="#{insights.result_title}">Today's Recommendation</p>
+            <p class="recommendation-text" th:text="${recommendation}">Recommendation</p>
+            <details class="evidence-box" open>
+                <summary th:text="#{insights.evidence_section}">How AI arrived at this</summary>
+                <ol>
+                    <li th:each="item : ${evidence}" th:text="${item['summary'] != null ? item['summary'] : item}">Evidence</li>
+                </ol>
+                <p class="muted" th:if="${iterations != null}" th:text="'Iterations: ' + ${iterations}">Iterations</p>
+            </details>
+        </article>
+    </section>
+
+    <section class="history-preview" th:if="${history != null}">
+        <div class="section-header">
+            <h2 th:text="#{insights.history_title}">Past Recommendations</h2>
+            <a th:href="@{/web/insights/history}" th:text="#{insights.history}">Open all</a>
+        </div>
+        <p class="empty-state" th:if="${#lists.isEmpty(history)}" th:text="#{insights.history_empty}">No recommendations yet.</p>
+        <div class="history-list compact" th:if="${!#lists.isEmpty(history)}">
+            <article class="history-item" th:each="item, stat : ${history}" th:if="${stat.index < 3}">
+                <span class="muted" th:text="${item.createdAt}">Time</span>
+                <p th:text="${item.content}">Recommendation content</p>
+            </article>
         </div>
     </section>
 </main>

@@ -1,3 +1,4 @@
+// Author: Wang Songyu, Xia Zihang
 package iss.nus.edu.sg.ca_application.model
 
 /**

@@ -1,49 +1,84 @@
-<!-- Author: Guo Jiali -->
+<!-- Author: Guo Jiali, Xia Zihang -->
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wellness AI - Dashboard</title>
+    <title>Record Your Wellness - Dashboard</title>
     <link rel="stylesheet" th:href="@{/web/css/style.css}">
+    <script defer th:src="@{/web/js/app.js}"></script>
 </head>
 <body>
-<header class="topbar">
-    <a class="brand" th:href="@{/web/dashboard}">Wellness AI</a>
-    <nav class="nav">
-        <a th:href="@{/web/records}" th:classappend="${activePage == 'records'} ? 'active'">Records</a>
-        <a th:href="@{/web/chat}" th:classappend="${activePage == 'chat'} ? 'active'">Chat</a>
-        <a th:href="@{/web/insights}" th:classappend="${activePage == 'insights'} ? 'active'">Insights</a>
-    </nav>
-    <form th:action="@{/web/logout}" method="post">
-        <button class="link-button" type="submit">Logout</button>
-    </form>
-</header>
+<header th:replace="web/fragments/chrome :: topbar(${activePage})"></header>
 
 <main class="page">
-    <div class="page-header">
+    <div class="home-topbar">
+        <a class="avatar-link" th:href="@{/web/profile}">
+            <img th:if="${profile.avatarUrl}" th:src="${profile.avatarUrl}" alt="">
+            <span th:unless="${profile.avatarUrl}" th:text="${username != null && !username.isBlank() ? #strings.substring(username,0,1).toUpperCase() : 'U'}">U</span>
+        </a>
         <div>
-            <p class="eyebrow">Dashboard</p>
-            <h1>Welcome, <span th:text="${username}">user</span></h1>
+            <p class="muted greeting" th:text="${greeting}">Good morning</p>
+            <h1 th:text="${profile.nickname != null && !profile.nickname.isBlank() ? profile.nickname : username}">User</h1>
         </div>
+        <a class="settings-link" th:href="@{/web/settings}" th:title="#{nav.settings}" th:text="#{nav.settings}">Settings</a>
     </div>
 
-    <section class="action-grid" aria-label="Dashboard actions">
-        <a class="action-tile" th:href="@{/web/records}">
-            <span class="tile-title">View Records</span>
-            <span class="tile-copy">Review, edit, or delete wellness records.</span>
+    <div class="alert success" th:if="${success}" th:text="${success}"></div>
+    <div class="alert error" th:if="${error}" th:text="${error}"></div>
+
+    <section class="dashboard-grid">
+        <a class="metric-card sleep-card" th:href="@{/web/sleep-detail}">
+            <div class="card-head">
+                <strong th:text="#{dash.sleep}">Sleep</strong>
+                <span class="card-icon" th:text="#{dash.sleep}">Sleep</span>
+            </div>
+            <div class="metric-line">
+                <span class="metric-value" th:text="${#numbers.formatDecimal(summary.avgSleep,1,1)} + ' h'">-- h</span>
+                <span class="metric-caption" th:text="#{dash.avg_per_night}">avg per night</span>
+            </div>
+            <div class="mini-meta">
+                <span th:text="${summary.sleepTrend >= 0 ? '+' : ''} + ${#numbers.formatDecimal(summary.sleepTrend,1,1)} + 'h'">--</span>
+                <small th:text="#{dash.vs_last_7d}">vs last 7d</small>
+            </div>
+            <div class="sparkline" th:attr="data-series=${#strings.listJoin(summary.sleepSeries, ',')},data-kind='sleep'"></div>
         </a>
+
+        <a class="metric-card exercise-card" th:href="@{/web/exercise-detail}">
+            <div class="card-head">
+                <strong th:text="#{dash.exercise}">Exercise</strong>
+                <span class="card-icon wide" th:text="#{dash.exercise}">Exercise</span>
+            </div>
+            <div class="metric-line">
+                <span class="metric-value" th:text="${#numbers.formatDecimal(summary.avgExercise,1,0)} + ' min'">-- min</span>
+                <span class="metric-caption" th:text="#{dash.avg_per_day}">avg per day</span>
+            </div>
+            <div class="mini-meta">
+                <span th:text="${summary.exerciseDays} + ' ' + #{dash.days}">-- days</span>
+                <small th:text="#{dash.this_week}">this week</small>
+            </div>
+            <div class="sparkline" th:attr="data-series=${#strings.listJoin(summary.exerciseSeries, ',')},data-kind='exercise'"></div>
+        </a>
+
+        <a class="tip-card" th:href="@{/web/insights}">
+            <p class="eyebrow" th:text="#{dash.todays_tip}">Today's Tip</p>
+            <h2 th:text="${summary.tip}">Tap to see your personalized wellness recommendations</h2>
+            <span th:text="#{dash.open_insights}">Open insights</span>
+        </a>
+    </section>
+
+    <section class="action-grid compact-actions">
         <a class="action-tile" th:href="@{/web/records/new}">
-            <span class="tile-title">Add Record</span>
-            <span class="tile-copy">Log sleep, exercise, mood, date, and notes.</span>
+            <span class="tile-title" th:text="#{dash.new_record}">New Record</span>
+            <span class="tile-copy" th:text="#{dash.new_record.copy}">Add sleep or exercise.</span>
+        </a>
+        <a class="action-tile" th:href="@{/web/records}">
+            <span class="tile-title" th:text="#{dash.view_records}">View Records</span>
+            <span class="tile-copy" th:text="#{dash.view_records.copy}">Review, edit, and delete entries.</span>
         </a>
         <a class="action-tile" th:href="@{/web/chat}">
-            <span class="tile-title">Chat</span>
-            <span class="tile-copy">Ask the AI wellness assistant for advice.</span>
-        </a>
-        <a class="action-tile" th:href="@{/web/insights}">
-            <span class="tile-title">Wellness Insights</span>
-            <span class="tile-copy">Generate an agentic recommendation.</span>
+            <span class="tile-title" th:text="#{dash.chat_yui}">Chat with Yui</span>
+            <span class="tile-copy" th:text="#{dash.chat_yui.copy}">Use chat or agent mode.</span>
         </a>
     </section>
 </main>

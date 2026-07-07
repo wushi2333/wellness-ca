@@ -1,3 +1,4 @@
+// Author: Xia Zihang
 using System.Drawing.Drawing2D;
 
 namespace RecordYourWellnessApp;

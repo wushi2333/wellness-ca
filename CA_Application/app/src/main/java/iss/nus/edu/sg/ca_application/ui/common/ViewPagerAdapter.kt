@@ -1,3 +1,4 @@
+// Author: Xia Zihang
 package iss.nus.edu.sg.ca_application.ui.common
 
 import androidx.fragment.app.Fragment

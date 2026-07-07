@@ -1,0 +1,40 @@
+{
+	"Version": 3,
+	"FileReferences": {
+		"Moc": "悠小喵.moc3",
+		"Textures": [
+			"悠小喵.8192/texture_00.png",
+			"悠小喵.8192/texture_01.png"
+		],
+		"Physics": "悠小喵.physics3.json",
+		"DisplayInfo": "悠小喵.cdi3.json",
+		"Expressions": [
+			{ "Name": "phone", "File": "exp/看手机.exp3.json" },
+			{ "Name": "notes", "File": "exp/记笔记.exp3.json" },
+			{ "Name": "starEyes", "File": "exp/星星眼.exp3.json" },
+			{ "Name": "cry", "File": "exp/哭哭.exp3.json" },
+			{ "Name": "blush", "File": "exp/脸红.exp3.json" },
+			{ "Name": "dizzy", "File": "exp/晕晕眼.exp3.json" },
+			{ "Name": "leanForward", "File": "exp/前倾.exp3.json" },
+			{ "Name": "tears", "File": "exp/流泪.exp3.json" },
+			{ "Name": "blackFace", "File": "exp/黑脸.exp3.json" },
+			{ "Name": "flyHead", "File": "exp/飞头.exp3.json" },
+			{ "Name": "watermark", "File": "exp/水印开关.exp3.json" }
+		]
+	},
+	"Groups": [
+		{
+			"Target": "Parameter",
+			"Name": "LipSync",
+			"Ids": []
+		},
+		{
+			"Target": "Parameter",
+			"Name": "EyeBlink",
+			"Ids": [
+				"ParamEyeLOpen",
+				"ParamEyeROpen"
+			]
+		}
+	]
+}

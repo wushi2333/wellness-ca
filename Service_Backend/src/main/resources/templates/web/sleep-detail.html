@@ -1,0 +1,54 @@
+<!-- Author: Guo Jiali, Xia Zihang -->
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Record Your Wellness - Sleep Detail</title>
+    <link rel="stylesheet" th:href="@{/web/css/style.css}">
+    <script defer th:src="@{/web/js/app.js}"></script>
+</head>
+<body>
+<header th:replace="web/fragments/chrome :: topbar(${activePage})"></header>
+
+<main class="page">
+    <div class="detail-topbar">
+        <a class="back-link" th:href="@{/web/dashboard}" th:text="#{common.back}">Back</a>
+        <h1 th:text="#{records.sleep}">Sleep</h1>
+        <a class="button secondary compact" th:href="@{/web/records/manage/sleep}" th:text="#{records.edit}">Edit</a>
+    </div>
+
+    <div class="alert success" th:if="${success}" th:text="${success}"></div>
+
+    <section class="stats-row three">
+        <article class="stat-card">
+            <strong th:text="${#numbers.formatDecimal(detail.avgSleep,1,1)}">--</strong>
+            <span th:text="#{detail.avg_hours}">Avg hours</span>
+        </article>
+        <article class="stat-card">
+            <strong th:text="${#numbers.formatDecimal(detail.bestSleep,1,1)}">--</strong>
+            <span th:text="#{detail.best_night}">Best night</span>
+        </article>
+        <article class="stat-card">
+            <strong class="warm" th:text="${#numbers.formatDecimal(detail.avgMood,1,1)}">--</strong>
+            <span th:text="#{detail.avg_mood}">Avg mood</span>
+        </article>
+    </section>
+
+    <div class="week-nav">
+        <a class="week-arrow" th:href="@{/web/sleep-detail(week=${prevWeek})}" th:if="${!prevDisabled}">‹</a>
+        <span class="week-arrow disabled" th:if="${prevDisabled}">‹</span>
+        <strong th:text="${detail.weekLabel}">Week</strong>
+        <a class="week-arrow" th:href="@{/web/sleep-detail(week=${nextWeek})}" th:if="${!nextDisabled}">›</a>
+        <span class="week-arrow disabled" th:if="${nextDisabled}">›</span>
+    </div>
+
+    <section class="chart-panel">
+        <div class="section-header">
+            <h2 th:text="#{records.sleep}">Sleep Hours</h2>
+        </div>
+        <div class="bar-chart" th:attr="data-series=${#strings.listJoin(detail.sleepSeries, ',')},data-labels=${#strings.listJoin(detail.dayLabels, ',')},data-max='12',data-target='7',data-kind='sleep'"></div>
+    </section>
+</main>
+</body>
+</html>

@@ -1,3 +1,4 @@
+// Author: Huang Qianer, Xia Zihang
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using RecordYourWellnessApp.Models;

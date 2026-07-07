@@ -1,3 +1,4 @@
+// Author: Xia Zihang
 using Microsoft.Extensions.DependencyInjection;
 
 namespace RecordYourWellnessApp.Services;

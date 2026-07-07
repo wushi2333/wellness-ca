@@ -1,3 +1,4 @@
+// Author: Xia Zihang
 using NAudio.Wave;
 
 namespace RecordYourWellnessApp.Services;

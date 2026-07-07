@@ -1,3 +1,4 @@
+// Author: Wang Songyu, Liu Yu, Cai Peilin, Xia Zihang
 package iss.nus.edu.sg.ca_application.auth
 
 import android.content.Context

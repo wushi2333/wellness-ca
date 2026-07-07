@@ -1,0 +1,66 @@
+<!-- Author: Guo Jiali, Xia Zihang -->
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Record Your Wellness - Sleep</title>
+    <link rel="stylesheet" th:href="@{/web/css/style.css}">
+    <script defer th:src="@{/web/js/app.js}"></script>
+</head>
+<body>
+<header th:replace="web/fragments/chrome :: topbar(${activePage})"></header>
+
+<main class="page narrow">
+    <div class="page-header">
+        <div>
+            <p class="eyebrow" th:text="${editMode} ? #{rec.sleep.edit} : #{rec.sleep.add}">Add Sleep</p>
+            <h1 th:text="#{rec.sleep.title}">Sleep</h1>
+        </div>
+        <a class="button secondary compact" th:href="@{/web/records}" th:text="#{common.back}">Back</a>
+    </div>
+
+    <div class="alert error" th:if="${error}" th:text="${error}"></div>
+
+    <form class="panel form-stack" th:action="@{${formAction}}" th:object="${sleep}" method="post" data-sleep-form>
+        <label for="recordDate" th:text="#{rec.field.date}">Date</label>
+        <input id="recordDate" th:field="*{recordDate}" type="date" required>
+        <p class="field-error" th:if="${#fields.hasErrors('recordDate')}" th:errors="*{recordDate}"></p>
+
+        <div class="field-grid">
+            <div>
+                <label for="sleepTime" th:text="#{rec.field.bedtime}">Bedtime *</label>
+                <input id="sleepTime" th:field="*{sleepTime}" type="time" required data-sleep-time>
+                <p class="field-error" th:if="${#fields.hasErrors('sleepTime')}" th:errors="*{sleepTime}"></p>
+            </div>
+            <div>
+                <label for="wakeTime" th:text="#{rec.field.wake_time}">Wake time *</label>
+                <input id="wakeTime" th:field="*{wakeTime}" type="time" required data-wake-time>
+                <p class="field-error" th:if="${#fields.hasErrors('wakeTime')}" th:errors="*{wakeTime}"></p>
+            </div>
+        </div>
+
+        <input th:field="*{sleepHours}" type="hidden" data-sleep-hours>
+        <div class="duration-pill" data-duration-label th:text="#{rec.duration} + ': --'">Duration: --</div>
+        <p class="field-error" th:if="${#fields.hasErrors('sleepHours')}" th:errors="*{sleepHours}"></p>
+
+        <label for="moodScore" th:text="#{rec.field.mood}">Morning mood</label>
+        <select id="moodScore" th:field="*{moodScore}" required>
+            <option value="5" th:text="#{rec.mood.good}">Good</option>
+            <option value="3" th:text="#{rec.mood.ok}">OK</option>
+            <option value="1" th:text="#{rec.mood.low}">Low</option>
+        </select>
+        <p class="field-error" th:if="${#fields.hasErrors('moodScore')}" th:errors="*{moodScore}"></p>
+
+        <label for="notes" th:text="#{rec.field.notes}">Notes</label>
+        <textarea id="notes" th:field="*{notes}" rows="4" th:placeholder="#{rec.field.notes}"></textarea>
+        <p class="field-error" th:if="${#fields.hasErrors('notes')}" th:errors="*{notes}"></p>
+
+        <div class="form-actions">
+            <button class="button primary" type="submit" th:text="${editMode} ? #{rec.btn.update} : #{rec.btn.confirm}">Confirm</button>
+            <a class="button secondary" th:href="@{/web/records}" th:text="#{rec.btn.cancel}">Cancel</a>
+        </div>
+    </form>
+</main>
+</body>
+</html>

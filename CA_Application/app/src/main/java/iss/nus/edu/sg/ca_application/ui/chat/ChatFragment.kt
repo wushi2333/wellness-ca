@@ -1,4 +1,4 @@
-// Author: Xia Zihang
+// Author: Huang Qianer, Xia Zihang
 package iss.nus.edu.sg.ca_application.ui.chat
 
 import android.Manifest

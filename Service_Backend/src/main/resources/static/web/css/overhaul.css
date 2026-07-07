@@ -1,0 +1,610 @@
+/* Author: Xia Zihang */
+/* Web overhaul — Phase 0/#1: macaron background, ambient glow (behind cards), click ripples,
+   page-transition animations. Loaded via app.js so style.css stays untouched.
+   All effects are GPU-composited on the visitor's device — zero server cost. */
+
+/* ---- Macaron background: paint on <html>, make <body> transparent so the glow
+   (z-index:-1) shows through the gaps between cards and is hidden behind solid cards. ---- */
+html {
+    background:
+        radial-gradient(1200px 800px at 0% 0%, #fdf2f8 0%, transparent 55%),
+        radial-gradient(1000px 700px at 100% 0%, #eef2ff 0%, transparent 55%),
+        radial-gradient(1100px 800px at 100% 100%, #ecfdf5 0%, transparent 55%),
+        radial-gradient(1000px 700px at 0% 100%, #fffbeb 0%, transparent 55%),
+        linear-gradient(135deg, #fffafc 0%, #f6f8ff 50%, #f4fff8 100%);
+    background-attachment: fixed;
+}
+
+body {
+    background: transparent;
+}
+
+/* ---- Ambient mouse glow. Sits BEHIND body content (z-index:-1) so cards cover it;
+   only visible through transparent gaps. Smaller radius, softer tint. ---- */
+#ambient-layer {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: radial-gradient(160px circle at var(--mx, 50%) var(--my, 50%),
+                rgba(124, 132, 214, 0.14), rgba(214, 167, 222, 0.06) 45%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    will-change: background-position;
+}
+
+#ambient-layer.active {
+    opacity: 1;
+}
+
+#ambient-layer .ripple {
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    background: radial-gradient(circle, rgba(124, 132, 214, 0.55), rgba(244, 114, 182, 0.28) 55%, rgba(167, 139, 250, 0) 75%);
+    box-shadow:
+        0 0 18px 4px rgba(167, 139, 250, 0.45),
+        inset 0 0 8px rgba(255, 255, 255, 0.6);
+    animation: overhaul-ripple 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+
+@keyframes overhaul-ripple {
+    0%   { transform: translate(-50%, -50%) scale(0);    opacity: 0.95; }
+    60%  { opacity: 0.8; }
+    100% { transform: translate(-50%, -50%) scale(3.2);  opacity: 0; }
+}
+
+/* Make sure solid surfaces (cards, panels, topbar) actually sit above the glow. */
+.topbar,
+.panel,
+.auth-panel,
+.profile-card,
+.chat-bubble,
+.session-rail,
+.character-stage,
+.form-stack,
+.alert {
+    position: relative;
+    z-index: 0;
+}
+
+/* ---- Lightweight page-transition: simple fade-in of <main> on Turbo arrival. ---- */
+main.vt-enter {
+    animation: overhaul-fade-in 0.28s ease both;
+}
+
+@keyframes overhaul-fade-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: none; }
+}
+
+/* Slightly soften Turbo's top progress bar so it reads as a gentle loading hint, not a jolt. */
+.turbo-progress-bar {
+    background: linear-gradient(90deg, #7c84d6, #f472b6, #a78bfa) !important;
+    height: 3px !important;
+    box-shadow: 0 0 8px rgba(167, 139, 250, 0.6);
+}
+
+/* Respect users who prefer reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+    #ambient-layer .ripple { display: none; }
+    main.vt-enter { animation: none; }
+}
+
+/* ===================================================================== */
+/* Chat: fixed input bar (#5), collapsible rail (#4), typing spinner (#10) */
+/* ===================================================================== */
+
+/* Lock the chat layout: character-stage + toolbar + alerts are fixed-height,
+   chat-window is the only scrolling region, chat-form is a fixed bottom bar. */
+.chat-main {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.chat-main > .character-stage,
+.chat-main > .chat-toolbar,
+.chat-main > .alert,
+.chat-main > .chat-notices {
+    flex-shrink: 0;
+}
+
+.chat-main > .chat-window {
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+.chat-form {
+    flex-shrink: 0;
+    height: 60px;
+}
+
+.chat-form input[name="message"] {
+    resize: none;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+/* Collapsible history rail. The shell column width is driven by a CSS var. */
+.chat-shell {
+    position: relative;
+    grid-template-columns: minmax(0, 1fr) var(--rail-w, 300px);
+    transition: grid-template-columns 0.25s ease;
+}
+
+.session-rail {
+    overflow: hidden;
+    transition: transform 0.25s ease, opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.session-rail.collapsed {
+    transform: translateX(100%);
+    opacity: 0;
+    visibility: hidden;
+}
+
+.rail-header .rail-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.rail-toggle {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+}
+
+.rail-toggle:hover {
+    background: var(--surface-soft);
+    color: var(--text);
+}
+
+.rail-reopen {
+    position: absolute;
+    right: 0;
+    top: 72px;
+    z-index: 6;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-right: 0;
+    border-radius: 10px 0 0 10px;
+    background: var(--surface);
+    color: var(--primary);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    box-shadow: var(--shadow);
+}
+
+.rail-reopen:hover {
+    background: var(--surface-soft);
+}
+
+/* Compact black × delete button for chat history items. */
+.session-delete {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: #1e293b;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+}
+
+.session-delete:hover {
+    background: #1e293b;
+    color: #ffffff;
+}
+
+/* Shared icon button (mic + tts). */
+.icon-btn {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    color: var(--muted);
+    cursor: pointer;
+    line-height: 1;
+    transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+
+.icon-btn:hover {
+    background: var(--surface-soft);
+    color: var(--text);
+}
+
+/* Mic: turns green while recording. */
+.mic-button.recording {
+    background: #22c55e;
+    border-color: #22c55e;
+    color: #ffffff;
+    transform: scale(1.08);
+    box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.2);
+}
+
+/* TTS toggle: show the right icon by aria-pressed state. */
+.tts-button .tts-off { display: none; }
+.tts-button .tts-on { display: block; }
+.tts-button[aria-pressed="false"] .tts-on { display: none; }
+.tts-button[aria-pressed="false"] .tts-off { display: block; }
+
+.tts-button[aria-pressed="true"] {
+    color: var(--primary);
+    border-color: var(--primary);
+}
+
+/* chat-form: make room for mic + tts buttons (overlays the original 1fr 62px grid). */
+.chat-form {
+    grid-template-columns: 44px 1fr 44px 62px;
+}
+
+/* Google sign-in card: square, centered, with the official "G" logo. */
+.google-card {
+    display: grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    margin: 0 auto;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background: #ffffff;
+    cursor: pointer;
+    text-decoration: none;
+    transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.google-card:hover {
+    box-shadow: 0 4px 16px rgba(66, 133, 244, 0.25);
+    transform: scale(1.06);
+}
+
+/* Auth divider: center the text. */
+.auth-divider {
+    justify-content: center;
+}
+
+/* Language toggle on auth pages — top-right, compact. Needs relative parent. */
+.auth-panel {
+    position: relative;
+}
+
+.lang-toggle {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    display: flex;
+    gap: 2px;
+}
+
+.lang-toggle button {
+    padding: 4px 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.lang-toggle button:hover {
+    background: var(--surface-soft);
+    color: var(--text);
+}
+
+.lang-toggle button.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #ffffff;
+}
+
+/* Week navigation arrows (sleep/exercise detail) — circular, primary-colored. */
+.week-nav {
+    justify-items: center;
+}
+.week-nav .week-arrow {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: #ffffff;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1;
+    text-decoration: none;
+    cursor: pointer;
+    border: 0;
+    transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+    box-shadow: 0 4px 12px rgba(69, 181, 213, 0.3);
+}
+
+.week-nav .week-arrow:hover {
+    background: var(--primary-dark);
+    transform: scale(1.08);
+}
+
+.week-nav .week-arrow:active {
+    transform: scale(0.96);
+}
+
+.week-nav .week-arrow.disabled {
+    background: var(--surface-soft);
+    color: var(--hint);
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+
+/* ===================================================================== */
+/* Floating companion (#8): draggable orb + agent popup                  */
+/* ===================================================================== */
+
+#companion {
+    position: fixed;
+    top: auto;
+    bottom: 24px;
+    right: 24px;
+    z-index: 50;
+    --orb-size: 84px;
+}
+
+#companion.left {
+    right: auto;
+    left: 24px;
+}
+
+.companion-orb {
+    width: var(--orb-size);
+    height: var(--orb-size);
+    border-radius: 50%;
+    overflow: hidden;
+    cursor: grab;
+    background: #97c3f4; /* matches icon.jpg background (rgb 151,195,244) */
+    border: 3px solid #ffffff;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.18);
+    touch-action: none;
+    user-select: none;
+}
+
+.companion-orb:active {
+    cursor: grabbing;
+}
+
+.companion-orb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.1s ease-out;
+    pointer-events: none;
+}
+
+/* Agent popup bubble — opens to the upper-left of the orb (upper-right if orb is on left). */
+.companion-bubble {
+    position: absolute;
+    bottom: calc(var(--orb-size) + 12px);
+    right: 0;
+    width: 320px;
+    max-width: calc(100vw - 48px);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.2);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 51;
+}
+
+/* Honor the [hidden] attribute — flex display would otherwise override it. */
+.companion-bubble[hidden] {
+    display: none !important;
+}
+
+.companion-bubble.left {
+    right: auto;
+    left: 0;
+}
+
+.companion-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: #fff;
+}
+
+.companion-head strong {
+    font-size: 14px;
+}
+
+.companion-head button {
+    background: rgba(255, 255, 255, 0.2);
+    border: 0;
+    color: #fff;
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+}
+
+.companion-messages {
+    height: 240px;
+    overflow-y: auto;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: linear-gradient(135deg, #fffafc 0%, #f6f8ff 100%);
+}
+
+.companion-msg {
+    max-width: 85%;
+    padding: 8px 11px;
+    border-radius: 10px;
+    font-size: 13px;
+    line-height: 1.4;
+    word-wrap: break-word;
+}
+
+.companion-msg.user {
+    align-self: flex-end;
+    background: var(--primary);
+    color: #fff;
+}
+
+.companion-msg.ai {
+    align-self: flex-start;
+    background: var(--surface-soft);
+}
+
+.companion-msg.typing {
+    padding: 12px;
+}
+
+.companion-form {
+    display: flex;
+    gap: 6px;
+    padding: 10px;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+}
+
+.companion-form input {
+    flex: 1;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 13px;
+}
+
+.companion-form button {
+    border: 0;
+    border-radius: 8px;
+    background: var(--primary);
+    color: #fff;
+    padding: 0 14px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+/* Live2D stage: a large rectangular region showing the upper body (Android-style),
+   not a small circle. Macaron gradient background. */
+.character-stage {
+    min-height: 320px;
+}
+
+.yui-stage {
+    position: relative;
+    width: 320px;
+    height: 320px;
+    flex-shrink: 0;
+    border-radius: 18px;
+    overflow: hidden;
+    background:
+        radial-gradient(120% 80% at 20% 0%, #fdf2f8 0%, transparent 60%),
+        radial-gradient(120% 80% at 100% 100%, #ecfdf5 0%, transparent 60%),
+        linear-gradient(135deg, #eef2ff 0%, #fffafc 50%, #f4fff8 100%);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+}
+
+.yui-stage.agent {
+    background:
+        radial-gradient(120% 80% at 20% 0%, #fffbeb 0%, transparent 60%),
+        radial-gradient(120% 80% at 100% 100%, #fef3c7 0%, transparent 60%),
+        linear-gradient(135deg, #fff7e6 0%, #fffafc 50%, #fef9e7 100%);
+}
+
+.yui-stage canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    cursor: grab;
+    touch-action: none;
+}
+
+.yui-stage canvas:active {
+    cursor: grabbing;
+}
+
+.yui-loading {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: var(--muted);
+    font-size: 13px;
+    text-align: center;
+    padding: 8px;
+    z-index: 2;
+}
+
+/* Typing spinner bubble. */
+.chat-bubble.typing {
+    align-self: flex-start;
+}
+
+.typing-dots {
+    display: inline-flex;
+    gap: 4px;
+    padding: 2px 0;
+}
+
+.typing-dots span {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--hint);
+    animation: overhaul-typing 1.2s infinite ease-in-out;
+}
+
+.typing-dots span:nth-child(2) { animation-delay: 0.15s; }
+.typing-dots span:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes overhaul-typing {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+    30%           { transform: translateY(-4px); opacity: 1; }
+}
+
+/* Keep the mobile (single-column) layout working with the collapsible rail. */
+@media (max-width: 720px) {
+    .chat-shell {
+        grid-template-columns: 1fr;
+    }
+    .session-rail.collapsed {
+        display: none;
+    }
+    .rail-reopen {
+        position: fixed;
+        right: 12px;
+        top: auto;
+        bottom: 80px;
+    }
+}

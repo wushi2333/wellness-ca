@@ -1,51 +1,119 @@
-<!-- Author: Guo Jiali -->
+<!-- Author: Guo Jiali, Xia Zihang -->
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wellness AI - Chat</title>
+    <title>Record Your Wellness - Chat</title>
     <link rel="stylesheet" th:href="@{/web/css/style.css}">
     <script defer th:src="@{/web/js/app.js}"></script>
 </head>
-<body>
-<header class="topbar">
-    <a class="brand" th:href="@{/web/dashboard}">Wellness AI</a>
-    <nav class="nav">
-        <a th:href="@{/web/records}">Records</a>
-        <a th:href="@{/web/chat}" class="active">Chat</a>
-        <a th:href="@{/web/insights}">Insights</a>
-    </nav>
-    <form th:action="@{/web/logout}" method="post">
-        <button class="link-button" type="submit">Logout</button>
-    </form>
-</header>
+<body class="chat-body">
+<header th:replace="web/fragments/chrome :: topbar(${activePage})"></header>
 
-<main class="page chat-page">
-    <div class="page-header">
-        <div>
-            <p class="eyebrow">AI Wellness Assistant</p>
-            <h1>Chat</h1>
+<main class="chat-shell">
+    <section class="chat-main">
+        <div class="character-stage">
+            <div class="yui-stage" id="yuiStage" th:classappend="${chatMode == 'agent'} ? 'agent' : ''">
+                <div class="yui-loading" id="yuiLoading" th:text="#{chat.memory_loading}">Loading...</div>
+                <canvas id="yuiCanvas"></canvas>
+            </div>
+            <div class="character-meta">
+                <p class="eyebrow" th:text="#{chat.title}">AI Wellness Assistant</p>
+                <h1 th:text="#{chat.with_yui}">Chat with Yui</h1>
+                <p class="muted" th:text="${ragReady} ? #{chat.memory_ready} : #{chat.memory_loading}">Ready</p>
+            </div>
         </div>
-        <form th:action="@{/web/chat/clear}" method="post">
-            <button class="button secondary compact" type="submit">Clear</button>
+
+        <div class="chat-toolbar">
+            <strong th:text="${currentSessionId == null || currentSessionTitle == null || currentSessionTitle.isBlank()} ? #{chat.new_chat} : ${currentSessionTitle}">New Chat</strong>
+            <form th:action="@{/web/chat/mode}" method="post" class="mode-toggle" data-mode-toggle data-turbo="false">
+                <button type="button" name="mode" value="chat" th:classappend="${chatMode == 'chat'} ? 'active'" th:text="#{chat.mode.chat}">Chat</button>
+                <button type="button" name="mode" value="agent" th:classappend="${chatMode == 'agent'} ? 'active'" th:text="#{chat.mode.agent}">Agent</button>
+            </form>
+        </div>
+
+        <div class="alert success" th:if="${success}" th:text="${success}"></div>
+        <div class="alert error" th:if="${error}" th:text="${error}"></div>
+        <div class="alert info" th:if="${intentTarget}" th:text="#{chat.intent.open} + ' ' + ${intentTarget}"></div>
+        <div class="chat-notices" id="chatNotices"></div>
+
+        <section class="chat-window" id="chatWindow" aria-live="polite">
+            <div class="empty-chat" th:if="${#lists.isEmpty(messages)}">
+                <strong th:text="#{chat.empty.title(${username})}">Hello, User!</strong>
+                <p th:text="#{chat.empty.body}">Switch to Agent mode...</p>
+            </div>
+            <article th:each="message : ${messages}"
+                     th:class="${message.role == 'user'} ? 'chat-bubble user' : 'chat-bubble ai'">
+                <p th:text="${message.content}">Message</p>
+                <div class="message-meta" th:if="${message.role != 'user'}">
+                    <span th:if="${message.emotion != null && !message.emotion.isBlank()}" th:text="${message.emotion}">happy</span>
+                    <span th:if="${!#lists.isEmpty(message.tools)}" th:text="'Tools: ' + ${#strings.listJoin(message.tools, ', ')}">Tools</span>
+                </div>
+            </article>
+        </section>
+
+        <form class="chat-form" th:action="@{/web/chat/send}" method="post" data-chat-send data-turbo="false">
+            <input type="hidden" name="mode" th:value="${chatMode}">
+            <input type="hidden" name="sessionId" th:value="${currentSessionId}">
+            <button type="button" class="icon-btn mic-button" id="chatMic" th:title="#{chat.mic}" aria-label="mic">
+                <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12 14a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3Zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2Z"/></svg>
+            </button>
+            <input name="message" type="text" th:placeholder="#{chat.placeholder}" autocomplete="off" required>
+            <button type="button" class="icon-btn tts-button" id="ttsToggle" th:title="#{chat.tts_on}" aria-pressed="true" aria-label="tts">
+                <svg class="tts-on" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M3 9v6h4l5 5V4L7 9H3z"/><path fill="currentColor" d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.74 2.5-2.26 2.5-4.02z"/><path fill="currentColor" d="M14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77S18.01 4.14 14 3.23z"/></svg>
+                <svg class="tts-off" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M3 9v6h4l5 5V4L7 9H3z"/><path fill="currentColor" d="M15.5 11h7v2h-7z" transform="rotate(45 19 12)"/><path fill="currentColor" d="M15.5 11h7v2h-7z" transform="rotate(-45 19 12)"/></svg>
+            </button>
+            <button class="send-button" type="submit" th:title="#{chat.send}" th:text="#{chat.send}">Send</button>
         </form>
-    </div>
-
-    <div class="alert error" th:if="${error}" th:text="${error}"></div>
-
-    <section class="chat-window" id="chatWindow" aria-live="polite">
-        <p class="empty-state" th:if="${#lists.isEmpty(messages)}">Ask the assistant about your wellness records.</p>
-        <div th:each="message : ${messages}"
-             th:class="${message.role == 'user'} ? 'chat-bubble user' : 'chat-bubble ai'">
-            <span th:text="${message.content}">Message</span>
-        </div>
     </section>
 
-    <form class="chat-form" th:action="@{/web/chat}" method="post" data-loading-form>
-        <input name="message" type="text" placeholder="Type a message..." autocomplete="off" required>
-        <button class="button primary compact" type="submit">Send</button>
-    </form>
+    <button type="button" class="rail-reopen" id="railReopen" th:text="#{chat.history}" hidden>History</button>
+    <aside class="session-rail" id="sessionRail">
+        <div class="rail-header">
+            <strong th:text="#{chat.history}">History</strong>
+            <div class="rail-actions">
+                <form th:action="@{/web/chat/new}" method="post">
+                    <button class="button secondary small" type="submit" th:text="#{chat.new_chat}">New</button>
+                </form>
+                <button type="button" class="rail-toggle" id="railCollapse" th:title="#{chat.history}">›</button>
+            </div>
+        </div>
+        <p class="empty-state" th:if="${#lists.isEmpty(sessions)}" th:text="#{chat.no_history}">No chat history yet.</p>
+        <div class="session-list" th:if="${!#lists.isEmpty(sessions)}">
+            <article class="session-item" th:each="item : ${sessions}" th:classappend="${item.active} ? 'active'">
+                <form th:action="@{/web/chat/sessions/{id}(id=${item.id})}" method="post">
+                    <button type="submit">
+                        <strong th:text="${item.title == null || item.title.isBlank()} ? #{chat.new_chat} : ${item.title}">New Chat</strong>
+                        <span th:text="${item.mode} + ' · ' + ${item.messageCount} + ' messages'">chat</span>
+                    </button>
+                </form>
+                <form th:action="@{/web/chat/sessions/{id}/delete(id=${item.id})}" method="post"
+                      th:attr="data-confirm=#{chat.delete.confirm}">
+                    <button class="session-delete" type="submit" th:title="#{chat.delete}" aria-label="delete">×</button>
+                </form>
+            </article>
+        </div>
+    </aside>
 </main>
+<script th:inline="javascript">
+  window.WEB_I18N = {
+    placeholder: /*[[#{chat.placeholder}]]*/ "Chat with Yui...",
+    loading: /*[[#{common.loading}]]*/ "Loading...",
+    send: /*[[#{chat.send}]]*/ "Send",
+    welcome: /*[[#{chat.welcome(${username})}]]*/ "Hello!",
+    mic: /*[[#{chat.mic}]]*/ "Hold to speak",
+    recording: /*[[#{chat.recording}]]*/ "Recording...",
+    transcribing: /*[[#{chat.transcribing}]]*/ "Transcribing...",
+    tooShort: /*[[#{chat.too_short}]]*/ "Too short",
+    asrFailed: /*[[#{chat.asr_failed}]]*/ "Didn't catch that",
+    unavailable: /*[[#{chat.unavailable}]]*/ "Yui is temporarily unavailable. Please try again.",
+    networkError: /*[[#{chat.network_error}]]*/ "Network error. Please try again.",
+    error: /*[[#{chat.error}]]*/ "Something went wrong.",
+    intentOpen: /*[[#{chat.intent.open}]]*/ "Yui suggested opening:",
+    ttsOn: /*[[#{chat.tts_on}]]*/ "Voice on",
+    ttsOff: /*[[#{chat.tts_off}]]*/ "Voice off"
+  };
+</script>
 </body>
 </html>

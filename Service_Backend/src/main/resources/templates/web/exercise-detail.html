@@ -1,0 +1,67 @@
+<!-- Author: Guo Jiali, Xia Zihang -->
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Record Your Wellness - Exercise Detail</title>
+    <link rel="stylesheet" th:href="@{/web/css/style.css}">
+    <script defer th:src="@{/web/js/app.js}"></script>
+</head>
+<body>
+<header th:replace="web/fragments/chrome :: topbar(${activePage})"></header>
+
+<main class="page">
+    <div class="detail-topbar">
+        <a class="back-link" th:href="@{/web/dashboard}" th:text="#{common.back}">Back</a>
+        <h1 th:text="#{records.exercise}">Exercise</h1>
+        <a class="button secondary compact" th:href="@{/web/records/manage/exercise}" th:text="#{records.edit}">Edit</a>
+    </div>
+
+    <div class="alert success" th:if="${success}" th:text="${success}"></div>
+
+    <section class="stats-row two">
+        <article class="stat-card">
+            <strong class="green" th:text="${#numbers.formatDecimal(detail.avgExercise,1,0)}">--</strong>
+            <span th:text="#{detail.avg_min_per_day}">Avg min/day</span>
+        </article>
+        <article class="stat-card">
+            <strong th:text="${detail.activeDays}">--</strong>
+            <span th:text="#{detail.active_days}">Active days</span>
+        </article>
+    </section>
+
+    <div class="week-nav">
+        <a class="week-arrow" th:href="@{/web/exercise-detail(week=${prevWeek})}" th:if="${!prevDisabled}">‹</a>
+        <span class="week-arrow disabled" th:if="${prevDisabled}">‹</span>
+        <strong th:text="${detail.weekLabel}">Week</strong>
+        <a class="week-arrow" th:href="@{/web/exercise-detail(week=${nextWeek})}" th:if="${!nextDisabled}">›</a>
+        <span class="week-arrow disabled" th:if="${nextDisabled}">›</span>
+    </div>
+
+    <section class="chart-panel">
+        <div class="section-header">
+            <h2 th:text="#{records.exercise}">Exercise Minutes</h2>
+        </div>
+        <div class="bar-chart" th:attr="data-series=${#strings.listJoin(detail.exerciseSeries, ',')},data-labels=${#strings.listJoin(detail.dayLabels, ',')},data-max='90',data-target='30',data-kind='exercise'"></div>
+    </section>
+
+    <section class="chart-panel">
+        <div class="section-header">
+            <h2 th:text="#{records.exercise}">Activity Breakdown</h2>
+            <span th:text="#{dash.this_week}">This Week</span>
+        </div>
+        <p class="empty-state" th:if="${#maps.isEmpty(detail.exerciseBreakdown)}" th:text="#{records.empty}">No activity data</p>
+        <div class="breakdown-list" th:if="${!#maps.isEmpty(detail.exerciseBreakdown)}">
+            <div class="breakdown-row" th:each="entry : ${detail.exerciseBreakdown}">
+                <span th:text="${entry.key}">Running</span>
+                <div class="breakdown-track">
+                    <i th:style="'width:' + ${entry.value > 120 ? 100 : entry.value * 100 / 120} + '%'"></i>
+                </div>
+                <strong th:text="${entry.value} + ' min'">30 min</strong>
+            </div>
+        </div>
+    </section>
+</main>
+</body>
+</html>

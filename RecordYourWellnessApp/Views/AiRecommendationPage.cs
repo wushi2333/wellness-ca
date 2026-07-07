@@ -1,3 +1,4 @@
+// Author: Cai Peilin, Xia Zihang
 using static RecordYourWellnessApp.Views.LoginForm;
 using RecordYourWellnessApp.Models;
 using RecordYourWellnessApp.Services;

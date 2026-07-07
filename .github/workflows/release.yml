@@ -1,4 +1,4 @@
-name: Build & Release APK
+name: Build & Release APK + WinForm EXE
 
 on:
   push:
@@ -8,12 +8,13 @@ permissions:
   contents: write
 
 jobs:
-  build-and-release:
+  release:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # ======================== Android APK ========================
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -45,10 +46,31 @@ jobs:
             echo "Could not extract SHA-1 (APK is signed, just can't read it here)"
           fi
 
+      # ======================== WinForm EXE ========================
+      - name: Set up .NET 10 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+          dotnet-quality: 'preview'
+
+      - name: Build WinForm release EXE (self-contained single-file)
+        working-directory: RecordYourWellnessApp
+        run: |
+          dotnet publish -c Release -p:PublishProfile=win-x64 -o publish
+          ls -la publish/
+
+      - name: Package EXE as zip
+        run: |
+          cd RecordYourWellnessApp/publish
+          zip -j ../../RecordYourWellnessApp-win-x64.zip RecordYourWellnessApp.exe
+
+      # ======================== Release ========================
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ github.run_number }}
           name: Release v${{ github.run_number }}
-          files: CA_Application/app/build/outputs/apk/debug/app-debug.apk
+          files: |
+            CA_Application/app/build/outputs/apk/debug/app-debug.apk
+            RecordYourWellnessApp-win-x64.zip
           generate_release_notes: true

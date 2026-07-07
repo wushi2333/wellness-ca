@@ -22,4 +22,17 @@ public class SleepRecordRequest {
 
     @Size(max = 1000)
     public String notes = "";
+
+    public Double getSleepHours() { return sleepHours; }
+    public void setSleepHours(Double v) { sleepHours = v; }
+    public String getSleepTime() { return sleepTime; }
+    public void setSleepTime(String v) { sleepTime = v; }
+    public String getWakeTime() { return wakeTime; }
+    public void setWakeTime(String v) { wakeTime = v; }
+    public Integer getMoodScore() { return moodScore; }
+    public void setMoodScore(Integer v) { moodScore = v; }
+    public String getRecordDate() { return recordDate; }
+    public void setRecordDate(String v) { recordDate = v; }
+    public String getNotes() { return notes; }
+    public void setNotes(String v) { notes = v; }
 }

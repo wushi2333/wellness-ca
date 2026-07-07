@@ -1,0 +1,38 @@
+<!-- Author: Xia Zihang -->
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Record Your Wellness - Choose Username</title>
+    <link rel="stylesheet" th:href="@{/web/css/style.css}">
+    <script defer th:src="@{/web/js/app.js}"></script>
+</head>
+<body class="auth-page">
+<main class="auth-shell">
+    <section class="auth-panel">
+        <div class="auth-brand">
+            <span class="brand-mark">W</span>
+            <div>
+                <p class="eyebrow" th:text="#{app.name}">Record Your Wellness</p>
+                <h1 th:text="#{google.new_user.title}">Choose Username</h1>
+            </div>
+        </div>
+
+        <div class="alert error" th:if="${error}" th:text="${error}"></div>
+
+        <p class="muted" th:text="#{google.new_user.message(${googleEmail})}">
+            Create a new account with this Google email?
+        </p>
+
+        <form class="form-stack" th:action="@{/web/google-username}" method="post">
+            <label for="username" th:text="#{auth.username}">Username</label>
+            <input id="username" name="username" type="text" autocomplete="username"
+                   th:value="${suggestedUsername}" required>
+            <button class="button primary" type="submit" th:text="#{google.new_user.confirm}">Create Account</button>
+        </form>
+        <a class="button secondary" th:href="@{/web/login}" th:text="#{google.conflict.cancel}">Go Back</a>
+    </section>
+</main>
+</body>
+</html>

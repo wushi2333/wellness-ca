@@ -43,6 +43,8 @@ wellness-ca/
 │       ├── rag/                   RAG (ChromaDB, FastAPI :8001)
 │       └── agent/                 Agentic AI (DeepSeek, FastAPI :8002)
 
+├── RecordYourWellnessApp/         ← .NET 10 WinForms desktop port (same backend/API)
+
 └── docs/
     └── api-reference.pdf          Backend API reference
 ```
@@ -76,13 +78,39 @@ git clone https://github.com/wushi2333/wellness-ca.git
 
 ### Backend
 
+The backend is built **on the server**. Package the source, upload, build, 
+and restart the systemd service:
+
 ```bash
+# From the dev machine
 cd Service_Backend
-mvn package -DskipTests
-java -jar target/wellness-backend-1.0.jar
+tar czf /tmp/sb_src.tgz -C . src pom.xml
+scp /tmp/sb_src.tgz root@152.42.181.66:/tmp/
+
+# On the server
+cd /home/wellness-dev/wellness-backend
+rm -rf src && tar xzf /tmp/sb_src.tgz
+mvn -q package -DskipTests
+systemctl restart wellness-backend   # ~80s cold start (Hibernate DDL + pool warmup)
 ```
 
-Requires: `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `JWT_SECRET_KEY`, `DEEPSEEK_API_KEY`, `API_GATEWAY_TOKEN`.
+Runtime env vars (set in the `wellness-backend.service` unit): `DB_HOST`, `DB_PORT`,
+`DB_USER`, `DB_PASSWORD`, `DB_NAME`, `JWT_SECRET_KEY`, `DEEPSEEK_API_KEY`,
+`API_GATEWAY_TOKEN`, `VOLCANO_TTS_APPID/TOKEN/SPEAKER`.
+
+> **Note:** the backend listens on **HTTP :8000** (for curl/API clients) **and**
+> **HTTPS :8443** (self-signed cert, for browsers — required for microphone/ASR and
+> Google OAuth). Browsers should use `https://152.42.181.66:8443`.
+
+### Web UI
+
+Open `https://152.42.181.66:8443/web/login` in a browser (accept the self-signed cert
+warning once). The Python sidecars must be running for agent chat and recommendations:
+
+```bash
+# On the server (already set up as systemd units: agent-sidecar, rag-sidecar)
+systemctl status agent-sidecar rag-sidecar   # :8002 agent, :8001 RAG
+```
 
 ## API Endpoints
 
@@ -91,7 +119,9 @@ Requires: `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `JWT_SECRET
 |--------|------|-------------|
 | POST | /register | Register |
 | POST | /login | Login (JWT) |
-| POST | /auth/google | Google OAuth |
+| POST | /auth/google | Google OAuth (authCode or idToken) |
+| GET | /web/auth/google | Web: start Google OAuth redirect |
+| GET | /web/auth/google/callback | Web: Google OAuth callback |
 
 ### Wellness Records (Split)
 | Method | Path | Description |
@@ -126,19 +156,26 @@ Requires: `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `JWT_SECRET
 
 ```
 Android App ──HTTP──→ Spring Boot :8000 ──→ Aiven MySQL (cloud)
-       │                   │
+       │                   │  :8443 (HTTPS, self-signed)
        │        ┌──────────┼────────────┐
        │        ▼          ▼            ▼
        │   DeepSeek API  RAG :8001  Agent :8002
        │                (ChromaDB)  (function-calling)
        │
-Web Browser ──HTTP──→ Spring Boot :8000 (Thymeleaf pages)
+Web Browser ──HTTPS:8443──→ Spring Boot (Thymeleaf + Turbo)
+       │                       │
+       │  Live2D (Cubism 4) rendered client-side via PixiJS
+       │  ASR/TTS proxied through /web/chat/{asr,tts} (session auth)
+       │
+WinForm (RecordYourWellnessApp) ──HTTP:8000──→ same backend (REST + JWT)
 ```
 
 - **DeepSeek API Key** stored only on server
 - **Aiven MySQL** accessed only through backend — never from mobile
 - **JWT** on all protected API endpoints; **X-API-Token** gateway guard
-- **Web UI** uses HttpSession-based auth (bypasses JWT)
+- **Web UI** uses HttpSession-based auth (bypasses JWT); **HTTPS :8443** required for microphone (ASR) and Google OAuth
+- **Live2D** runs entirely in the browser (Cubism Core + PixiJS) — server only serves the ~23MB model assets
+- **Agent navigation intent** (`navigate`/`create_record`) is a shared contract across Android, Web, and WinForm — only the target→URL mapping is web-specific
 - JSON uses **camelCase** (Spring Boot default)
 
 ## Features
@@ -158,11 +195,27 @@ Web Browser ──HTTP──→ Spring Boot :8000 (Thymeleaf pages)
 | Chinese / English | Full i18n via SharedPreferences, all UI and charts localized |
 | Session Management | Multi-select delete, lazy session creation |
 
+### Web UI (`Service_Backend` — Thymeleaf + Turbo Drive)
+| Feature | Description |
+|---|---|
+| Pages | Login, Register, Dashboard, Records, Sleep/Exercise forms & detail, Chat, Insights + history, Profile, Settings, Change password, Google OAuth resolve/username |
+| Global i18n | Full Chinese/English toggle via `web-messages_*.properties` (Spring `MessageSource` + session locale); brand name stays English |
+| Turbo Drive | SPA-like navigation without full reloads; `data-turbo-permanent` ambient layer & companion persist across pages |
+| Visual polish | Macaron gradient background, mouse-follow glow (behind cards), click ripples, lightweight page-transition fade |
+| Yui Chat (Live2D) | YouXiaoMiao model (Cubism 4) in a fixed upper-body stage; head sway, irregular blink, breath, drag-follow, tap-for-expression (blackFace/tears/cry), 5s auto-recover — ported 1:1 from Android |
+| Chat ASR/TTS | Hold-to-record mic (AudioWorklet 16kHz PCM → `/web/chat/asr`); reply auto-spoken via `/web/chat/tts` (Volcano) with TTS on/off toggle; lip-sync hook (`window.WEB_TTS_LEVEL`) drives Live2D mouth |
+| Instant send | Optimistic user bubble + typing spinner; fetch-based (no page reload) so the Live2D canvas survives |
+| Collapsible rail | Chat history sidebar collapses; main area expands; state persisted |
+| Agent titles | Chat header shows the LLM-generated short title (not `Session #id`) |
+| Floating companion | Draggable Yui orb on non-chat pages; head tracks mouse; click opens an agent popup that can navigate (`navigate` intent → `/web/sleep-detail` etc., shared contract with Android/WinForm) |
+| Google OAuth | `Sign in with Google` on login/register → `/web/auth/google` → callback handles direct-login / email-conflict / new-user-username branches |
+| Week navigation | Circular primary-colored prev/next arrows with disabled states (no older data / already latest week) |
+
 ## Authors
 
 | Module | Author |
 |--------|:--:|
-| Spring Boot backend (base) + Character system | Xia Zihang |
+| Spring Boot backend (base) + Character system + Google OAuth | Xia Zihang |
 | Backend DB/JWT hardening + wellness records | Yutong Luo |
 | RAG chatbot + ChromaDB | Huang Qianer |
 | Agentic AI recommendation | Cai Peilin |

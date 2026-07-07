@@ -1,3 +1,4 @@
+// Author: Wang Songyu, Xia Zihang
 using System.Drawing.Drawing2D;
 using static RecordYourWellnessApp.Views.LoginForm;
 using RecordYourWellnessApp.ViewModels;

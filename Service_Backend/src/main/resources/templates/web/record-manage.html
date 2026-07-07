@@ -1,0 +1,57 @@
+<!-- Author: Guo Jiali, Xia Zihang -->
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Record Your Wellness - Manage Records</title>
+    <link rel="stylesheet" th:href="@{/web/css/style.css}">
+    <script defer th:src="@{/web/js/app.js}"></script>
+</head>
+<body>
+<header th:replace="web/fragments/chrome :: topbar(${activePage})"></header>
+
+<main class="page">
+    <div class="detail-topbar">
+        <a class="back-link" th:href="@{/web/records}" th:text="#{common.back}">Back</a>
+        <h1 th:text="${type == 'sleep'} ? #{manage.sleep_title} : #{manage.exercise_title}">Records</h1>
+        <a class="button primary compact" th:if="${type == 'sleep'}" th:href="@{/web/records/sleep/new}" th:text="#{dash.new_record}">Add</a>
+        <a class="button primary compact" th:if="${type == 'exercise'}" th:href="@{/web/records/exercise/new}" th:text="#{dash.new_record}">Add</a>
+    </div>
+
+    <div class="alert success" th:if="${success}" th:text="${success}"></div>
+    <div class="alert error" th:if="${error}" th:text="${error}"></div>
+
+    <p class="empty-state" th:if="${#lists.isEmpty(sections)}" th:text="#{records.empty}">No records yet.</p>
+    <section class="manage-list" th:if="${!#lists.isEmpty(sections)}">
+        <div th:each="section : ${sections}">
+            <p class="date-label" th:text="${section.label}">Week</p>
+            <article class="record-row" th:each="item : ${section.items}">
+                <div class="record-main">
+                    <strong th:text="${item.date}">2026-07-02</strong>
+                    <span th:text="${item.primary}">Primary</span>
+                    <span th:text="${item.secondary}">Secondary</span>
+                    <small th:if="${item.notes != null && !item.notes.isBlank()}" th:text="${item.notes}">Notes</small>
+                </div>
+                <div class="row-actions">
+                    <a class="button secondary small" th:if="${type == 'sleep'}"
+                       th:href="@{/web/records/sleep/{id}/edit(id=${item.id})}" th:text="#{records.edit}">Edit</a>
+                    <a class="button secondary small" th:if="${type == 'exercise'}"
+                       th:href="@{/web/records/exercise/{id}/edit(id=${item.id})}" th:text="#{records.edit}">Edit</a>
+                    <form th:if="${type == 'sleep'}"
+                          th:action="@{/web/records/sleep/{id}/delete(id=${item.id})}" method="post"
+                          th:attr="data-confirm=#{records.confirm_delete}">
+                        <button class="button danger small" type="submit" th:text="#{records.delete}">Delete</button>
+                    </form>
+                    <form th:if="${type == 'exercise'}"
+                          th:action="@{/web/records/exercise/{id}/delete(id=${item.id})}" method="post"
+                          th:attr="data-confirm=#{records.confirm_delete}">
+                        <button class="button danger small" type="submit" th:text="#{records.delete}">Delete</button>
+                    </form>
+                </div>
+            </article>
+        </div>
+    </section>
+</main>
+</body>
+</html>

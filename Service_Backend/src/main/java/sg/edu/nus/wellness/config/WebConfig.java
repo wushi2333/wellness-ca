@@ -1,3 +1,4 @@
+// Author: Xia Zihang
 package sg.edu.nus.wellness.config;
 
 import org.springframework.beans.factory.annotation.Value;

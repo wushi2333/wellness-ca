@@ -1,0 +1,30 @@
+<!-- Author: Guo Jiali, Xia Zihang -->
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Record Your Wellness - New Record</title>
+    <link rel="stylesheet" th:href="@{/web/css/style.css}">
+    <script defer th:src="@{/web/js/app.js}"></script>
+</head>
+<body>
+<header th:replace="web/fragments/chrome :: topbar(${activePage})"></header>
+
+<main class="page add-choice-page">
+    <h1 th:text="#{rec.new.title}">New Record</h1>
+    <section class="add-choice-grid">
+        <a class="add-choice-card sleep-card" th:href="@{/web/records/sleep/new}">
+            <span class="choice-icon" th:text="#{records.sleep}">Sleep</span>
+            <strong th:text="#{rec.add_sleep}">Add Sleep</strong>
+            <small th:text="#{rec.add_sleep.copy}">Bedtime · Wake time · Mood</small>
+        </a>
+        <a class="add-choice-card exercise-card" th:href="@{/web/records/exercise/new}">
+            <span class="choice-icon wide" th:text="#{records.exercise}">Exercise</span>
+            <strong th:text="#{rec.add_exercise}">Add Exercise</strong>
+            <small th:text="#{rec.add_exercise.copy}">Type · Duration · Notes</small>
+        </a>
+    </section>
+</main>
+</body>
+</html>

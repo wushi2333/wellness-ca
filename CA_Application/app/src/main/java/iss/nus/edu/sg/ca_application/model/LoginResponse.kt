@@ -1,3 +1,4 @@
+// Author: Liu Yu, Xia Zihang
 package iss.nus.edu.sg.ca_application.model
 
 // Author: Yutong Luo, Liu Yu

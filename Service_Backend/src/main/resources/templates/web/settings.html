@@ -1,0 +1,73 @@
+<!-- Author: Guo Jiali, Xia Zihang -->
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Record Your Wellness - Settings</title>
+    <link rel="stylesheet" th:href="@{/web/css/style.css}">
+    <script defer th:src="@{/web/js/app.js}"></script>
+</head>
+<body>
+<header th:replace="web/fragments/chrome :: topbar(${activePage})"></header>
+
+<main class="page narrow">
+    <div class="page-header">
+        <div>
+            <p class="eyebrow" th:text="#{settings.account}">Account</p>
+            <h1 th:text="#{settings.title}">Settings</h1>
+        </div>
+    </div>
+
+    <div class="alert success" th:if="${success}" th:text="${success}"></div>
+    <div class="alert error" th:if="${error}" th:text="${error}"></div>
+
+    <section class="settings-list">
+        <a class="settings-row" th:href="@{/web/profile}">
+            <div>
+                <strong th:text="#{settings.profile}">Profile</strong>
+                <span th:text="${profile.email != null ? profile.email : profile.username}">Profile</span>
+            </div>
+            <span>→</span>
+        </a>
+
+        <form class="settings-row language-row" th:action="@{/web/settings/language}" method="post">
+            <div>
+                <strong th:text="#{settings.language}">Language</strong>
+                <span th:text="#{insights.subtitle}">Choose recommendation language</span>
+            </div>
+            <select name="language" onchange="this.form.submit()">
+                <option value="en" th:selected="${language == 'en'}">English</option>
+                <option value="zh" th:selected="${language == 'zh'}">中文</option>
+            </select>
+        </form>
+
+        <a class="settings-row" th:href="@{/web/change-password}">
+            <div>
+                <strong th:text="#{settings.change_password}">Change Password</strong>
+                <span th:text="#{cp.google_no_password}">Available for local accounts</span>
+            </div>
+            <span>→</span>
+        </a>
+
+        <form class="settings-row" th:action="@{/web/logout}" method="post">
+            <div>
+                <strong th:text="#{action.logout}">Logout</strong>
+                <span>End current web session</span>
+            </div>
+            <button class="button secondary small" type="submit" th:text="#{action.logout}">Logout</button>
+        </form>
+    </section>
+
+    <section class="danger-zone panel">
+        <h2 th:text="#{settings.delete_account}">Delete Account</h2>
+        <p class="muted" th:text="#{settings.delete_account.desc}">This removes your account, records, chat history, recommendations, and avatar.</p>
+        <form class="form-stack" th:action="@{/web/account/delete}" method="post" th:attr="data-confirm=#{settings.delete_confirm}">
+            <label for="confirmDelete" th:text="#{settings.delete_confirm}">Type DELETE to confirm</label>
+            <input id="confirmDelete" name="confirm" type="text" autocomplete="off">
+            <button class="button danger" type="submit" th:text="#{settings.delete_account}">Delete Account</button>
+        </form>
+    </section>
+</main>
+</body>
+</html>

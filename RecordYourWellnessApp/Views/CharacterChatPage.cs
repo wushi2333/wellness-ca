@@ -1,3 +1,4 @@
+// Author: Huang Qianer, Xia Zihang
 using System.Drawing.Drawing2D;
 using RecordYourWellnessApp.ViewModels;
 using RecordYourWellnessApp.Services;

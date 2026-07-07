@@ -1,43 +1,46 @@
-<!-- Author: Guo Jiali -->
+<!-- Author: Guo Jiali, Xia Zihang -->
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wellness AI - Recommendation History</title>
+    <title>Record Your Wellness - Recommendation History</title>
     <link rel="stylesheet" th:href="@{/web/css/style.css}">
+    <script defer th:src="@{/web/js/app.js}"></script>
 </head>
 <body>
-<header class="topbar">
-    <a class="brand" th:href="@{/web/dashboard}">Wellness AI</a>
-    <nav class="nav">
-        <a th:href="@{/web/records}">Records</a>
-        <a th:href="@{/web/chat}">Chat</a>
-        <a th:href="@{/web/insights}" class="active">Insights</a>
-    </nav>
-    <form th:action="@{/web/logout}" method="post">
-        <button class="link-button" type="submit">Logout</button>
-    </form>
-</header>
+<header th:replace="web/fragments/chrome :: topbar(${activePage})"></header>
 
 <main class="page">
     <div class="page-header">
         <div>
-            <p class="eyebrow">Wellness Insights</p>
-            <h1>Past Recommendations</h1>
+            <p class="eyebrow" th:text="#{insights.title}">Wellness Insights</p>
+            <h1 th:text="#{insights.history_title}">Past Recommendations</h1>
         </div>
-        <a class="button secondary compact" th:href="@{/web/insights}">Back</a>
+        <a class="button secondary compact" th:href="@{/web/insights}" th:text="#{common.back}">Back</a>
     </div>
 
-    <p class="empty-state" th:if="${#lists.isEmpty(items)}">No recommendations yet. Generate your first one.</p>
+    <div class="alert success" th:if="${success}" th:text="${success}"></div>
+    <div class="alert error" th:if="${error}" th:text="${error}"></div>
+
+    <p class="empty-state" th:if="${#lists.isEmpty(items)}" th:text="#{insights.history_empty}">No recommendations yet.</p>
 
     <section class="history-list" th:if="${!#lists.isEmpty(items)}">
         <article class="history-item" th:each="item : ${items}">
-            <span class="muted" th:text="${item.createdAt}">2026-07-02T10:00</span>
+            <div class="history-heading">
+                <span class="muted" th:text="${item.createdAt}">2026-07-02T10:00</span>
+                <form th:action="@{/web/insights/history/{id}/delete(id=${item.id})}" method="post"
+                      th:attr="data-confirm=#{records.confirm_delete}">
+                    <button class="delete-text" type="submit" th:text="#{records.delete}">Delete</button>
+                </form>
+            </div>
             <p th:text="${item.content}">Recommendation content</p>
-            <details th:if="${item.evidence != null}">
-                <summary>How AI arrived at this</summary>
-                <pre th:text="${item.evidence}">Evidence</pre>
+            <details th:if="${!#lists.isEmpty(item.evidence)}">
+                <summary th:text="#{insights.evidence_section}">How AI arrived at this</summary>
+                <ol>
+                    <li th:each="e : ${item.evidence}" th:text="${e['summary'] != null ? e['summary'] : e}">Evidence</li>
+                </ol>
+                <p class="muted" th:text="'Iterations: ' + ${item.iterations}">Iterations</p>
             </details>
         </article>
     </section>

@@ -1,3 +1,4 @@
+// Author: Xia Zihang
 using System.Text.Json.Serialization;
 
 namespace RecordYourWellnessApp.Models;

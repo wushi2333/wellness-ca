@@ -1,0 +1,18 @@
+<!-- Author: Xia Zihang -->
+<!-- Shared page chrome: brand + nav + logout. activePage drives the highlighted tab. -->
+<header class="topbar" th:fragment="topbar(activePage)">
+    <a class="brand" th:href="@{/web/dashboard}">
+        <span class="brand-mark small">W</span>
+        <span th:text="#{app.name}">Record Your Wellness</span>
+    </a>
+    <nav class="nav">
+        <a th:href="@{/web/dashboard}" th:classappend="${activePage == 'dashboard'} ? 'active'" th:text="#{nav.dashboard}">Dashboard</a>
+        <a th:href="@{/web/records}" th:classappend="${activePage == 'records'} ? 'active'" th:text="#{nav.records}">Records</a>
+        <a th:href="@{/web/chat}" th:classappend="${activePage == 'chat'} ? 'active'" th:text="#{nav.chat}">Chat</a>
+        <a th:href="@{/web/insights}" th:classappend="${activePage == 'insights'} ? 'active'" th:text="#{nav.insights}">Insights</a>
+        <a th:href="@{/web/settings}" th:classappend="${activePage == 'settings'} ? 'active'" th:text="#{nav.settings}">Settings</a>
+    </nav>
+    <form th:action="@{/web/logout}" method="post">
+        <button class="icon-button" type="submit" th:title="#{action.logout}" th:text="#{action.logout}">Logout</button>
+    </form>
+</header>

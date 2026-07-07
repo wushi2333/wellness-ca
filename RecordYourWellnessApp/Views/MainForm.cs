@@ -1,3 +1,4 @@
+// Author: Wang Songyu, Liu Yu, Huang Qianer, Xia Zihang
 using Microsoft.Extensions.DependencyInjection;
 using RecordYourWellnessApp.Services;
 using RecordYourWellnessApp.ViewModels;

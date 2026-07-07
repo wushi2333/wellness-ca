@@ -16,4 +16,13 @@ public class ExerciseRecordRequest {
 
     @Size(max = 1000)
     public String notes = "";
+
+    public String getExerciseActivity() { return exerciseActivity; }
+    public void setExerciseActivity(String v) { exerciseActivity = v; }
+    public Integer getExerciseDuration() { return exerciseDuration; }
+    public void setExerciseDuration(Integer v) { exerciseDuration = v; }
+    public String getRecordDate() { return recordDate; }
+    public void setRecordDate(String v) { recordDate = v; }
+    public String getNotes() { return notes; }
+    public void setNotes(String v) { notes = v; }
 }
