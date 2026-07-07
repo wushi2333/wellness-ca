@@ -55,7 +55,10 @@ jobs:
         working-directory: RecordYourWellnessApp
         run: >
           dotnet publish -c Release
-          -p:PublishProfile=win-x64
+          -r win-x64
+          --self-contained true
+          -p:PublishSingleFile=true
+          -p:IncludeNativeLibrariesForSelfExtract=true
           -o publish
 
       - name: List publish output
