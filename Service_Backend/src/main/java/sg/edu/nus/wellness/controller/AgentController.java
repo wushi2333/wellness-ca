@@ -64,7 +64,7 @@ public class AgentController {
     public ResponseEntity<?> history(HttpServletRequest req) {
         Long userId = (Long) req.getAttribute("userId");
         if (userId == null) return ResponseEntity.status(401).body(Map.of("detail","Unauthorized"));
-        var recs = recRepo.findTop10ByUserIdOrderByCreatedAtDesc(userId);
+        var recs = recRepo.findByUserIdOrderByCreatedAtDesc(userId);
         var result = recs.stream().map(r -> Map.of(
             "id", r.getId(),
             "content", r.getContent(),
