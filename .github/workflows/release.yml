@@ -8,18 +8,18 @@ permissions:
   contents: write
 
 jobs:
-  release:
+  # ======================== Android APK ========================
+  build-apk:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # ======================== Android APK ========================
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
-          distribution: 'temurin'
+          java-version: "17"
+          distribution: temurin
 
       - name: Restore debug keystore
         env:
@@ -27,54 +27,73 @@ jobs:
         run: |
           mkdir -p ~/.android
           echo "$KEYSTORE_BASE64" | base64 -d > ~/.android/debug.keystore
-          echo "Keystore file size: $(wc -c < ~/.android/debug.keystore) bytes"
-          echo "SHA-1 fingerprint:"
-          keytool -list -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey 2>/dev/null | grep -E "SHA1|SHA256" || echo "WARNING: Could not read SHA-1 — secret may be missing or invalid!"
 
       - name: Build debug APK
         working-directory: CA_Application
         run: ./gradlew assembleDebug
 
-      - name: Verify APK signature SHA-1
-        run: |
-          APK="CA_Application/app/build/outputs/apk/debug/app-debug.apk"
-          if [ -f "$APK" ]; then
-            echo "APK signing cert SHA-1:"
-            unzip -p "$APK" META-INF/CERT.RSA 2>/dev/null | keytool -printcert 2>/dev/null | grep SHA1 || \
-            unzip -p "$APK" META-INF/ANDROIDD.RSA 2>/dev/null | keytool -printcert 2>/dev/null | grep SHA1 || \
-            echo "Trying jarsigner..." && jarsigner -verify -verbose -certs "$APK" 2>/dev/null | head -20 || \
-            echo "Could not extract SHA-1 (APK is signed, just can't read it here)"
-          fi
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: CA_Application/app/build/outputs/apk/debug/app-debug.apk
 
-      # ======================== WinForm EXE ========================
+  # ======================== WinForm EXE ========================
+  build-exe:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Set up .NET 10 SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '10.0.x'
-          dotnet-quality: 'preview'
+          dotnet-version: "10.0.x"
+          dotnet-quality: preview
 
-      - name: Build WinForm release EXE (self-contained single-file)
+      - name: Build WinForm EXE (self-contained single-file)
         working-directory: RecordYourWellnessApp
-        run: |
-          dotnet publish -c Release -p:PublishProfile=win-x64 -p:EnableWindowsTargeting=true -o publish
-          ls -la publish/
+        run: >
+          dotnet publish -c Release
+          -p:PublishProfile=win-x64
+          -o publish
+
+      - name: List publish output
+        run: Get-ChildItem RecordYourWellnessApp\publish\ | Select-Object Name, Length
 
       - name: Package EXE as zip
-        run: |
-          cd RecordYourWellnessApp/publish
-          ls -la
-          BIN=$(find . -maxdepth 1 -type f -name "RecordYourWellnessApp*" ! -name "*.pdb" | head -1)
-          if [ -z "$BIN" ]; then echo "No binary found!"; find . -type f; exit 1; fi
-          echo "Packaging: $BIN"
-          zip -j ../../RecordYourWellnessApp-win-x64.zip "$BIN"
+        run: >
+          Compress-Archive
+          -Path RecordYourWellnessApp\publish\RecordYourWellnessApp.exe
+          -DestinationPath RecordYourWellnessApp-win-x64.zip
 
-      # ======================== Release ========================
+      - name: Upload EXE artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: winform-exe
+          path: RecordYourWellnessApp-win-x64.zip
+
+  # ======================== Release ========================
+  release:
+    needs: [build-apk, build-exe]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download APK artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: android-apk
+
+      - name: Download EXE artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: winform-exe
+
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ github.run_number }}
           name: Release v${{ github.run_number }}
           files: |
-            CA_Application/app/build/outputs/apk/debug/app-debug.apk
-            RecordYourWellnessApp-win-x64.zip
+            *.apk
+            *.zip
           generate_release_notes: true
