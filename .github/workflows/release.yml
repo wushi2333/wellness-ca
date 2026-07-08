@@ -54,7 +54,8 @@ jobs:
       - name: Build WinForm EXE (self-contained single-file)
         working-directory: RecordYourWellnessApp
         run: >
-          dotnet publish -c Release
+          dotnet publish RecordYourWellnessApp.csproj
+          -c Release
           -r win-x64
           --self-contained true
           -p:PublishSingleFile=true
